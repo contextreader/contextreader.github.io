@@ -62,12 +62,33 @@ const styles = `
          (no shadow DOM) and a bare --glass-bg would collide with the site's own. */
       --sr-glass-blur: 55px;                      /* Fibonacci — deeper frost */
       --sr-glass-sat: 180%;
-      /* the readability engine: lift + flatten the backdrop before the scrim */
-      --sr-glass-fx: blur(55px) saturate(180%) brightness(1.14) contrast(0.88);
-      --sr-glass-fx-sm: blur(21px) saturate(180%) brightness(1.12) contrast(0.9);
-      --sr-glass-top: rgba(255,255,255,0.62);     /* scrim gradient: light falls from above */
-      --sr-glass-mid: rgba(255,255,255,0.50);
-      --sr-glass-bot: rgba(255,255,255,0.44);
+      /* ── Liquid Glass ──────────────────────────────────────────────
+         Real glass is barely tinted. What makes it read as glass is the EDGE:
+         a thick band that refracts — blurring, brightening and saturating what
+         passes through it far more than the flat middle does. Two filters, and
+         the DIFFERENCE between them is the refraction.                       */
+      --sr-fx-body: blur(24px) saturate(170%) brightness(1.10) contrast(0.94);
+      --sr-fx-lens: blur(4px) brightness(1.32) saturate(1.75);   /* the edge */
+      --sr-fx-sm:   blur(14px) saturate(170%) brightness(1.10) contrast(0.95);
+      --sr-lens-w: var(--space-lg);                              /* edge thickness */
+
+      /* Specular set: light catching the top edge, bouncing off the bottom,
+         and blooming inward from both. This is the "thickness" of the slab. */
+      --sr-spec:
+        inset 0 1.5px 0 rgba(255,255,255,0.95),
+        inset 0 -1.5px 0 rgba(255,255,255,0.55),
+        inset 1.5px 0 0 rgba(255,255,255,0.45),
+        inset -1.5px 0 0 rgba(255,255,255,0.45),
+        inset 0 16px 26px -16px rgba(255,255,255,0.80),
+        inset 0 -16px 26px -16px rgba(255,255,255,0.45);
+      --sr-spec-sm:
+        inset 0 1.2px 0 rgba(255,255,255,0.95),
+        inset 0 -1.2px 0 rgba(255,255,255,0.5),
+        inset 0 8px 12px -8px rgba(255,255,255,0.75),
+        inset 0 -8px 12px -8px rgba(255,255,255,0.4);
+      --sr-glass-top: rgba(255,255,255,0.38);     /* barely there — see --sr-fx-lens */
+      --sr-glass-mid: rgba(255,255,255,0.26);
+      --sr-glass-bot: rgba(255,255,255,0.30);
       /* accent glass, by role — see the panel comments below */
       --sr-teal-deep: #0e7490;
       --sr-teal-veil: rgba(8,145,178,0.09);
@@ -128,26 +149,43 @@ const styles = `
         background:
           url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/></filter><rect width='140' height='140' filter='url(%23n)' opacity='0.035'/></svg>"),
           linear-gradient(180deg, var(--sr-glass-top) 0%, var(--sr-glass-mid) 46%, var(--sr-glass-bot) 100%);
-        -webkit-backdrop-filter: var(--sr-glass-fx);
-        backdrop-filter: var(--sr-glass-fx);
+        -webkit-backdrop-filter: var(--sr-fx-body);
+        backdrop-filter: var(--sr-fx-body);
         border: none;                                  /* replaced by the ::after rim */
         border-radius: var(--space-xxl);               /* 34px — reference proportion */
 
         box-shadow:
-          0 0 var(--space-2xl) -12px var(--sr-amber-glow),        /* amber ambient bloom */
-          0 var(--space-xl) var(--space-2xl) -8px var(--sr-shadow),
-          0 var(--space-md) var(--space-lg) -6px rgba(17,24,39,0.10),
-          inset 0 1px 0 var(--sr-glass-spec),
-          inset 0 -2px var(--space-lg) -6px rgba(17,24,39,0.10); /* glass has thickness */
+          0 0 var(--space-2xl) -12px var(--sr-amber-glow),
+          0 var(--space-xl) var(--space-2xl) -10px rgba(17,24,39,0.30),
+          0 var(--space-md) var(--space-lg) -8px rgba(17,24,39,0.14),
+          var(--sr-spec);
 
         position: fixed; z-index: 2147483647;
         resize: both; overflow: hidden;
         animation: popIn var(--timing-normal) cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    /* Masked 1px ring: the gradient shows ONLY in the border band, so this never
-       covers .sr-header / .sr-body — no z-index surgery needed. This is the
-       single detail that separates "translucent card" from "liquid glass". */
+    /* ── the lens ────────────────────────────────────────────────────────
+       A band at the edge that filters the backdrop a SECOND time — sharper,
+       brighter, more saturated than the panel's own filter. That differential
+       is refraction: light bending as it passes through the thick rim of a
+       slab. Masked to the band, so the flat middle stays clear and the 21px
+       body padding keeps text well inside it. */
+    #smart-reader-bubble::before {
+        content: ''; position: absolute; inset: 0;
+        border-radius: inherit; padding: var(--sr-lens-w);
+        -webkit-backdrop-filter: var(--sr-fx-lens);
+        backdrop-filter: var(--sr-fx-lens);
+        -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        -webkit-mask-composite: xor;
+        mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        mask-composite: exclude;
+        pointer-events: none; z-index: 1;
+    }
+    /* content rides above the lens */
+    #smart-reader-bubble > * { position: relative; z-index: 2; }
+
+    /* the bright line right at the glass edge, over the lens */
     #smart-reader-bubble::after {
         content: ''; position: absolute; inset: 0;
         border-radius: inherit; padding: 1px;
@@ -171,8 +209,8 @@ const styles = `
     
     .sr-general-card {
         background: linear-gradient(180deg, var(--sr-glass-top) 0%, var(--sr-glass-bot) 100%);
-        -webkit-backdrop-filter: var(--sr-glass-fx-sm);
-        backdrop-filter: var(--sr-glass-fx-sm);
+        -webkit-backdrop-filter: var(--sr-fx-body);
+        backdrop-filter: var(--sr-fx-body);
         border: 1px solid var(--sr-glass-line);
         border-radius: var(--space-xl);
         padding: var(--space-xl);
@@ -331,9 +369,8 @@ const styles = `
     
     .sr-header {
         padding: var(--space-lg) var(--space-xl);
-        background: linear-gradient(180deg, rgba(255,255,255,0.34), rgba(255,255,255,0.04));
-        border-bottom: 1px solid rgba(255,255,255,0.42);
-        box-shadow: 0 1px 0 rgba(17,24,39,0.04);
+        background: linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0));
+        border-bottom: 1px solid rgba(255,255,255,0.35);
         cursor: move; user-select: none; flex-shrink: 0; position: relative;
     }
     
@@ -388,10 +425,10 @@ const styles = `
         position: absolute; top: calc(var(--space-xxl) + var(--space-sm)); right: 0; left: auto;
         width: 208px; max-width: 208px;
         background:
-          linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.80) 100%);
-        -webkit-backdrop-filter: var(--sr-glass-fx-sm);
-        backdrop-filter: var(--sr-glass-fx-sm);
-        border: 1px solid var(--sr-glass-line);
+          linear-gradient(180deg, rgba(255,255,255,0.44) 0%, rgba(255,255,255,0.30) 100%);
+        -webkit-backdrop-filter: var(--sr-fx-body);
+        backdrop-filter: var(--sr-fx-body);
+        border: none;
         border-radius: var(--space-xl);
         box-shadow:
           0 0 var(--space-xxl) -14px var(--sr-amber-glow),
@@ -433,18 +470,37 @@ const styles = `
     .sr-g-item .sr-g-q { flex: 1 1 auto; min-width: 0; font-weight: 500; }
     .sr-g-item .sr-g-q b { font-weight: 700; color: var(--sr-ink); }
 
+    /* ── small-control lens ──────────────────────────────────────────────
+       Chips and pills carry no body text, so they take Liquid Glass neat:
+       almost no tint, and the edge doing all the work. position:relative is
+       required — the ::before is absolutely positioned against it. */
+    .sr-icon-btn, .sr-secondary-btn, .sr-close-btn, .sr-cancel-btn,
+    .sr-view-btn, .sr-delete-btn, .sr-nav-btn { position: relative; }
+    .sr-icon-btn::before, .sr-secondary-btn::before, .sr-close-btn::before,
+    .sr-cancel-btn::before, .sr-view-btn::before, .sr-delete-btn::before,
+    .sr-nav-btn::before {
+        content: ''; position: absolute; inset: 0;
+        border-radius: inherit; padding: var(--space-sm);
+        -webkit-backdrop-filter: var(--sr-fx-lens);
+        backdrop-filter: var(--sr-fx-lens);
+        -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        -webkit-mask-composite: xor;
+        mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        mask-composite: exclude;
+        pointer-events: none;
+    }
+    .sr-secondary-btn > *, .sr-icon-btn > * { position: relative; z-index: 1; }
+
     .sr-icon-btn {
         width: var(--space-xxl); height: var(--space-xxl);   /* 34px, Fibonacci */
         border-radius: 50%;
-        background: var(--sr-gel), var(--sr-glass-soft);
-        -webkit-backdrop-filter: var(--sr-glass-fx-sm);
-        backdrop-filter: var(--sr-glass-fx-sm);
-        border: 1px solid var(--sr-glass-line);
+        background: rgba(255,255,255,0.16);
+        -webkit-backdrop-filter: var(--sr-fx-sm);
+        backdrop-filter: var(--sr-fx-sm);
+        border: none;
         box-shadow:
-          0 1px 3px rgba(17,24,39,0.09),
-          0 var(--space-md) var(--space-xl) -10px rgba(17,24,39,0.3),
-          inset 0 1px 0 var(--sr-glass-spec),
-          inset 0 -1px 2px rgba(17,24,39,0.06);
+          0 var(--space-sm) var(--space-lg) -6px rgba(17,24,39,0.30),
+          var(--sr-spec-sm);
         font-size: 14px; cursor: pointer;
         transition: all var(--timing-fast);
         display: flex; align-items: center; justify-content: center;
@@ -571,12 +627,25 @@ const styles = `
        Simple is green: the approachable register, for a younger reader.
        Gemini emits .sr-general-box / .sr-simple-box and they had no rules at all
        until now; the prompts' inline colours are removed so these win. */
+    .sr-general-box, .sr-simple-box { position: relative; }
+    .sr-general-box::before, .sr-simple-box::before {
+        content: ''; position: absolute; inset: 0;
+        border-radius: inherit; padding: var(--space-md);
+        -webkit-backdrop-filter: var(--sr-fx-lens);
+        backdrop-filter: var(--sr-fx-lens);
+        -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        -webkit-mask-composite: xor;
+        mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        mask-composite: exclude;
+        pointer-events: none;
+    }
+    .sr-general-box > *, .sr-simple-box > * { position: relative; z-index: 1; }
     .sr-general-box, .sr-simple-box {
         padding: var(--space-lg);
         border-radius: var(--space-xl);
         margin-top: var(--space-lg);
-        -webkit-backdrop-filter: var(--sr-glass-fx-sm);
-        backdrop-filter: var(--sr-glass-fx-sm);
+        -webkit-backdrop-filter: var(--sr-fx-body);
+        backdrop-filter: var(--sr-fx-body);
         box-shadow: inset 0 1px 0 rgba(255,255,255,0.85);
         animation: fadeIn var(--timing-normal) both;
     }
@@ -657,31 +726,29 @@ const styles = `
     .sr-secondary-btn {
         display: inline-flex; align-items: center; justify-content: center;
         gap: var(--space-sm);
-        background: var(--sr-gel), var(--sr-glass-soft);
-        -webkit-backdrop-filter: var(--sr-glass-fx-sm);
-        backdrop-filter: var(--sr-glass-fx-sm);
-        border: 1px solid var(--sr-glass-line);
-        color: var(--sr-ink-soft);
+        background: rgba(255,255,255,0.16);
+        -webkit-backdrop-filter: var(--sr-fx-sm);
+        backdrop-filter: var(--sr-fx-sm);
+        border: none;
+        color: var(--sr-ink);
         font-family: 'Inter', system-ui, sans-serif;
-        font-size: 12px;
+        font-size: 12px; font-weight: 600;
         padding: var(--space-md) var(--space-lg);
-        border-radius: 100px;                       /* fully rounded, per reference */
-        cursor: pointer; font-weight: 600;
+        border-radius: 100px;
+        cursor: pointer;
         transition: all var(--timing-fast);
+        text-shadow: 0 1px 0 rgba(255,255,255,0.5);
         box-shadow:
-          0 1px 2px rgba(17,24,39,0.07),
-          0 var(--space-md) var(--space-xl) -10px rgba(17,24,39,0.25),
-          inset 0 1px 0 rgba(255,255,255,0.95),
-          inset 0 -1px 1px rgba(17,24,39,0.05);
+          0 var(--space-sm) var(--space-lg) -6px rgba(17,24,39,0.28),
+          var(--sr-spec-sm);
     }
     .sr-secondary-btn:hover {
-        background: rgba(255,255,255,0.78);
-        border-color: rgba(251,191,36,0.55);
-        color: var(--sr-ink);
+        background: rgba(255,255,255,0.34);
         transform: translateY(-1px);
         box-shadow:
-          0 var(--space-sm) var(--space-lg) -2px rgba(17,24,39,0.12),
-          inset 0 1px 0 rgba(255,255,255,0.95);
+          0 var(--space-md) var(--space-xl) -6px rgba(17,24,39,0.30),
+          0 0 0 1px rgba(251,191,36,0.35),
+          var(--sr-spec-sm);
     }
     .sr-secondary-btn:active { transform: translateY(0); }
     .sr-secondary-btn svg { display: block; flex: 0 0 auto; }
@@ -833,19 +900,18 @@ const styles = `
            and because they depict text, which is dark. */
         background:
           url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Cdefs%3E%3ClinearGradient id='l' x1='3' y1='10' x2='13' y2='13.6' gradientUnits='userSpaceOnUse'%3E%3Cstop offset='0' stop-color='%23FDE68A'/%3E%3Cstop offset='0.4' stop-color='%23F59E0B'/%3E%3Cstop offset='1' stop-color='%23D97706'/%3E%3C/linearGradient%3E%3ClinearGradient id='f' x1='12' y1='4' x2='12' y2='20' gradientUnits='userSpaceOnUse'%3E%3Cstop offset='0' stop-color='%23111827' stop-opacity='0.46'/%3E%3Cstop offset='1' stop-color='%23111827' stop-opacity='0.28'/%3E%3C/linearGradient%3E%3Cfilter id='g' x='-0.7' y='-1.8' width='2.4' height='4.6'%3E%3CfeGaussianBlur stdDeviation='1.4' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Crect x='3.2' y='4.8' width='17.6' height='2.8' rx='1.4' fill='url(%23f)'/%3E%3Crect x='15.4' y='10.6' width='5.4' height='2.8' rx='1.4' fill='url(%23f)'/%3E%3Crect x='3.2' y='16.4' width='13.4' height='2.8' rx='1.4' fill='url(%23f)'/%3E%3Cg filter='url(%23g)'%3E%3Crect x='3.2' y='10.6' width='10.2' height='2.8' rx='1.4' fill='url(%23l)'/%3E%3C/g%3E%3Crect x='4.3' y='11.1' width='8.0' height='0.8' rx='0.4' fill='%23FFFBEB' opacity='0.6'/%3E%3C/svg%3E") no-repeat center / 18px 18px,
-          linear-gradient(180deg, rgba(255,255,255,0.62) 0%, rgba(255,255,255,0.34) 52%, rgba(255,255,255,0.44) 100%);
-        -webkit-backdrop-filter: var(--sr-glass-fx-sm);
-        backdrop-filter: var(--sr-glass-fx-sm);
-        border: 1px solid rgba(255,255,255,0.75);
+          linear-gradient(180deg, rgba(255,255,255,0.30) 0%, rgba(255,255,255,0.10) 52%, rgba(255,255,255,0.20) 100%);
+        -webkit-backdrop-filter: var(--sr-fx-sm);
+        backdrop-filter: var(--sr-fx-sm);
+        border: none;
         border-radius: 50%;
         display: none; align-items: center; justify-content: center;
         cursor: pointer; z-index: 2147483647;
         box-shadow:
           0 0 var(--space-xl) -5px var(--sr-amber-glow),
-          0 var(--space-md) var(--space-xl) -7px rgba(17,24,39,0.35),
-          0 1px 3px rgba(17,24,39,0.18),
-          inset 0 1px 0 rgba(255,255,255,0.95),
-          inset 0 -2px 3px -1px rgba(17,24,39,0.07);
+          0 var(--space-md) var(--space-xl) -7px rgba(17,24,39,0.34),
+          0 1px 3px rgba(17,24,39,0.16),
+          var(--sr-spec-sm);
         transition: transform var(--timing-fast) cubic-bezier(0.16, 1, 0.3, 1),
                     box-shadow var(--timing-fast),
                     background-size var(--timing-normal) cubic-bezier(0.16, 1, 0.3, 1);
@@ -854,16 +920,24 @@ const styles = `
     /* after the background shorthand, which resets background-size. Two layers:
        the mark, then the glass gradient. */
     #smart-reader-trigger { background-size: 18px 18px, auto; }
+    #smart-reader-trigger::before {
+        content: ''; position: absolute; inset: 0;
+        border-radius: 50%; padding: var(--space-sm);
+        -webkit-backdrop-filter: var(--sr-fx-lens);
+        backdrop-filter: var(--sr-fx-lens);
+        -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        -webkit-mask-composite: xor;
+        mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        mask-composite: exclude;
+        pointer-events: none;
+    }
     #smart-reader-trigger:hover {
         transform: scale(1.1);
-        background-color: rgba(255,255,255,0.12);
-        border-color: rgba(255,255,255,0.9);
         box-shadow:
           0 0 var(--space-xxl) -6px rgba(251,191,36,0.5),
           0 var(--space-lg) var(--space-xxl) -8px rgba(17,24,39,0.4),
           0 0 0 3px rgba(251,191,36,0.16),
-          inset 0 1px 0 rgba(255,255,255,1),
-          inset 0 -2px 3px -1px rgba(17,24,39,0.06);
+          var(--sr-spec-sm);
     }
     #smart-reader-trigger:hover { background-size: 19.5px 19.5px, auto; }
     #smart-reader-trigger:active { transform: scale(1.02); }

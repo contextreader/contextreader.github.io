@@ -18,11 +18,12 @@
             --t-fast:0.236s; --t-norm:0.382s;
             --ease:cubic-bezier(0.16,1,0.3,1);
 
-            --glass-top:rgba(255,255,255,0.72);
-            --glass-mid:rgba(255,255,255,0.58);
-            --glass-bot:rgba(255,255,255,0.50);
+            --glass-top:rgba(255,255,255,0.46);
+            --glass-mid:rgba(255,255,255,0.32);
+            --glass-bot:rgba(255,255,255,0.36);
             --glass-line:rgba(255,255,255,0.75);
-            --glass-fx:blur(34px) saturate(180%) brightness(1.1) contrast(0.92);
+            --glass-fx:blur(24px) saturate(170%) brightness(1.10) contrast(0.94);
+            --fx-lens:blur(4px) brightness(1.32) saturate(1.75);
             --gel:linear-gradient(180deg,rgba(255,255,255,0.85) 0%,rgba(255,255,255,0.34) 52%,rgba(255,255,255,0.50) 100%);
             --rim:linear-gradient(140deg,
                     rgba(255,255,255,0.98) 0%,
@@ -77,6 +78,21 @@
               0 var(--space-lg) var(--space-xxl) -12px var(--shadow),
               inset 0 1px 0 rgba(255,255,255,0.95),
               inset 0 -2px var(--space-md) -4px rgba(17,24,39,0.06);
+        }
+        /* ── the lens ────────────────────────────────────────────────
+           A band at the edge filtering the backdrop a SECOND time, sharper and
+           brighter than the card's own filter. That differential is refraction
+           — the thick rim of a glass slab. Here it refracts the page's amber
+           and teal blooms, which is why the field exists. */
+        .card::before{
+            content:''; position:absolute; inset:0;
+            border-radius:inherit; padding:var(--space-lg);
+            -webkit-backdrop-filter:var(--fx-lens);
+            backdrop-filter:var(--fx-lens);
+            -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+            -webkit-mask-composite:xor;
+            mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+            mask-composite:exclude; pointer-events:none;
         }
         .card::after{
             content:''; position:absolute; inset:0;
