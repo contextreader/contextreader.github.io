@@ -2,73 +2,301 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
     <style>
-        body { width: 300px; padding: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background: #fff; }
-        .logo { font-size: 24px; font-weight: 800; color: #111827; margin-bottom: 5px; }
-        .subtitle { font-size: 13px; color: #6b7280; margin-bottom: 20px; }
-        
+        /* ═══════════════════════════════════════════════════════════════
+           Liquid Glass — popup
+           The bubble refracts the host page. A popup has no page behind it,
+           so the glass needs its own ambient field to sit on: amber + teal
+           radial blooms, the same device as the landing page's body::before.
+           ═══════════════════════════════════════════════════════════════ */
+        :root {
+            --space-xs: 3px;  --space-sm: 5px;  --space-md: 8px;
+            --space-lg: 13px; --space-xl: 21px; --space-xxl: 34px;
+            --phi: 1.618;
+            --timing-fast: 0.236s;
+            --timing-normal: 0.382s;
+
+            --glass-top: rgba(255,255,255,0.92);
+            --glass-bot: rgba(255,255,255,0.68);
+            --glass-line: rgba(255,255,255,0.75);
+            --gel: linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.34) 52%, rgba(255,255,255,0.50) 100%);
+            --rim: linear-gradient(140deg,
+                     rgba(255,255,255,0.98) 0%,
+                     rgba(251,191,36,0.45) 22%,
+                     rgba(255,255,255,0.75) 46%,
+                     rgba(8,145,178,0.32) 72%,
+                     rgba(255,255,255,0.95) 100%);
+
+            --amber: #fbbf24;  --amber-hi: #fcd34d;
+            --amber-deep: #d97706; --amber-ink: #78350f;
+            --amber-glow: rgba(251,191,36,0.30);
+            --teal: #0891b2; --teal-deep: #0e7490;
+
+            --ink: #111827; --ink-soft: #374151; --ink-mute: #6b7280;
+            --shadow: rgba(17,24,39,0.18);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            width: 300px;
+            padding: var(--space-xl);
+            margin: 0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            text-align: center;
+            color: var(--ink-soft);
+            position: relative;
+            background:
+              url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/></filter><rect width='140' height='140' filter='url(%23n)' opacity='0.035'/></svg>"),
+              radial-gradient(ellipse 70% 50% at 18% 0%, rgba(251,191,36,0.16) 0%, transparent 62%),
+              radial-gradient(ellipse 70% 55% at 88% 22%, rgba(8,145,178,0.13) 0%, transparent 60%),
+              radial-gradient(ellipse 90% 45% at 50% 105%, rgba(251,191,36,0.10) 0%, transparent 62%),
+              linear-gradient(180deg, #fdfcfa 0%, #f7f5f2 100%);
+        }
+
+        /* ── head ───────────────────────────────────────────────────── */
+        .logo {
+            font-size: 23px; font-weight: 800; letter-spacing: -0.5px;
+            color: var(--ink); margin-bottom: var(--space-xs);
+        }
+        .subtitle {
+            font-size: 12px; color: var(--ink-mute);
+            margin-bottom: var(--space-xl); line-height: 1.4;
+        }
+
+        /* ── glass card: masked 1px iridescent rim ───────────────────── */
+        .glass {
+            position: relative;
+            background: linear-gradient(180deg, var(--glass-top) 0%, var(--glass-bot) 100%);
+            -webkit-backdrop-filter: blur(var(--space-xxl)) saturate(180%);
+            backdrop-filter: blur(var(--space-xxl)) saturate(180%);
+            border-radius: var(--space-xl);
+            box-shadow:
+              0 var(--space-md) var(--space-xl) -10px var(--shadow),
+              inset 0 1px 0 rgba(255,255,255,0.95),
+              inset 0 -2px var(--space-md) -4px rgba(17,24,39,0.07);
+        }
+        .glass::after {
+            content: ''; position: absolute; inset: 0;
+            border-radius: inherit; padding: 1px;
+            background: var(--rim);
+            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
         .counter-card {
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-            border: 1px solid #bae6fd;
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 20px;
+            padding: var(--space-lg) var(--space-lg) var(--space-xl);
+            margin-bottom: var(--space-lg);
+            box-shadow:
+              0 0 var(--space-xxl) -14px rgba(8,145,178,0.45),
+              0 var(--space-md) var(--space-xl) -10px var(--shadow),
+              inset 0 1px 0 rgba(255,255,255,0.95);
         }
-        
-        .label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #0369a1; font-weight: 700; }
-        .count { font-size: 32px; font-weight: 800; color: #0284c7; margin: 5px 0; font-family: monospace; }
-        
+        .label {
+            font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em;
+            color: var(--teal-deep); font-weight: 700;
+        }
+        .count {
+            font-size: 34px; font-weight: 800; line-height: 1.1;
+            margin: var(--space-sm) 0 0;
+            background: linear-gradient(135deg, #22d3ee 0%, var(--teal) 55%, var(--teal-deep) 100%);
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-variant-numeric: tabular-nums;
+        }
+
+        #usage-card {
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+            text-align: left;
+            box-shadow:
+              0 0 var(--space-xxl) -14px var(--amber-glow),
+              0 var(--space-md) var(--space-xl) -10px var(--shadow),
+              inset 0 1px 0 rgba(255,255,255,0.95);
+        }
+        #usage-card .label { color: var(--amber-ink); }
+        .usage-row {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: var(--space-md);
+        }
+        #usage-text { font-size: 12px; font-weight: 700; color: var(--amber-ink); }
+        .usage-track {
+            background: rgba(251,191,36,0.18);
+            border-radius: 100px; height: 6px; overflow: hidden;
+            box-shadow: inset 0 1px 2px rgba(146,64,14,0.12);
+        }
+        #usage-bar {
+            height: 100%; width: 0%; border-radius: 100px;
+            background: linear-gradient(90deg, var(--amber-hi), #f59e0b);
+            box-shadow: 0 0 var(--space-md) var(--amber-glow);
+            transition: width var(--timing-normal);
+        }
+
+        /* ── gel pills ───────────────────────────────────────────────── */
         .btn {
-            display: block; width: 100%; padding: 10px; margin-top: 10px;
-            background: #fff; border: 1px solid #e5e7eb; border-radius: 8px;
-            color: #374151; text-decoration: none; font-size: 13px; font-weight: 600;
-            cursor: pointer; transition: 0.2s;
+            display: flex; align-items: center; justify-content: center;
+            gap: var(--space-md);
+            width: 100%; padding: var(--space-lg);
+            margin-top: var(--space-md);
+            background: var(--gel), rgba(255,255,255,0.55);
+            -webkit-backdrop-filter: blur(var(--space-xl)) saturate(180%);
+            backdrop-filter: blur(var(--space-xl)) saturate(180%);
+            border: 1px solid var(--glass-line);
+            border-radius: 100px;
+            color: var(--ink-soft); text-decoration: none;
+            font-family: inherit; font-size: 13px; font-weight: 600;
+            cursor: pointer;
+            transition: all var(--timing-fast);
+            box-shadow:
+              0 1px 2px rgba(17,24,39,0.07),
+              0 var(--space-md) var(--space-xl) -10px rgba(17,24,39,0.25),
+              inset 0 1px 0 rgba(255,255,255,0.95),
+              inset 0 -1px 1px rgba(17,24,39,0.05);
         }
-        .btn:hover { background: #f9fafb; border-color: #d1d5db; }
-        .discord-btn { background: #5865F2; color: white; border: none; }
-        .discord-btn:hover { background: #4752C4; }
+        .btn:hover {
+            background: var(--gel), rgba(255,255,255,0.8);
+            border-color: rgba(251,191,36,0.5);
+            color: var(--ink);
+            transform: translateY(-1px);
+            box-shadow:
+              0 var(--space-sm) var(--space-lg) -2px rgba(17,24,39,0.13),
+              inset 0 1px 0 rgba(255,255,255,0.95);
+        }
+        .btn:active { transform: translateY(0); }
+        .btn svg { flex: 0 0 auto; display: block; }
+
+        /* amber primary — gloss layered over the fill */
+        .btn-primary {
+            background:
+              linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.06) 52%, rgba(255,255,255,0.18) 100%),
+              linear-gradient(135deg, var(--amber-hi) 0%, #f59e0b 100%);
+            border-color: rgba(217,119,6,0.30);
+            color: var(--amber-ink); font-weight: 700;
+            box-shadow:
+              0 2px var(--space-md) var(--amber-glow),
+              0 var(--space-md) var(--space-xl) -8px rgba(217,119,6,0.45),
+              inset 0 1px 0 rgba(255,255,255,0.75),
+              inset 0 -1px 2px rgba(146,64,14,0.18);
+        }
+        .btn-primary:hover {
+            background:
+              linear-gradient(180deg, rgba(255,255,255,0.62) 0%, rgba(255,255,255,0.08) 52%, rgba(255,255,255,0.2) 100%),
+              linear-gradient(135deg, #fde68a 0%, var(--amber) 100%);
+            border-color: rgba(217,119,6,0.45);
+            color: var(--amber-ink);
+        }
+
+        /* Discord keeps its brand indigo, gets the gel */
+        .discord-btn {
+            background:
+              linear-gradient(180deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.02) 52%, rgba(0,0,0,0.06) 100%),
+              linear-gradient(135deg, #6f7bf7 0%, #5865F2 55%, #4752C4 100%);
+            border-color: rgba(71,82,196,0.45);
+            color: #fff;
+            box-shadow:
+              0 2px var(--space-md) rgba(88,101,242,0.30),
+              0 var(--space-md) var(--space-xl) -8px rgba(88,101,242,0.5),
+              inset 0 1px 0 rgba(255,255,255,0.35),
+              inset 0 -1px 2px rgba(0,0,0,0.18);
+        }
+        .discord-btn:hover {
+            background:
+              linear-gradient(180deg, rgba(255,255,255,0.34) 0%, rgba(255,255,255,0.04) 52%, rgba(0,0,0,0.05) 100%),
+              linear-gradient(135deg, #7f8aff 0%, #6570f5 55%, #5059cf 100%);
+            border-color: rgba(71,82,196,0.6);
+            color: #fff;
+        }
+
+        /* ── inline notices ──────────────────────────────────────────── */
+        .notice {
+            padding: var(--space-lg); margin-bottom: var(--space-lg);
+            text-align: left; border-radius: var(--space-lg);
+            font-size: 11px; line-height: 1.5;
+        }
+        .notice-title {
+            display: flex; align-items: center; gap: var(--space-sm);
+            font-size: 12px; font-weight: 700; margin-bottom: var(--space-sm);
+        }
+        #pdf-alert-box { background: rgba(255,241,242,0.75); border: 1px solid rgba(254,205,211,0.9); }
+        #pdf-alert-box .notice-title { color: #be123c; }
+        #pdf-alert-box p { color: #881337; margin: 0 0 var(--space-md); }
+        #restricted-page-msg {
+            background: rgba(240,249,255,0.75); border: 1px solid rgba(186,230,253,0.9);
+            color: var(--teal-deep); text-align: center; margin-top: var(--space-lg);
+        }
+        .badge {
+            display: inline-block; padding: 2px var(--space-md);
+            border-radius: 100px; font-size: 10px; font-weight: 700;
+            background: linear-gradient(135deg, var(--amber-hi), #f59e0b);
+            color: var(--amber-ink);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.55);
+        }
+
+        /* ── footer ──────────────────────────────────────────────────── */
+        .foot {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: var(--space-lg); padding-top: var(--space-lg);
+            border-top: 1px solid rgba(17,24,39,0.07);
+        }
+        .foot a { font-size: 11px; color: var(--ink-mute); text-decoration: none; font-weight: 500; }
+        .foot a:hover { color: var(--amber-deep); }
+        .foot span { font-size: 10px; color: #9ca3af; font-variant-numeric: tabular-nums; }
     </style>
 </head>
 <body>
     <div class="logo">Context Reader</div>
     <div class="subtitle">Context-aware definitions in Sinhala</div>
 
-    <div id="pdf-alert-box" style="display: none; background: #fff1f2; border: 1px solid #fecdd3; border-radius: 8px; padding: 12px; margin-bottom: 15px; text-align: left;">
-        <div style="font-size: 12px; font-weight: 700; color: #be123c; margin-bottom: 6px;">📄 PDF Detected</div>
-        <p style="font-size: 11px; color: #881337; margin-bottom: 8px; line-height: 1.4;">
-            Chrome's default viewer doesn't support translation.
-        </p>
-        <button id="open-pdf-btn" class="btn" style="background: #e11d48; color: white; border: none; font-size: 12px;">
-            🚀 Open in Context Reader
-        </button>
-    </div>
-
-    <div class="counter-card">
-        <div class="label">Community Translations</div>
-        <div class="count" id="global-count">...</div>
-    </div>
-
-    <div id="usage-card" style="background:linear-gradient(135deg,#fefce8 0%,#fef9c3 100%); border:1px solid #fde68a; border-radius:12px; padding:12px; margin-bottom:15px; text-align:left;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <div class="label" style="color:#92400e;">Today's Lookups</div>
-            <div id="usage-text" style="font-size:13px; font-weight:700; color:#92400e;">...</div>
+    <div id="pdf-alert-box" class="notice" style="display: none;">
+        <div class="notice-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6.5A1.5 1.5 0 0 0 5 3.5v17A1.5 1.5 0 0 0 6.5 22h11a1.5 1.5 0 0 0 1.5-1.5V7Z"/><path d="M14 2v5h5"/></svg>
+            PDF Detected
         </div>
-        <div style="background:#fef3c7; border-radius:6px; height:8px; overflow:hidden;">
-            <div id="usage-bar" style="background:#f59e0b; height:100%; border-radius:6px; width:0%; transition:width 0.3s;"></div>
+        <p>Chrome's default viewer doesn't support translation.</p>
+        <button id="open-pdf-btn" class="btn btn-primary" style="font-size:12px;">Open in Context Reader</button>
+    </div>
+
+    <div class="counter-card glass">
+        <div class="label">Words Looked Up</div>
+        <div class="count" id="global-count">…</div>
+    </div>
+
+    <div id="usage-card" class="glass">
+        <div class="usage-row">
+            <div class="label">Today's Lookups</div>
+            <div id="usage-text">…</div>
+        </div>
+        <div class="usage-track">
+            <div id="usage-bar"></div>
         </div>
     </div>
 
-    <button id="study-sheet-btn" class="btn" style="background:#fffbeb; border-color:#fbbf24; color:#92400e; font-weight:700;">📋 Generate Study Sheet</button>
-    <a href="#" id="join-discord" class="btn discord-btn">💬 Join Community</a>
-    <a href="#" id="open-settings" class="btn">⚙️ Settings</a>
+    <button id="study-sheet-btn" class="btn btn-primary">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6a1 1 0 0 1 1 1v1H8V4a1 1 0 0 1 1-1Z"/><path d="M16 5h2a1.5 1.5 0 0 1 1.5 1.5v13A1.5 1.5 0 0 1 18 21H6a1.5 1.5 0 0 1-1.5-1.5v-13A1.5 1.5 0 0 1 6 5h2"/><path d="M8.5 11.5h7M8.5 15.5h4.5"/></svg>
+        Generate Study Sheet
+    </button>
 
-    <div id="restricted-page-msg" style="display:none; background:#f0f9ff; border:1px solid #bae6fd; border-radius:8px; padding:12px; margin-top:12px; text-align:center;">
-        <div style="font-size:12px; color:#0369a1; line-height:1.5;">Context Reader works on regular web pages. Navigate to a website to start.</div>
+    <a href="#" id="join-discord" class="btn discord-btn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19.3 5.4a16.7 16.7 0 0 0-4.1-1.3l-.2.4a12.6 12.6 0 0 1 3.7 1.9 16.5 16.5 0 0 0-13.4 0 12.6 12.6 0 0 1 3.7-1.9l-.2-.4A16.7 16.7 0 0 0 4.7 5.4C2.1 9.3 1.4 13.1 1.7 16.8a16.8 16.8 0 0 0 5.1 2.6l.4-.6c-.8-.3-1.6-.7-2.3-1.2l.5-.4a12 12 0 0 0 10.2 0l.5.4c-.7.5-1.5.9-2.3 1.2l.4.6a16.8 16.8 0 0 0 5.1-2.6c.4-4.3-.7-8.1-2.4-11.4ZM8.5 14.6c-1 0-1.8-.9-1.8-2.1s.8-2.1 1.8-2.1 1.8 1 1.8 2.1-.8 2.1-1.8 2.1Zm7 0c-1 0-1.8-.9-1.8-2.1s.8-2.1 1.8-2.1 1.8 1 1.8 2.1-.8 2.1-1.8 2.1Z"/></svg>
+        Join Community
+    </a>
+
+    <a href="#" id="open-settings" class="btn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.1 14.4a1.6 1.6 0 0 0 .3 1.8l.1.1a1.9 1.9 0 1 1-2.7 2.7l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5v.2a1.9 1.9 0 1 1-3.8 0v-.1a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.8.3l-.1.1a1.9 1.9 0 1 1-2.7-2.7l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a1.9 1.9 0 1 1 0-3.8h.1a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.8l-.1-.1a1.9 1.9 0 1 1 2.7-2.7l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a1.9 1.9 0 1 1 3.8 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a1.9 1.9 0 1 1 2.7 2.7l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1h.2a1.9 1.9 0 1 1 0 3.8h-.1a1.6 1.6 0 0 0-1.5 1Z"/></svg>
+        Settings
+    </a>
+
+    <div id="restricted-page-msg" class="notice" style="display:none;">
+        Context Reader works on regular web pages. Navigate to a website to start.
     </div>
 
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px; padding-top:8px; border-top:1px solid #f3f4f6;">
-        <a href="#" id="feedback-link" style="font-size:11px; color:#6b7280; text-decoration:none;">Feedback</a>
-        <span id="version-label" style="font-size:10px; color:#9ca3af;">v2.0</span>
+    <div class="foot">
+        <a href="#" id="feedback-link">Feedback</a>
+        <span id="version-label">v2.0</span>
     </div>
 
     <script src="popup.js"></script>

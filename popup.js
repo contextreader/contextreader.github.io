@@ -79,13 +79,16 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.extension.isAllowedFileSchemeAccess((isAllowed) => {
         if (!isAllowed) {
             const warningHTML = `
-                <div id="file-access-warning" style="background: #fff7ed; border: 1px solid #fdba74; border-radius: 8px; padding: 12px; margin-bottom: 15px; text-align: left;">
-                    <div style="font-size: 12px; font-weight: 700; color: #c2410c; margin-bottom: 6px;">⚠️ Setup Required</div>
-                    <p style="font-size: 11px; color: #9a3412; margin-bottom: 8px; line-height: 1.4;">
+                <div id="file-access-warning" class="notice" style="background: rgba(255,247,237,0.78); border: 1px solid rgba(253,186,116,0.85);">
+                    <div class="notice-title" style="color:#c2410c;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.9 18.2A1.5 1.5 0 0 0 3.2 20.5h17.6a1.5 1.5 0 0 0 1.3-2.3L13.7 3.9a1.5 1.5 0 0 0-2.6 0Z"/><path d="M12 9.5v4M12 17h.01"/></svg>
+                        Setup Required
+                    </div>
+                    <p style="color:#9a3412; margin:0 0 8px;">
                         To read PDFs saved on your computer, you need to enable file access.
                     </p>
-                    <button id="enable-file-access-btn" class="btn" style="background: #ea580c; color: white; border: none; font-size: 12px;">
-                        🔧 Enable File Access
+                    <button id="enable-file-access-btn" class="btn btn-primary" style="font-size:12px;">
+                        Enable File Access
                     </button>
                 </div>
             `;
@@ -134,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
         chrome.runtime.sendMessage({ action: "getAccessInfo" }, (access) => {
             if (access && !access.studySheet) {
                 // Non-dev user: show "Coming Soon" badge
-                studyBtn.innerHTML = '📋 Study Sheet <span style="font-size:10px; background:#fbbf24; color:#78350f; padding:1px 6px; border-radius:4px; margin-left:4px; font-weight:700;">Coming Soon</span>';
+                studyBtn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6a1 1 0 0 1 1 1v1H8V4a1 1 0 0 1 1-1Z"/><path d="M16 5h2a1.5 1.5 0 0 1 1.5 1.5v13A1.5 1.5 0 0 1 18 21H6a1.5 1.5 0 0 1-1.5-1.5v-13A1.5 1.5 0 0 1 6 5h2"/><path d="M8.5 11.5h7M8.5 15.5h4.5"/></svg> Study Sheet <span class="badge">Coming Soon</span>`;
                 studyBtn.style.opacity = '0.75';
             }
         });
