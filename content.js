@@ -25,26 +25,10 @@ document.body.appendChild(bubble);
 
 const triggerBtn = document.createElement("div");
 triggerBtn.setAttribute("id", "smart-reader-trigger");
-// Custom bolt mark. The emoji rendered differently on every OS and carried its
-// own baseline offset, which is why it never sat centred. This is a drawn glyph:
-// amber gradient fill, a soft outer bloom, and a highlight along the leading edge.
-triggerBtn.innerHTML = `<svg class="sr-trigger-bolt" width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-  <defs>
-    <linearGradient id="srBoltFill" x1="7" y1="1.5" x2="17" y2="22.5" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#FEF3C7"/>
-      <stop offset="38%" stop-color="#FCD34D"/>
-      <stop offset="100%" stop-color="#F59E0B"/>
-    </linearGradient>
-    <filter id="srBoltGlow" x="-60%" y="-60%" width="220%" height="220%">
-      <feGaussianBlur stdDeviation="2.2" result="b"/>
-      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-  </defs>
-  <path d="M13.4 1.8 5.1 13.05a.62.62 0 0 0 .5.99h4.36l-1.2 7.36a.6.6 0 0 0 1.09.43l8.2-11.2a.62.62 0 0 0-.5-.99h-4.3l1.13-7.38a.6.6 0 0 0-1.08-.46Z"
-        fill="url(#srBoltFill)" filter="url(#srBoltGlow)"/>
-  <path d="M13.4 1.8 5.1 13.05a.62.62 0 0 0 .5.99h1.5L14.1 2.9Z"
-        fill="#FFFDF5" opacity="0.55"/>
-</svg>`;
+// The trigger's mark (Lit Line) is painted from CSS as a self-contained data
+// URI, not an inline <svg>: fragment refs like url(#gradient) break on host
+// pages that set a <base href>, and inline <defs> would leak ids into the
+// host page's id namespace.
 document.body.appendChild(triggerBtn);
 
 // ========================================
@@ -738,6 +722,7 @@ const styles = `
         height: var(--space-xxl);
         /* dark glass puck: gloss on top, lit rim, amber bloom underneath */
         background:
+          url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Cdefs%3E%3ClinearGradient id='l' x1='3' y1='10' x2='13' y2='13.6' gradientUnits='userSpaceOnUse'%3E%3Cstop offset='0' stop-color='%23FEF3C7'/%3E%3Cstop offset='0.45' stop-color='%23FCD34D'/%3E%3Cstop offset='1' stop-color='%23F59E0B'/%3E%3C/linearGradient%3E%3ClinearGradient id='f' x1='12' y1='4' x2='12' y2='20' gradientUnits='userSpaceOnUse'%3E%3Cstop offset='0' stop-color='%23FFFFFF' stop-opacity='0.62'/%3E%3Cstop offset='1' stop-color='%23FFFFFF' stop-opacity='0.30'/%3E%3C/linearGradient%3E%3Cfilter id='g' x='-0.7' y='-1.8' width='2.4' height='4.6'%3E%3CfeGaussianBlur stdDeviation='1.5' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Crect x='3.2' y='4.8' width='17.6' height='2.8' rx='1.4' fill='url(%23f)'/%3E%3Crect x='15.4' y='10.6' width='5.4' height='2.8' rx='1.4' fill='url(%23f)'/%3E%3Crect x='3.2' y='16.4' width='13.4' height='2.8' rx='1.4' fill='url(%23f)'/%3E%3Cg filter='url(%23g)'%3E%3Crect x='3.2' y='10.6' width='10.2' height='2.8' rx='1.4' fill='url(%23l)'/%3E%3C/g%3E%3Crect x='4.1' y='11.0' width='8.4' height='0.9' rx='0.45' fill='%23FFFDF5' opacity='0.55'/%3E%3C/svg%3E") no-repeat center / 18px 18px,
           linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.02) 48%, rgba(0,0,0,0.10) 100%),
           linear-gradient(160deg, #2a3242 0%, #151b28 55%, #0b0f18 100%);
         -webkit-backdrop-filter: blur(var(--space-lg)) saturate(var(--sr-glass-sat));
@@ -752,12 +737,11 @@ const styles = `
           inset 0 1px 0 rgba(255,255,255,0.22),
           inset 0 -1px 2px rgba(0,0,0,0.35);
         transition: transform var(--timing-fast) cubic-bezier(0.16, 1, 0.3, 1),
-                    box-shadow var(--timing-fast);
+                    box-shadow var(--timing-fast),
+                    background-size var(--timing-normal) cubic-bezier(0.16, 1, 0.3, 1);
     }
-    #smart-reader-trigger .sr-trigger-bolt {
-        display: block;
-        transition: transform var(--timing-normal) cubic-bezier(0.16, 1, 0.3, 1);
-    }
+    /* declared after the background shorthand, which resets background-size */
+    #smart-reader-trigger { background-size: 18px 18px, auto, auto; }
     #smart-reader-trigger:hover {
         transform: scale(1.1);
         box-shadow:
@@ -767,7 +751,7 @@ const styles = `
           inset 0 1px 0 rgba(255,255,255,0.3),
           inset 0 -1px 2px rgba(0,0,0,0.35);
     }
-    #smart-reader-trigger:hover .sr-trigger-bolt { transform: scale(1.08) rotate(-4deg); }
+    #smart-reader-trigger:hover { background-size: 19.5px 19.5px, auto, auto; }
     #smart-reader-trigger:active { transform: scale(1.02); }
     
     @keyframes popIn {
