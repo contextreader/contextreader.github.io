@@ -1,5 +1,9 @@
 # Context Reader (Direct) — Sinhala
 
+> **⚠️ UX pass INCOMPLETE — see [HANDOFF.md](HANDOFF.md) before continuing.**
+> Tagged `ux-wip-2026-09-12`. The Liquid Glass redesign is written and pushed but has
+> never been rendered in a browser. Verify it before building anything on top.
+
 Experiment build. Forked from the published `sinhala/` v2.1.0 extension to answer one
 question: **is a newer Gemini model plus a user-supplied API key better than the
 Worker-proxied setup?**
