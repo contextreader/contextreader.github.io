@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Context Reader</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', -apple-system, system-ui, sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #fefce8 50%, #f0fdf4 100%);
+            color: #111827;
+            min-height: 100vh;
+        }
+
+        .container { max-width: 600px; margin: 0 auto; padding: 40px 20px 60px; }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .hero-icon { font-size: 64px; margin-bottom: 16px; }
+        .hero h1 { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
+        .hero p { font-size: 16px; color: #4b5563; line-height: 1.5; }
+
+        .step-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .step-num {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .step-content { flex: 1; }
+        .step-content h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+        .step-content p { font-size: 14px; color: #6b7280; line-height: 1.5; }
+
+        .step-visual {
+            margin-top: 10px;
+            background: #f9fafb;
+            border: 1px solid #f3f4f6;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            font-size: 32px;
+        }
+
+        .features {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .features h2 { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .feature-item {
+            padding: 12px;
+            background: #f9fafb;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .feature-item .emoji { font-size: 24px; margin-bottom: 6px; }
+        .feature-item .name { font-size: 13px; font-weight: 600; color: #374151; }
+        .feature-item .desc { font-size: 11px; color: #6b7280; margin-top: 2px; }
+
+        .shortcut-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .shortcut-card h2 { font-size: 18px; font-weight: 700; margin-bottom: 12px; }
+        .shortcut-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .shortcut-row:last-child { border-bottom: none; }
+        .shortcut-label { font-size: 14px; color: #374151; }
+        .shortcut-key {
+            font-family: 'SF Mono', monospace;
+            font-size: 12px; font-weight: 600;
+            background: #f3f4f6; color: #374151;
+            padding: 3px 8px; border-radius: 4px;
+            border: 1px solid #d1d5db;
+        }
+
+        .privacy-note {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        .privacy-note h3 { font-size: 14px; font-weight: 700; color: #166534; margin-bottom: 6px; }
+        .privacy-note p { font-size: 12px; color: #15803d; line-height: 1.5; }
+
+        .cta {
+            text-align: center;
+            margin-top: 24px;
+        }
+        .cta-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            padding: 14px 32px;
+            border-radius: 12px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .cta-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        .cta-sub {
+            font-size: 13px;
+            color: #6b7280;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="hero">
+            <div class="hero-icon">&#x26A1;</div>
+            <h1>Welcome to Context Reader</h1>
+            <p>Your smart Sinhala dictionary that understands what you're reading.</p>
+        </div>
+
+        <!-- Step 1: Pin -->
+        <div class="step-card">
+            <div class="step-num">1</div>
+            <div class="step-content">
+                <h3>Pin the extension</h3>
+                <p>Click the <strong>puzzle piece icon</strong> in your Chrome toolbar (top-right), find <strong>Context Reader</strong>, and click the <strong>pin icon</strong> next to it. This keeps it visible for quick access.</p>
+                <div class="step-visual">&#x1F9E9; &#x1F4CC;</div>
+            </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step-card">
+            <div class="step-num">2</div>
+            <div class="step-content">
+                <h3>Highlight any word</h3>
+                <p>Select a word on any webpage by clicking and dragging over it.</p>
+                <div class="step-visual">&#x1F446; &#x1F4DD;</div>
+            </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step-card">
+            <div class="step-num">3</div>
+            <div class="step-content">
+                <h3>Click the lightning bolt</h3>
+                <p>A small icon appears near your selection. Click it to get the definition.</p>
+                <div class="step-visual">&#x26A1;</div>
+            </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="step-card">
+            <div class="step-num">4</div>
+            <div class="step-content">
+                <h3>Get a context-aware definition</h3>
+                <p>Unlike a dictionary, Context Reader gives you the meaning that fits <strong>what you're reading</strong> &mdash; in Sinhala.</p>
+                <div class="step-visual">&#x1F4A1; &#x1F1F1;&#x1F1F0;</div>
+            </div>
+        </div>
+
+        <!-- Features -->
+        <div class="features">
+            <h2>What you can do</h2>
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <div class="emoji">&#x1F50A;</div>
+                    <div class="name">Audio</div>
+                    <div class="desc">Hear pronunciation</div>
+                </div>
+                <div class="feature-item">
+                    <div class="emoji">&#x1F3AC;</div>
+                    <div class="name">Video Clips</div>
+                    <div class="desc">See it used in movies</div>
+                </div>
+                <div class="feature-item">
+                    <div class="emoji">&#x2764;&#xFE0F;</div>
+                    <div class="name">Save Words</div>
+                    <div class="desc">Build your vocab list</div>
+                </div>
+                <div class="feature-item">
+                    <div class="emoji">&#x1F4C4;</div>
+                    <div class="name">PDF Reader</div>
+                    <div class="desc">Read PDFs with lookups</div>
+                </div>
+                <div class="feature-item">
+                    <div class="emoji">&#x1F1F1;&#x1F1F0;</div>
+                    <div class="name">Sinhala Mode</div>
+                    <div class="desc">Simplify hard Sinhala</div>
+                </div>
+                <div class="feature-item">
+                    <div class="emoji">&#x1F476;</div>
+                    <div class="name">Simple Mode</div>
+                    <div class="desc">Kid-friendly explanations</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shortcuts -->
+        <div class="shortcut-card">
+            <h2>Keyboard Shortcuts</h2>
+            <div class="shortcut-row">
+                <span class="shortcut-label">Activate extension</span>
+                <span class="shortcut-key">Alt+Shift+S</span>
+            </div>
+            <div class="shortcut-row">
+                <span class="shortcut-label">Close definition bubble</span>
+                <span class="shortcut-key">Esc</span>
+            </div>
+        </div>
+
+        <!-- Daily limit note -->
+        <div class="privacy-note" style="background:#fffbeb; border-color:#fde68a;">
+            <h3 style="color:#92400e;">&#x1F4CA; 30 free lookups per day</h3>
+            <p style="color:#a16207;">That's plenty for most reading sessions. Your count resets every day at midnight.</p>
+        </div>
+
+        <!-- Pin reminder -->
+        <div class="privacy-note" style="background:#f0f9ff; border-color:#bae6fd;">
+            <h3 style="color:#0369a1;">&#x1F4CC; Don't forget to pin!</h3>
+            <p style="color:#0369a1;">Click the puzzle piece icon in your toolbar and pin Context Reader for one-click access.</p>
+        </div>
+
+        <!-- Privacy -->
+        <div class="privacy-note">
+            <h3>&#x1F512; Your privacy matters</h3>
+            <p>No account needed. No browsing history collected.<br>Words you look up are never sent to analytics.</p>
+        </div>
+
+        <!-- CTA -->
+        <div class="cta">
+            <button class="cta-btn" id="start-btn">Start Reading &#x2192;</button>
+            <div class="cta-sub">Highlight any word on a webpage to try it out</div>
+        </div>
+    </div>
+
+    <script src="welcome.js"></script>
+</body>
+</html>

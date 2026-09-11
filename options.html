@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Context Reader - Settings</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', -apple-system, sans-serif; background: #f9fafb; color: #111827; min-height: 100vh; }
+
+        .container { max-width: 640px; margin: 0 auto; padding: 40px 20px; }
+
+        .header { margin-bottom: 30px; }
+        .header h1 { font-size: 24px; font-weight: 800; margin-bottom: 4px; }
+        .header p { font-size: 14px; color: #6b7280; }
+
+        .card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #374151;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Usage dashboard */
+        .usage-section { display: flex; align-items: center; gap: 16px; }
+        .usage-circle {
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border: 3px solid #38bdf8;
+            flex-shrink: 0;
+        }
+        .usage-circle .num { font-size: 24px; font-weight: 800; color: #0284c7; line-height: 1; }
+        .usage-circle .label { font-size: 9px; color: #0369a1; text-transform: uppercase; letter-spacing: 0.5px; }
+        .usage-info { flex: 1; }
+        .usage-info .bar-bg { background: #e5e7eb; border-radius: 6px; height: 8px; margin: 8px 0; overflow: hidden; }
+        .usage-info .bar-fill { background: #38bdf8; height: 100%; border-radius: 6px; transition: width 0.3s; }
+        .usage-info .bar-label { font-size: 12px; color: #6b7280; }
+
+        /* Shortcuts */
+        .shortcut-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f3f4f6; }
+        .shortcut-row:last-child { border-bottom: none; }
+        .shortcut-desc { font-size: 13px; color: #374151; }
+        .shortcut-key {
+            font-family: 'SF Mono', 'Consolas', monospace;
+            font-size: 12px; font-weight: 600;
+            background: #f3f4f6; color: #374151;
+            padding: 3px 8px; border-radius: 4px;
+            border: 1px solid #d1d5db;
+        }
+
+        /* Links */
+        .link-list a {
+            display: flex; align-items: center; gap: 10px;
+            padding: 12px 0; border-bottom: 1px solid #f3f4f6;
+            text-decoration: none; color: #374151; font-size: 13px; font-weight: 500;
+            transition: color 0.15s;
+        }
+        .link-list a:last-child { border-bottom: none; }
+        .link-list a:hover { color: #2563eb; }
+        .link-list .icon { font-size: 16px; width: 24px; text-align: center; }
+        .link-list .arrow { margin-left: auto; color: #9ca3af; font-size: 14px; }
+
+        /* About */
+        .about-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 13px; }
+        .about-row .label { color: #6b7280; }
+        .about-row .value { color: #111827; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Context Reader</h1>
+            <p>Smart Sinhala Dictionary &mdash; Settings &amp; Info</p>
+        </div>
+
+        <!-- Usage Dashboard -->
+        <div class="card">
+            <div class="card-title">Today's Usage</div>
+            <div class="usage-section">
+                <div class="usage-circle">
+                    <div class="num" id="opt-remaining">--</div>
+                    <div class="label">left</div>
+                </div>
+                <div class="usage-info">
+                    <div style="font-size:13px; font-weight:600; color:#111827;" id="opt-usage-label">Loading...</div>
+                    <div class="bar-bg"><div class="bar-fill" id="opt-usage-bar" style="width:0%"></div></div>
+                    <div class="bar-label">Resets daily at midnight IST</div>
+                    <button id="opt-refresh-usage" style="margin-top:8px; font-size:11px; color:#0369a1; background:none; border:1px solid #bae6fd; padding:4px 10px; border-radius:6px; cursor:pointer;">Refresh</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Keyboard Shortcuts -->
+        <div class="card">
+            <div class="card-title">Keyboard Shortcuts</div>
+            <div class="shortcut-row">
+                <span class="shortcut-desc">Activate extension</span>
+                <span class="shortcut-key">Alt+Shift+S</span>
+            </div>
+            <div class="shortcut-row">
+                <span class="shortcut-desc">Close bubble</span>
+                <span class="shortcut-key">Esc</span>
+            </div>
+            <div style="margin-top: 10px;">
+                <a href="#" id="opt-customize-shortcuts" style="font-size:12px; color:#2563eb; text-decoration:none;">Customize shortcuts in Chrome settings &rarr;</a>
+            </div>
+        </div>
+
+        <!-- Links -->
+        <div class="card">
+            <div class="card-title">Resources</div>
+            <div class="link-list">
+                <a href="https://docs.google.com/document/d/e/2PACX-1vSseVLIuc_9TPD15k6Gk3TOUBQC5cImMMmbgELuXwl2k0bCAmfOABf3lQ9_E_BcL_WzlnV19AdIkmim/pub" id="opt-privacy-link" target="_blank" rel="noopener">
+                    <span class="icon">🔒</span> Privacy Policy <span class="arrow">›</span>
+                </a>
+                <a href="https://discord.gg/tdwHWmmC" target="_blank" rel="noopener">
+                    <span class="icon">💬</span> Join Discord Community <span class="arrow">›</span>
+                </a>
+                <a href="#" id="opt-rate-link" target="_blank" rel="noopener">
+                    <span class="icon">⭐</span> Rate on Chrome Web Store <span class="arrow">›</span>
+                </a>
+                <a href="#" id="opt-feedback-link" target="_blank" rel="noopener">
+                    <span class="icon">📧</span> Send Feedback <span class="arrow">›</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- About -->
+        <div class="card">
+            <div class="card-title">About</div>
+            <div class="about-row">
+                <span class="label">Version</span>
+                <span class="value" id="opt-version">2.0</span>
+            </div>
+            <div class="about-row">
+                <span class="label">Extension ID</span>
+                <span class="value" id="opt-ext-id" style="font-size:11px; font-family:monospace;">&mdash;</span>
+            </div>
+            <div class="about-row">
+                <span class="label">Language Modes</span>
+                <span class="value">English &rarr; Sinhala, Sinhala &rarr; Sinhala</span>
+            </div>
+            <div class="about-row">
+                <span class="label">AI Model</span>
+                <span class="value">Gemini 3.1 Flash Lite (direct)</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+        <h2 style="margin:0 0 6px; font-size:15px;">Gemini API Key</h2>
+        <p style="font-size:12px; color:#78716c; line-height:1.5; margin:0 0 10px;">
+            This build calls Gemini directly, so it needs your own key. It is free and stays on this
+            device &mdash; it is never sent anywhere except Google.
+            <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Get a key</a>.
+        </p>
+        <div style="display:flex; gap:8px; align-items:center;">
+            <input id="opt-api-key" type="password" placeholder="AIza..." autocomplete="off"
+                   style="flex:1; padding:9px 11px; border:1px solid #d6d3d1; border-radius:8px;
+                          font-family:monospace; font-size:12px;">
+            <button id="opt-save-key"
+                    style="padding:9px 16px; border:none; border-radius:8px; background:#2563eb;
+                           color:#fff; font-size:13px; font-weight:600; cursor:pointer;">Save</button>
+        </div>
+        <div id="opt-key-status" style="font-size:12px; margin-top:8px; min-height:16px;"></div>
+    </div>
+
+    <script src="options.js"></script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+.DS_Store
+node_modules/
+package-lock.json
+*.zip
+
+# never commit worker source or config — that is where keys have leaked before
+cloudfareworker*.js
+wrangler.toml
+.wrangler/
+.env

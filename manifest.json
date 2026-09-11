@@ -1,0 +1,68 @@
+{
+  "manifest_version": 3,
+  "name": "Context Reader (Direct) — Sinhala",
+  "version": "2.1.0",
+  "description": "Experiment build: calls Gemini directly with your own API key. No proxy, no cache.",
+  "permissions": [
+    "storage",
+    "contextMenus",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://generativelanguage.googleapis.com/*",
+    "https://api.dictionaryapi.dev/*",
+    "https://getyarn.io/*",
+    "https://y.yarn.co/*",
+    "https://www.google-analytics.com/*",
+    "https://cdn.jsdelivr.net/*"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "Readability.min.js",
+        "content.js"
+      ],
+      "exclude_matches": [
+        "*://*/pdf-reader.html",
+        "*://*/options.html",
+        "*://*/welcome.html"
+      ]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "pdf-reader.html",
+        "welcome.html",
+        "content.js",
+        "pdf.min.js",
+        "pdf.worker.min.js",
+        "sinhala-unicode-converter.min.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ],
+  "action": {
+    "default_title": "Context Reader",
+    "default_icon": "icon128.png",
+    "default_popup": "popup.html"
+  },
+  "icons": {
+    "128": "icon128.png"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  }
+}

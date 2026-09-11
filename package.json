@@ -1,0 +1,31 @@
+{
+  "name": "sinhala",
+  "version": "1.0.0",
+  "description": "",
+  "main": "Readability.min.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "build": "node esbuild.config.mjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IanXavierx/context-reader.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/IanXavierx/context-reader/issues"
+  },
+  "homepage": "https://github.com/IanXavierx/context-reader#readme",
+  "dependencies": {
+    "@hyzyla/pdfium": "^2.1.12"
+  },
+  "devDependencies": {
+    "esbuild": "^0.27.4"
+  }
+}
