@@ -541,7 +541,7 @@ IMPORTANT:
 
 Output ONLY this HTML structure (No markdown):
 <div class="sr-simple-box">
-    <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:15px; margin-bottom:10px;">
+    <div style="background:rgba(240,253,244,0.66); border:1px solid rgba(134,239,172,0.45); border-radius:13px; padding:15px; margin-bottom:10px;">
         <div style="font-weight:700; color:#166534; font-size:14px; margin-bottom:5px;">👶 Simple Explanation</div>
         <p style="font-size:14px; color:#14532d; line-height:1.6; font-family:'Noto Sans Sinhala', sans-serif;">
             [Start with "ඔයා කියවන දේ අනුව..." then explain in super simple Sinhala what ${word} means in their context]
@@ -607,13 +607,13 @@ Output ONLY this HTML structure (no markdown, no extra text):
         <p class="sr-sub-text" style="font-family:'Noto Sans Sinhala', sans-serif; line-height:1.6;">[Formal/academic Sinhala definition with etymological or grammatical notes, with <b>key term</b> in bold]</p>
 
         <div id="sr-general-btn-area" style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
-            <button id="sr-load-more" class="sr-secondary-btn" style="flex:1; min-width:90px; background:#fff9e6; border-color:#fbbf24; color:#92400e;">
+            <button id="sr-load-more" class="sr-secondary-btn sr-btn-primary" style="flex:1; min-width:90px;">
                 ⚡ More
             </button>
             <button id="sr-load-general" class="sr-secondary-btn" style="flex:1; min-width:80px;">
                 🌐 General
             </button>
-            <button id="sr-load-simple" class="sr-secondary-btn" style="flex:1; min-width:80px; border-color:#86efac; background:#f0fdf4; color:#166534;">
+            <button id="sr-load-simple" class="sr-secondary-btn" style="flex:1; min-width:80px;">
                 👶 Simple
             </button>
         </div>
@@ -729,7 +729,7 @@ IMPORTANT:
 
 Output ONLY this HTML structure (No markdown):
 <div class="sr-simple-box">
-    <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:15px; margin-bottom:10px;">
+    <div style="background:rgba(240,253,244,0.66); border:1px solid rgba(134,239,172,0.45); border-radius:13px; padding:15px; margin-bottom:10px;">
         <div style="font-weight:700; color:#166534; font-size:14px; margin-bottom:5px;">👶 සරල පැහැදිලි කිරීම</div>
         <p style="font-size:14px; color:#14532d; line-height:1.6; font-family:'Noto Sans Sinhala', sans-serif;">
             [Start with "මේ වචනේ තේරුම..." then explain in super simple spoken Sinhala what ${word} means in their context]
