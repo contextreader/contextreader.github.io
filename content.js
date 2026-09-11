@@ -25,7 +25,26 @@ document.body.appendChild(bubble);
 
 const triggerBtn = document.createElement("div");
 triggerBtn.setAttribute("id", "smart-reader-trigger");
-triggerBtn.innerHTML = "⚡️"; 
+// Custom bolt mark. The emoji rendered differently on every OS and carried its
+// own baseline offset, which is why it never sat centred. This is a drawn glyph:
+// amber gradient fill, a soft outer bloom, and a highlight along the leading edge.
+triggerBtn.innerHTML = `<svg class="sr-trigger-bolt" width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="srBoltFill" x1="7" y1="1.5" x2="17" y2="22.5" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FEF3C7"/>
+      <stop offset="38%" stop-color="#FCD34D"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+    <filter id="srBoltGlow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="2.2" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <path d="M13.4 1.8 5.1 13.05a.62.62 0 0 0 .5.99h4.36l-1.2 7.36a.6.6 0 0 0 1.09.43l8.2-11.2a.62.62 0 0 0-.5-.99h-4.3l1.13-7.38a.6.6 0 0 0-1.08-.46Z"
+        fill="url(#srBoltFill)" filter="url(#srBoltGlow)"/>
+  <path d="M13.4 1.8 5.1 13.05a.62.62 0 0 0 .5.99h1.5L14.1 2.9Z"
+        fill="#FFFDF5" opacity="0.55"/>
+</svg>`;
 document.body.appendChild(triggerBtn);
 
 // ========================================
@@ -59,7 +78,19 @@ const styles = `
          (no shadow DOM) and a bare --glass-bg would collide with the site's own. */
       --sr-glass-blur: 34px;                      /* Fibonacci */
       --sr-glass-sat: 180%;
-      --sr-glass: rgba(255,255,255,0.82);         /* the scrim = the readability guarantee */
+      --sr-glass: rgba(255,255,255,0.80);         /* the scrim = the readability guarantee */
+      --sr-glass-top: rgba(255,255,255,0.90);     /* scrim gradient: light falls from above */
+      --sr-glass-bot: rgba(255,255,255,0.72);
+      /* Iridescent rim. Amber + teal are the brand's own two accents, so the
+         chromatic edge reads as Context Reader rather than generic Apple glass. */
+      --sr-rim: linear-gradient(140deg,
+                  rgba(255,255,255,0.98) 0%,
+                  rgba(251,191,36,0.45) 22%,
+                  rgba(255,255,255,0.75) 46%,
+                  rgba(8,145,178,0.32) 72%,
+                  rgba(255,255,255,0.95) 100%);
+      /* Gel: a bright top half over any fill, the way light sits on a lozenge. */
+      --sr-gel: linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.34) 52%, rgba(255,255,255,0.50) 100%);
       --sr-glass-soft: rgba(255,255,255,0.55);    /* chips, pills */
       --sr-glass-line: rgba(255,255,255,0.72);    /* borders */
       --sr-glass-spec: rgba(255,255,255,0.95);    /* top specular edge */
@@ -98,24 +129,41 @@ const styles = `
 
         /* Liquid glass: sample the page, then lay a scrim over it so text
            stays crisp no matter what is behind (white article, dark PDF, photo). */
-        background: var(--sr-glass);
+        /* Scrim is a gradient, not a flat fill — brighter at the top reads as
+           light landing on a pane. Grain on top of it kills gradient banding. */
+        background:
+          url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/></filter><rect width='140' height='140' filter='url(%23n)' opacity='0.035'/></svg>"),
+          linear-gradient(180deg, var(--sr-glass-top) 0%, var(--sr-glass-bot) 100%);
         -webkit-backdrop-filter: blur(var(--sr-glass-blur)) saturate(var(--sr-glass-sat));
         backdrop-filter: blur(var(--sr-glass-blur)) saturate(var(--sr-glass-sat));
-        border: 1px solid var(--sr-glass-line);
-        border-radius: var(--space-xl);
+        border: none;                                  /* replaced by the ::after rim */
+        border-radius: var(--space-xxl);               /* 34px — reference proportion */
 
-        /* ambient + contact shadow, then inset speculars for the lit-edge look.
-           Inset rather than a ::before overlay — a pseudo-element with inset:0
-           would cover .sr-header/.sr-body and need z-index surgery. */
         box-shadow:
+          0 0 var(--space-2xl) -12px var(--sr-amber-glow),        /* amber ambient bloom */
           0 var(--space-xl) var(--space-2xl) -8px var(--sr-shadow),
           0 var(--space-md) var(--space-lg) -6px rgba(17,24,39,0.10),
           inset 0 1px 0 var(--sr-glass-spec),
-          inset 0 -1px 0 rgba(255,255,255,0.35);
+          inset 0 -2px var(--space-lg) -6px rgba(17,24,39,0.10); /* glass has thickness */
 
         position: fixed; z-index: 2147483647;
         resize: both; overflow: hidden;
         animation: popIn var(--timing-normal) cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Masked 1px ring: the gradient shows ONLY in the border band, so this never
+       covers .sr-header / .sr-body — no z-index surgery needed. This is the
+       single detail that separates "translucent card" from "liquid glass". */
+    #smart-reader-bubble::after {
+        content: ''; position: absolute; inset: 0;
+        border-radius: inherit; padding: 1px;
+        background: var(--sr-rim);
+        -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        -webkit-mask-composite: xor;
+        mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        mask-composite: exclude;
+        pointer-events: none;
+        z-index: 2;
     }
     
     #sr-general-modal {
@@ -338,14 +386,17 @@ const styles = `
            gets clipped. Opening leftward keeps it inside the 400px bubble. */
         position: absolute; top: calc(var(--space-xxl) + var(--space-sm)); right: 0; left: auto;
         width: 208px; max-width: 208px;
-        background: rgba(255,255,255,0.86);
-        -webkit-backdrop-filter: blur(var(--space-xl)) saturate(var(--sr-glass-sat));
-        backdrop-filter: blur(var(--space-xl)) saturate(var(--sr-glass-sat));
+        background:
+          linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.80) 100%);
+        -webkit-backdrop-filter: blur(var(--space-xxl)) saturate(var(--sr-glass-sat));
+        backdrop-filter: blur(var(--space-xxl)) saturate(var(--sr-glass-sat));
         border: 1px solid var(--sr-glass-line);
-        border-radius: var(--space-lg);
+        border-radius: var(--space-xl);
         box-shadow:
-          0 var(--space-lg) var(--space-xxl) -8px rgba(17,24,39,0.22),
-          inset 0 1px 0 var(--sr-glass-spec);
+          0 0 var(--space-xxl) -14px var(--sr-amber-glow),
+          0 var(--space-lg) var(--space-xxl) -8px rgba(17,24,39,0.24),
+          inset 0 1px 0 var(--sr-glass-spec),
+          inset 0 -2px var(--space-md) -4px rgba(17,24,39,0.08);
         padding: var(--space-sm);
         z-index: 2147483647; display: none;
         font-family: 'Inter', system-ui, sans-serif;
@@ -384,13 +435,15 @@ const styles = `
     .sr-icon-btn {
         width: var(--space-xxl); height: var(--space-xxl);   /* 34px, Fibonacci */
         border-radius: 50%;
-        background: var(--sr-glass-soft);
-        -webkit-backdrop-filter: blur(var(--space-lg));
-        backdrop-filter: blur(var(--space-lg));
+        background: var(--sr-gel), var(--sr-glass-soft);
+        -webkit-backdrop-filter: blur(var(--space-xl)) saturate(var(--sr-glass-sat));
+        backdrop-filter: blur(var(--space-xl)) saturate(var(--sr-glass-sat));
         border: 1px solid var(--sr-glass-line);
         box-shadow:
-          0 1px 3px rgba(17,24,39,0.08),
-          inset 0 1px 0 var(--sr-glass-spec);
+          0 1px 3px rgba(17,24,39,0.09),
+          0 var(--space-md) var(--space-xl) -10px rgba(17,24,39,0.3),
+          inset 0 1px 0 var(--sr-glass-spec),
+          inset 0 -1px 2px rgba(17,24,39,0.06);
         font-size: 14px; cursor: pointer;
         transition: all var(--timing-fast);
         display: flex; align-items: center; justify-content: center;
@@ -562,9 +615,9 @@ const styles = `
     .sr-secondary-btn {
         display: inline-flex; align-items: center; justify-content: center;
         gap: var(--space-sm);
-        background: var(--sr-glass-soft);
-        -webkit-backdrop-filter: blur(var(--space-lg));
-        backdrop-filter: blur(var(--space-lg));
+        background: var(--sr-gel), var(--sr-glass-soft);
+        -webkit-backdrop-filter: blur(var(--space-xl)) saturate(var(--sr-glass-sat));
+        backdrop-filter: blur(var(--space-xl)) saturate(var(--sr-glass-sat));
         border: 1px solid var(--sr-glass-line);
         color: var(--sr-ink-soft);
         font-family: 'Inter', system-ui, sans-serif;
@@ -574,8 +627,10 @@ const styles = `
         cursor: pointer; font-weight: 600;
         transition: all var(--timing-fast);
         box-shadow:
-          0 1px 2px rgba(17,24,39,0.06),
-          inset 0 1px 0 rgba(255,255,255,0.9);
+          0 1px 2px rgba(17,24,39,0.07),
+          0 var(--space-md) var(--space-xl) -10px rgba(17,24,39,0.25),
+          inset 0 1px 0 rgba(255,255,255,0.95),
+          inset 0 -1px 1px rgba(17,24,39,0.05);
     }
     .sr-secondary-btn:hover {
         background: rgba(255,255,255,0.78);
@@ -592,13 +647,18 @@ const styles = `
     /* Primary action (⚡ More) — amber gradient. Dark ink, because white text
        on #fbbf24 fails contrast. */
     .sr-secondary-btn.sr-btn-primary {
-        background: linear-gradient(135deg, var(--sr-amber-hi) 0%, #f59e0b 100%);
-        border-color: rgba(217,119,6,0.35);
+        /* gloss layered over the amber fill — the reference's lozenge look */
+        background:
+          linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.06) 52%, rgba(255,255,255,0.18) 100%),
+          linear-gradient(135deg, var(--sr-amber-hi) 0%, #f59e0b 100%);
+        border-color: rgba(217,119,6,0.30);
         color: var(--sr-amber-ink);
         font-weight: 700;
         box-shadow:
           0 2px var(--space-md) var(--sr-amber-glow),
-          inset 0 1px 0 rgba(255,255,255,0.6);
+          0 var(--space-md) var(--space-xl) -8px rgba(217,119,6,0.45),
+          inset 0 1px 0 rgba(255,255,255,0.75),
+          inset 0 -1px 2px rgba(146,64,14,0.18);
     }
     .sr-secondary-btn.sr-btn-primary:hover {
         background: linear-gradient(135deg, #fde68a 0%, var(--sr-amber) 100%);
@@ -676,26 +736,39 @@ const styles = `
         position: absolute;
         width: var(--space-xxl);
         height: var(--space-xxl);
-        background: rgba(17,24,39,0.86);
+        /* dark glass puck: gloss on top, lit rim, amber bloom underneath */
+        background:
+          linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.02) 48%, rgba(0,0,0,0.10) 100%),
+          linear-gradient(160deg, #2a3242 0%, #151b28 55%, #0b0f18 100%);
         -webkit-backdrop-filter: blur(var(--space-lg)) saturate(var(--sr-glass-sat));
         backdrop-filter: blur(var(--space-lg)) saturate(var(--sr-glass-sat));
         color: #fff; border-radius: 50%;
-        text-align: center;
-        line-height: var(--space-xxl);
-        cursor: pointer; z-index: 2147483647; display: none;
+        display: none; align-items: center; justify-content: center;
+        cursor: pointer; z-index: 2147483647;
         box-shadow:
-          0 var(--space-sm) var(--space-lg) -2px rgba(17,24,39,0.38),
-          0 1px 2px rgba(17,24,39,0.20),
-          inset 0 1px 0 rgba(255,255,255,0.18);
-        transition: transform var(--timing-fast), box-shadow var(--timing-fast);
+          0 0 var(--space-xl) -6px var(--sr-amber-glow),
+          0 var(--space-md) var(--space-xl) -6px rgba(17,24,39,0.55),
+          0 1px 2px rgba(17,24,39,0.28),
+          inset 0 1px 0 rgba(255,255,255,0.22),
+          inset 0 -1px 2px rgba(0,0,0,0.35);
+        transition: transform var(--timing-fast) cubic-bezier(0.16, 1, 0.3, 1),
+                    box-shadow var(--timing-fast);
+    }
+    #smart-reader-trigger .sr-trigger-bolt {
+        display: block;
+        transition: transform var(--timing-normal) cubic-bezier(0.16, 1, 0.3, 1);
     }
     #smart-reader-trigger:hover {
-        transform: scale(1.12);
+        transform: scale(1.1);
         box-shadow:
-          0 var(--space-md) var(--space-xl) -2px rgba(17,24,39,0.42),
-          0 0 0 var(--space-sm) var(--sr-amber-veil),
-          inset 0 1px 0 rgba(255,255,255,0.25);
+          0 0 var(--space-xxl) -6px rgba(251,191,36,0.55),
+          0 var(--space-lg) var(--space-xxl) -6px rgba(17,24,39,0.6),
+          0 0 0 3px rgba(251,191,36,0.18),
+          inset 0 1px 0 rgba(255,255,255,0.3),
+          inset 0 -1px 2px rgba(0,0,0,0.35);
     }
+    #smart-reader-trigger:hover .sr-trigger-bolt { transform: scale(1.08) rotate(-4deg); }
+    #smart-reader-trigger:active { transform: scale(1.02); }
     
     @keyframes popIn {
         from { opacity:0; transform:scale(0.95); }
@@ -1435,7 +1508,7 @@ document.addEventListener('mouseup', function(event) {
     if (text.length > 0 && text.length < 50) { 
         currentSelection = text;
         currentContext = getExpandedContext(selection);
-        triggerBtn.style.display = "block";
+        triggerBtn.style.display = "flex";
         triggerBtn.style.left = (event.pageX + 10) + "px";
         triggerBtn.style.top = (event.pageY - 45) + "px";
     } else { triggerBtn.style.display = "none"; }
