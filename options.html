@@ -2,91 +2,273 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Context Reader - Settings</title>
+    <title>Context Reader — Settings</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', -apple-system, sans-serif; background: #f9fafb; color: #111827; min-height: 100vh; }
+        /* ═══════════════════════════════════════════════════════════════
+           Liquid Glass — settings
+           A full page, so the glass needs a field to refract: amber and teal
+           blooms over a warm neutral, plus grain. Same vocabulary as the
+           bubble — masked iridescent rim, gel pills, normalised backdrop.
+           ═══════════════════════════════════════════════════════════════ */
+        :root {
+            --space-xs:3px; --space-sm:5px; --space-md:8px;
+            --space-lg:13px; --space-xl:21px; --space-xxl:34px; --space-2xl:55px;
+            --phi:1.618;
+            --t-fast:0.236s; --t-norm:0.382s;
+            --ease:cubic-bezier(0.16,1,0.3,1);
 
-        .container { max-width: 640px; margin: 0 auto; padding: 40px 20px; }
+            --glass-top:rgba(255,255,255,0.72);
+            --glass-mid:rgba(255,255,255,0.58);
+            --glass-bot:rgba(255,255,255,0.50);
+            --glass-line:rgba(255,255,255,0.75);
+            --glass-fx:blur(34px) saturate(180%) brightness(1.1) contrast(0.92);
+            --gel:linear-gradient(180deg,rgba(255,255,255,0.85) 0%,rgba(255,255,255,0.34) 52%,rgba(255,255,255,0.50) 100%);
+            --rim:linear-gradient(140deg,
+                    rgba(255,255,255,0.98) 0%,
+                    rgba(251,191,36,0.45) 22%,
+                    rgba(255,255,255,0.75) 46%,
+                    rgba(8,145,178,0.32) 72%,
+                    rgba(255,255,255,0.95) 100%);
 
-        .header { margin-bottom: 30px; }
-        .header h1 { font-size: 24px; font-weight: 800; margin-bottom: 4px; }
-        .header p { font-size: 14px; color: #6b7280; }
+            --amber:#fbbf24; --amber-hi:#fcd34d; --amber-deep:#d97706;
+            --amber-ink:#78350f; --amber-glow:rgba(251,191,36,0.30);
+            --teal:#0891b2; --teal-deep:#0e7490; --teal-line:rgba(8,145,178,0.28);
+            --green:#16a34a; --red:#dc2626;
 
-        .card {
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            --ink:#111827; --ink-soft:#374151; --ink-mute:#6b7280; --ink-faint:#9ca3af;
+            --shadow:rgba(17,24,39,0.16);
+        }
+        *{box-sizing:border-box}
+        body{
+            margin:0; padding:var(--space-2xl) var(--space-xl) var(--space-2xl);
+            font-family:Inter,system-ui,-apple-system,sans-serif;
+            font-size:14px; line-height:var(--phi); color:var(--ink-soft);
+            background:
+              url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/></filter><rect width='140' height='140' filter='url(%23n)' opacity='0.04'/></svg>"),
+              radial-gradient(ellipse 55% 40% at 12% 0%, rgba(251,191,36,0.20) 0%, transparent 62%),
+              radial-gradient(ellipse 50% 45% at 92% 14%, rgba(8,145,178,0.16) 0%, transparent 60%),
+              radial-gradient(ellipse 70% 40% at 50% 100%, rgba(251,191,36,0.12) 0%, transparent 62%),
+              linear-gradient(180deg,#fdfcfa 0%,#f6f4f1 100%);
+            background-attachment:fixed;
+        }
+        .container{max-width:620px; margin:0 auto}
+
+        /* ── header ────────────────────────────────────────────────── */
+        .header{text-align:center; margin-bottom:var(--space-2xl)}
+        .header h1{
+            font-size:30px; font-weight:800; letter-spacing:-0.03em;
+            color:var(--ink); margin:0 0 var(--space-sm);
+            text-shadow:0 1px 0 rgba(255,255,255,0.6);
+        }
+        .header p{font-size:13px; color:var(--ink-mute); margin:0}
+
+        /* ── glass card ────────────────────────────────────────────── */
+        .card{
+            position:relative;
+            background:linear-gradient(180deg,var(--glass-top) 0%,var(--glass-mid) 50%,var(--glass-bot) 100%);
+            -webkit-backdrop-filter:var(--glass-fx);
+            backdrop-filter:var(--glass-fx);
+            border-radius:var(--space-xxl);
+            padding:var(--space-xl);
+            margin-bottom:var(--space-xl);
+            box-shadow:
+              0 0 var(--space-2xl) -18px var(--amber-glow),
+              0 var(--space-lg) var(--space-xxl) -12px var(--shadow),
+              inset 0 1px 0 rgba(255,255,255,0.95),
+              inset 0 -2px var(--space-md) -4px rgba(17,24,39,0.06);
+        }
+        .card::after{
+            content:''; position:absolute; inset:0;
+            border-radius:inherit; padding:1px; background:var(--rim);
+            -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+            -webkit-mask-composite:xor;
+            mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+            mask-composite:exclude; pointer-events:none;
+        }
+        .card > *{position:relative}
+        .card-title{
+            font-size:11px; font-weight:700; text-transform:uppercase;
+            letter-spacing:0.12em; color:var(--amber-ink);
+            margin-bottom:var(--space-lg);
+        }
+        .card-title.teal{color:var(--teal-deep)}
+
+        /* ── usage ─────────────────────────────────────────────────── */
+        .usage-section{display:flex; gap:var(--space-xl); align-items:center}
+        .usage-circle{
+            flex:0 0 auto; width:82px; height:82px; border-radius:50%;
+            display:flex; flex-direction:column; align-items:center; justify-content:center;
+            background:var(--gel),rgba(255,255,255,0.5);
+            -webkit-backdrop-filter:blur(var(--space-xl));
+            backdrop-filter:blur(var(--space-xl));
+            border:2px solid var(--amber);
+            box-shadow:
+              0 0 var(--space-xl) -6px var(--amber-glow),
+              inset 0 1px 0 rgba(255,255,255,0.95);
+        }
+        .usage-circle .num{
+            font-size:26px; font-weight:800; line-height:1;
+            color:var(--amber-deep); font-variant-numeric:tabular-nums;
+        }
+        .usage-circle .label{
+            font-size:9px; text-transform:uppercase; letter-spacing:0.1em;
+            color:var(--ink-mute); font-weight:600; margin-top:2px;
+        }
+        .usage-info{flex:1; min-width:0}
+        #opt-usage-label{font-size:13px; font-weight:600; color:var(--ink)}
+        .bar-bg{
+            background:rgba(251,191,36,0.18); border-radius:100px;
+            height:6px; overflow:hidden; margin:var(--space-md) 0 var(--space-sm);
+            box-shadow:inset 0 1px 2px rgba(146,64,14,0.12);
+        }
+        .bar-fill{
+            height:100%; border-radius:100px; width:0%;
+            background:linear-gradient(90deg,var(--amber-hi),#f59e0b);
+            box-shadow:0 0 var(--space-md) var(--amber-glow);
+            transition:width var(--t-norm) var(--ease);
+        }
+        .bar-label{font-size:11px; color:var(--ink-mute)}
+
+        /* ── controls ──────────────────────────────────────────────── */
+        .btn{
+            display:inline-flex; align-items:center; justify-content:center;
+            gap:var(--space-sm);
+            padding:var(--space-md) var(--space-lg);
+            background:var(--gel),rgba(255,255,255,0.55);
+            -webkit-backdrop-filter:blur(var(--space-xl));
+            backdrop-filter:blur(var(--space-xl));
+            border:1px solid var(--glass-line); border-radius:100px;
+            font-family:inherit; font-size:12px; font-weight:600;
+            color:var(--ink-soft); cursor:pointer;
+            transition:all var(--t-fast);
+            box-shadow:
+              0 1px 2px rgba(17,24,39,0.07),
+              inset 0 1px 0 rgba(255,255,255,0.95);
+        }
+        .btn:hover{
+            transform:translateY(-1px); color:var(--ink);
+            border-color:rgba(251,191,36,0.5);
+            background:var(--gel),rgba(255,255,255,0.8);
+            box-shadow:0 var(--space-sm) var(--space-lg) -3px rgba(17,24,39,0.13),
+                       inset 0 1px 0 rgba(255,255,255,0.95);
+        }
+        .btn:active{transform:translateY(0)}
+        .btn-primary{
+            background:
+              linear-gradient(180deg,rgba(255,255,255,0.55) 0%,rgba(255,255,255,0.06) 52%,rgba(255,255,255,0.18) 100%),
+              linear-gradient(135deg,var(--amber-hi) 0%,#f59e0b 100%);
+            border-color:rgba(217,119,6,0.30); color:var(--amber-ink); font-weight:700;
+            box-shadow:
+              0 2px var(--space-md) var(--amber-glow),
+              0 var(--space-md) var(--space-xl) -8px rgba(217,119,6,0.45),
+              inset 0 1px 0 rgba(255,255,255,0.75),
+              inset 0 -1px 2px rgba(146,64,14,0.18);
+        }
+        .btn-primary:hover{
+            background:
+              linear-gradient(180deg,rgba(255,255,255,0.62) 0%,rgba(255,255,255,0.08) 52%,rgba(255,255,255,0.2) 100%),
+              linear-gradient(135deg,#fde68a 0%,var(--amber) 100%);
+            border-color:rgba(217,119,6,0.45); color:var(--amber-ink);
+        }
+        .field{
+            width:100%; padding:var(--space-lg) var(--space-lg);
+            background:rgba(255,255,255,0.55);
+            -webkit-backdrop-filter:blur(var(--space-lg));
+            backdrop-filter:blur(var(--space-lg));
+            border:1px solid var(--glass-line); border-radius:100px;
+            font-family:'JetBrains Mono',ui-monospace,monospace; font-size:12px;
+            color:var(--ink); outline:none;
+            transition:all var(--t-fast);
+            box-shadow:inset 0 1px 3px rgba(17,24,39,0.06);
+        }
+        .field::placeholder{color:var(--ink-faint)}
+        .field:focus{
+            border-color:rgba(251,191,36,0.65); background:rgba(255,255,255,0.78);
+            box-shadow:0 0 0 3px rgba(251,191,36,0.16), inset 0 1px 3px rgba(17,24,39,0.05);
         }
 
-        .card-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: #374151;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        /* ── shortcuts ─────────────────────────────────────────────── */
+        .shortcut-row{
+            display:flex; justify-content:space-between; align-items:center;
+            padding:var(--space-md) 0; border-bottom:1px solid rgba(255,255,255,0.55);
+        }
+        .shortcut-row:last-of-type{border-bottom:none}
+        .shortcut-desc{font-size:13px; color:var(--ink-soft)}
+        .shortcut-key{
+            font-family:'JetBrains Mono',ui-monospace,monospace; font-size:11px;
+            padding:var(--space-xs) var(--space-md); border-radius:var(--space-md);
+            background:var(--gel),rgba(255,255,255,0.6);
+            border:1px solid var(--glass-line); color:var(--ink);
+            box-shadow:0 1px 2px rgba(17,24,39,0.08), inset 0 1px 0 rgba(255,255,255,0.95);
         }
 
-        /* Usage dashboard */
-        .usage-section { display: flex; align-items: center; gap: 16px; }
-        .usage-circle {
-            width: 80px; height: 80px;
-            border-radius: 50%;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
-            border: 3px solid #38bdf8;
-            flex-shrink: 0;
+        /* ── links ─────────────────────────────────────────────────── */
+        .link-list{display:flex; flex-direction:column; gap:var(--space-sm)}
+        .link-list a{
+            display:flex; align-items:center; gap:var(--space-lg);
+            padding:var(--space-lg); border-radius:var(--space-xl);
+            color:var(--ink-soft); text-decoration:none; font-size:13px; font-weight:500;
+            border:1px solid transparent;
+            transition:all var(--t-fast);
         }
-        .usage-circle .num { font-size: 24px; font-weight: 800; color: #0284c7; line-height: 1; }
-        .usage-circle .label { font-size: 9px; color: #0369a1; text-transform: uppercase; letter-spacing: 0.5px; }
-        .usage-info { flex: 1; }
-        .usage-info .bar-bg { background: #e5e7eb; border-radius: 6px; height: 8px; margin: 8px 0; overflow: hidden; }
-        .usage-info .bar-fill { background: #38bdf8; height: 100%; border-radius: 6px; transition: width 0.3s; }
-        .usage-info .bar-label { font-size: 12px; color: #6b7280; }
-
-        /* Shortcuts */
-        .shortcut-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f3f4f6; }
-        .shortcut-row:last-child { border-bottom: none; }
-        .shortcut-desc { font-size: 13px; color: #374151; }
-        .shortcut-key {
-            font-family: 'SF Mono', 'Consolas', monospace;
-            font-size: 12px; font-weight: 600;
-            background: #f3f4f6; color: #374151;
-            padding: 3px 8px; border-radius: 4px;
-            border: 1px solid #d1d5db;
+        .link-list a:hover{
+            background:var(--gel),rgba(255,255,255,0.6);
+            border-color:var(--glass-line); color:var(--ink);
+            transform:translateX(2px);
+            box-shadow:inset 0 1px 0 rgba(255,255,255,0.95);
         }
-
-        /* Links */
-        .link-list a {
-            display: flex; align-items: center; gap: 10px;
-            padding: 12px 0; border-bottom: 1px solid #f3f4f6;
-            text-decoration: none; color: #374151; font-size: 13px; font-weight: 500;
-            transition: color 0.15s;
+        .link-list .icon{
+            flex:0 0 auto; display:flex; align-items:center; justify-content:center;
+            width:30px; height:30px; border-radius:50%;
+            background:var(--gel),rgba(255,255,255,0.55);
+            border:1px solid var(--glass-line); color:var(--amber-deep);
+            box-shadow:inset 0 1px 0 rgba(255,255,255,0.95);
         }
-        .link-list a:last-child { border-bottom: none; }
-        .link-list a:hover { color: #2563eb; }
-        .link-list .icon { font-size: 16px; width: 24px; text-align: center; }
-        .link-list .arrow { margin-left: auto; color: #9ca3af; font-size: 14px; }
+        .link-list .arrow{margin-left:auto; color:var(--ink-faint); font-size:16px}
+        .link-list a:hover .arrow{color:var(--amber-deep)}
 
-        /* About */
-        .about-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 13px; }
-        .about-row .label { color: #6b7280; }
-        .about-row .value { color: #111827; font-weight: 600; }
+        /* ── about ─────────────────────────────────────────────────── */
+        .about-row{
+            display:flex; justify-content:space-between; align-items:baseline; gap:var(--space-lg);
+            padding:var(--space-md) 0; border-bottom:1px solid rgba(255,255,255,0.55);
+        }
+        .about-row:last-child{border-bottom:none}
+        .about-row .label{font-size:12px; color:var(--ink-mute)}
+        .about-row .value{font-size:12px; color:var(--ink); font-weight:600; text-align:right}
+        .mono{font-family:'JetBrains Mono',ui-monospace,monospace; font-size:11px; font-weight:400}
+
+        .note{font-size:12px; color:var(--ink-mute); line-height:1.6; margin:0 0 var(--space-lg)}
+        .note a{color:var(--amber-deep); font-weight:600}
+        .key-row{display:flex; gap:var(--space-md); align-items:center}
+        #opt-key-status{font-size:12px; margin-top:var(--space-lg); min-height:18px; font-weight:500}
+
+        @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+        :focus-visible{outline:2px solid var(--amber-deep); outline-offset:2px}
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>Context Reader</h1>
-            <p>Smart Sinhala Dictionary &mdash; Settings &amp; Info</p>
+            <p>Smart Sinhala Dictionary — Settings &amp; Info</p>
         </div>
 
-        <!-- Usage Dashboard -->
+        <!-- API key first: nothing else works without it -->
+        <div class="card">
+            <div class="card-title">Gemini API Key</div>
+            <p class="note">
+                This build calls Gemini directly, so it needs your own key. It's free, and it stays
+                on this device — it is never sent anywhere except Google.
+                <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Get a key →</a>
+            </p>
+            <div class="key-row">
+                <input id="opt-api-key" class="field" type="password" placeholder="AIza…" autocomplete="off">
+                <button id="opt-save-key" class="btn btn-primary">Save</button>
+            </div>
+            <div id="opt-key-status"></div>
+        </div>
+
         <div class="card">
             <div class="card-title">Today's Usage</div>
             <div class="usage-section">
@@ -95,17 +277,16 @@
                     <div class="label">left</div>
                 </div>
                 <div class="usage-info">
-                    <div style="font-size:13px; font-weight:600; color:#111827;" id="opt-usage-label">Loading...</div>
-                    <div class="bar-bg"><div class="bar-fill" id="opt-usage-bar" style="width:0%"></div></div>
-                    <div class="bar-label">Resets daily at midnight IST</div>
-                    <button id="opt-refresh-usage" style="margin-top:8px; font-size:11px; color:#0369a1; background:none; border:1px solid #bae6fd; padding:4px 10px; border-radius:6px; cursor:pointer;">Refresh</button>
+                    <div id="opt-usage-label">Loading…</div>
+                    <div class="bar-bg"><div class="bar-fill" id="opt-usage-bar"></div></div>
+                    <div class="bar-label">Limits come from Google's free tier — 20 requests per minute.</div>
+                    <button id="opt-refresh-usage" class="btn" style="margin-top:var(--space-lg);">Refresh</button>
                 </div>
             </div>
         </div>
 
-        <!-- Keyboard Shortcuts -->
         <div class="card">
-            <div class="card-title">Keyboard Shortcuts</div>
+            <div class="card-title teal">Keyboard Shortcuts</div>
             <div class="shortcut-row">
                 <span class="shortcut-desc">Activate extension</span>
                 <span class="shortcut-key">Alt+Shift+S</span>
@@ -114,31 +295,33 @@
                 <span class="shortcut-desc">Close bubble</span>
                 <span class="shortcut-key">Esc</span>
             </div>
-            <div style="margin-top: 10px;">
-                <a href="#" id="opt-customize-shortcuts" style="font-size:12px; color:#2563eb; text-decoration:none;">Customize shortcuts in Chrome settings &rarr;</a>
+            <div style="margin-top:var(--space-lg)">
+                <a href="#" id="opt-customize-shortcuts" class="btn">Customize in Chrome settings →</a>
             </div>
         </div>
 
-        <!-- Links -->
         <div class="card">
-            <div class="card-title">Resources</div>
+            <div class="card-title teal">Resources</div>
             <div class="link-list">
                 <a href="https://docs.google.com/document/d/e/2PACX-1vSseVLIuc_9TPD15k6Gk3TOUBQC5cImMMmbgELuXwl2k0bCAmfOABf3lQ9_E_BcL_WzlnV19AdIkmim/pub" id="opt-privacy-link" target="_blank" rel="noopener">
-                    <span class="icon">🔒</span> Privacy Policy <span class="arrow">›</span>
+                    <span class="icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10.5" width="16" height="10" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg></span>
+                    Privacy Policy <span class="arrow">›</span>
                 </a>
                 <a href="https://discord.gg/tdwHWmmC" target="_blank" rel="noopener">
-                    <span class="icon">💬</span> Join Discord Community <span class="arrow">›</span>
+                    <span class="icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 18.5 21 12a9 9 0 1 0-3.6 7.2Z"/><path d="M8.5 11h.01M12 11h.01M15.5 11h.01"/></svg></span>
+                    Join Discord Community <span class="arrow">›</span>
                 </a>
                 <a href="#" id="opt-rate-link" target="_blank" rel="noopener">
-                    <span class="icon">⭐</span> Rate on Chrome Web Store <span class="arrow">›</span>
+                    <span class="icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3.6 2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.8l5.9-.9Z"/></svg></span>
+                    Rate on Chrome Web Store <span class="arrow">›</span>
                 </a>
                 <a href="#" id="opt-feedback-link" target="_blank" rel="noopener">
-                    <span class="icon">📧</span> Send Feedback <span class="arrow">›</span>
+                    <span class="icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6 8.5-6"/></svg></span>
+                    Send Feedback <span class="arrow">›</span>
                 </a>
             </div>
         </div>
 
-        <!-- About -->
         <div class="card">
             <div class="card-title">About</div>
             <div class="about-row">
@@ -147,35 +330,21 @@
             </div>
             <div class="about-row">
                 <span class="label">Extension ID</span>
-                <span class="value" id="opt-ext-id" style="font-size:11px; font-family:monospace;">&mdash;</span>
+                <span class="value mono" id="opt-ext-id">—</span>
             </div>
             <div class="about-row">
                 <span class="label">Language Modes</span>
-                <span class="value">English &rarr; Sinhala, Sinhala &rarr; Sinhala</span>
+                <span class="value">English → Sinhala, Sinhala → Sinhala</span>
             </div>
             <div class="about-row">
                 <span class="label">AI Model</span>
-                <span class="value">Gemini 3.1 Flash Lite (direct)</span>
+                <span class="value mono">gemini-3.1-flash-lite</span>
+            </div>
+            <div class="about-row">
+                <span class="label">Request path</span>
+                <span class="value">Direct to Google — no proxy, no cache</span>
             </div>
         </div>
-    </div>
-
-    <div class="card" style="margin-top:16px;">
-        <h2 style="margin:0 0 6px; font-size:15px;">Gemini API Key</h2>
-        <p style="font-size:12px; color:#78716c; line-height:1.5; margin:0 0 10px;">
-            This build calls Gemini directly, so it needs your own key. It is free and stays on this
-            device &mdash; it is never sent anywhere except Google.
-            <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Get a key</a>.
-        </p>
-        <div style="display:flex; gap:8px; align-items:center;">
-            <input id="opt-api-key" type="password" placeholder="AIza..." autocomplete="off"
-                   style="flex:1; padding:9px 11px; border:1px solid #d6d3d1; border-radius:8px;
-                          font-family:monospace; font-size:12px;">
-            <button id="opt-save-key"
-                    style="padding:9px 16px; border:none; border-radius:8px; background:#2563eb;
-                           color:#fff; font-size:13px; font-weight:600; cursor:pointer;">Save</button>
-        </div>
-        <div id="opt-key-status" style="font-size:12px; margin-top:8px; min-height:16px;"></div>
     </div>
 
     <script src="options.js"></script>

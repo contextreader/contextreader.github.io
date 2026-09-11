@@ -60,11 +60,21 @@ const styles = `
       /* ═══ Liquid Glass ═══
          Namespaced --sr-* because these tokens land in the HOST page's :root
          (no shadow DOM) and a bare --glass-bg would collide with the site's own. */
-      --sr-glass-blur: 34px;                      /* Fibonacci */
+      --sr-glass-blur: 55px;                      /* Fibonacci — deeper frost */
       --sr-glass-sat: 180%;
-      --sr-glass: rgba(255,255,255,0.80);         /* the scrim = the readability guarantee */
-      --sr-glass-top: rgba(255,255,255,0.90);     /* scrim gradient: light falls from above */
-      --sr-glass-bot: rgba(255,255,255,0.72);
+      /* the readability engine: lift + flatten the backdrop before the scrim */
+      --sr-glass-fx: blur(55px) saturate(180%) brightness(1.14) contrast(0.88);
+      --sr-glass-fx-sm: blur(21px) saturate(180%) brightness(1.12) contrast(0.9);
+      --sr-glass-top: rgba(255,255,255,0.62);     /* scrim gradient: light falls from above */
+      --sr-glass-mid: rgba(255,255,255,0.50);
+      --sr-glass-bot: rgba(255,255,255,0.44);
+      /* accent glass, by role — see the panel comments below */
+      --sr-teal-deep: #0e7490;
+      --sr-teal-veil: rgba(8,145,178,0.09);
+      --sr-teal-line: rgba(8,145,178,0.26);
+      --sr-teal-glow: rgba(8,145,178,0.28);
+      --sr-green: #047857;
+      --sr-green-line: rgba(16,185,129,0.28);
       /* Iridescent rim. Amber + teal are the brand's own two accents, so the
          chromatic edge reads as Context Reader rather than generic Apple glass. */
       --sr-rim: linear-gradient(140deg,
@@ -117,9 +127,9 @@ const styles = `
            light landing on a pane. Grain on top of it kills gradient banding. */
         background:
           url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/></filter><rect width='140' height='140' filter='url(%23n)' opacity='0.035'/></svg>"),
-          linear-gradient(180deg, var(--sr-glass-top) 0%, var(--sr-glass-bot) 100%);
-        -webkit-backdrop-filter: blur(var(--sr-glass-blur)) saturate(var(--sr-glass-sat));
-        backdrop-filter: blur(var(--sr-glass-blur)) saturate(var(--sr-glass-sat));
+          linear-gradient(180deg, var(--sr-glass-top) 0%, var(--sr-glass-mid) 46%, var(--sr-glass-bot) 100%);
+        -webkit-backdrop-filter: var(--sr-glass-fx);
+        backdrop-filter: var(--sr-glass-fx);
         border: none;                                  /* replaced by the ::after rim */
         border-radius: var(--space-xxl);               /* 34px — reference proportion */
 
@@ -160,8 +170,11 @@ const styles = `
     #sr-general-modal.active { display: flex; }
     
     .sr-general-card {
-        background: #fff; 
-        border-radius: var(--space-lg); 
+        background: linear-gradient(180deg, var(--sr-glass-top) 0%, var(--sr-glass-bot) 100%);
+        -webkit-backdrop-filter: var(--sr-glass-fx-sm);
+        backdrop-filter: var(--sr-glass-fx-sm);
+        border: 1px solid var(--sr-glass-line);
+        border-radius: var(--space-xl);
         padding: var(--space-xl);
         max-width: calc(400px / var(--phi));
         margin: var(--space-xl);
@@ -189,7 +202,10 @@ const styles = `
     
     .sr-general-close { 
         width: 26px; height: 26px; border-radius: 50%; 
-        background: #f3f4f6; border: none; color: #6b7280; cursor: pointer; 
+        background: var(--sr-gel), var(--sr-glass-soft);
+        -webkit-backdrop-filter: blur(var(--space-lg));
+        backdrop-filter: blur(var(--space-lg));
+        border: 1px solid rgba(255,255,255,0.6); color: var(--sr-ink-mute); cursor: pointer; 
         display: flex; align-items: center; justify-content: center; 
         font-size: 18px; 
         transition: all var(--timing-fast); 
@@ -315,8 +331,8 @@ const styles = `
     
     .sr-header {
         padding: var(--space-lg) var(--space-xl);
-        background: linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0.12));
-        border-bottom: 1px solid rgba(255,255,255,0.55);
+        background: linear-gradient(180deg, rgba(255,255,255,0.34), rgba(255,255,255,0.04));
+        border-bottom: 1px solid rgba(255,255,255,0.42);
         box-shadow: 0 1px 0 rgba(17,24,39,0.04);
         cursor: move; user-select: none; flex-shrink: 0; position: relative;
     }
@@ -329,6 +345,7 @@ const styles = `
     .sr-word {
         margin:0; font-size: 22px; font-weight: 800;
         color: var(--sr-ink); letter-spacing: -0.5px;
+        text-shadow: 0 1px 0 rgba(255,255,255,0.55);
     }
     
     .sr-translation {
@@ -372,8 +389,8 @@ const styles = `
         width: 208px; max-width: 208px;
         background:
           linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.80) 100%);
-        -webkit-backdrop-filter: blur(var(--space-xxl)) saturate(var(--sr-glass-sat));
-        backdrop-filter: blur(var(--space-xxl)) saturate(var(--sr-glass-sat));
+        -webkit-backdrop-filter: var(--sr-glass-fx-sm);
+        backdrop-filter: var(--sr-glass-fx-sm);
         border: 1px solid var(--sr-glass-line);
         border-radius: var(--space-xl);
         box-shadow:
@@ -420,8 +437,8 @@ const styles = `
         width: var(--space-xxl); height: var(--space-xxl);   /* 34px, Fibonacci */
         border-radius: 50%;
         background: var(--sr-gel), var(--sr-glass-soft);
-        -webkit-backdrop-filter: blur(var(--space-xl)) saturate(var(--sr-glass-sat));
-        backdrop-filter: blur(var(--space-xl)) saturate(var(--sr-glass-sat));
+        -webkit-backdrop-filter: var(--sr-glass-fx-sm);
+        backdrop-filter: var(--sr-glass-fx-sm);
         border: 1px solid var(--sr-glass-line);
         box-shadow:
           0 1px 3px rgba(17,24,39,0.09),
@@ -503,8 +520,10 @@ const styles = `
     }
     
     .sr-def {
-        font-size: 15px; color: #374151; margin: 0;
+        font-size: 15px; color: var(--sr-ink); margin: 0;
         line-height: var(--phi);
+        font-weight: 500;                       /* holds up on a thinner scrim */
+        text-shadow: 0 1px 0 rgba(255,255,255,0.6);
     }
     
     .sr-def-label {
@@ -546,6 +565,45 @@ const styles = `
         border-radius: var(--space-sm);
     }
     
+    /* ── follow-up panels ──────────────────────────────────────────────
+       Context is amber: the product's core promise, the meaning HERE.
+       General is teal: the zoom-out, dictionary view — the brand's second accent.
+       Simple is green: the approachable register, for a younger reader.
+       Gemini emits .sr-general-box / .sr-simple-box and they had no rules at all
+       until now; the prompts' inline colours are removed so these win. */
+    .sr-general-box, .sr-simple-box {
+        padding: var(--space-lg);
+        border-radius: var(--space-xl);
+        margin-top: var(--space-lg);
+        -webkit-backdrop-filter: var(--sr-glass-fx-sm);
+        backdrop-filter: var(--sr-glass-fx-sm);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.85);
+        animation: fadeIn var(--timing-normal) both;
+    }
+    .sr-general-box {
+        background: linear-gradient(180deg, rgba(236,254,255,0.78) 0%, rgba(236,254,255,0.52) 100%);
+        border: 1px solid var(--sr-teal-line);
+    }
+    .sr-general-box .sr-label { color: var(--sr-teal-deep); }
+    .sr-general-box .sr-sub-text {
+        background: rgba(8,145,178,0.08);
+        border-color: var(--sr-teal-line);
+        color: #0b4f5e;
+    }
+    .sr-general-box .sr-sub-text b { color: var(--sr-teal-deep); background: rgba(8,145,178,0.14); }
+
+    .sr-simple-box {
+        background: linear-gradient(180deg, rgba(240,253,244,0.80) 0%, rgba(240,253,244,0.54) 100%);
+        border: 1px solid var(--sr-green-line);
+    }
+    .sr-simple-box .sr-label { color: var(--sr-green); }
+    .sr-simple-box .sr-sub-text {
+        background: rgba(16,185,129,0.08);
+        border-color: var(--sr-green-line);
+        color: #14532d;
+    }
+    .sr-simple-box .sr-sub-text b { color: var(--sr-green); background: rgba(16,185,129,0.14); }
+
     .sr-hook-box {
         background: rgba(255,251,235,0.70);
         -webkit-backdrop-filter: blur(var(--space-lg));
@@ -600,8 +658,8 @@ const styles = `
         display: inline-flex; align-items: center; justify-content: center;
         gap: var(--space-sm);
         background: var(--sr-gel), var(--sr-glass-soft);
-        -webkit-backdrop-filter: blur(var(--space-xl)) saturate(var(--sr-glass-sat));
-        backdrop-filter: blur(var(--space-xl)) saturate(var(--sr-glass-sat));
+        -webkit-backdrop-filter: var(--sr-glass-fx-sm);
+        backdrop-filter: var(--sr-glass-fx-sm);
         border: 1px solid var(--sr-glass-line);
         color: var(--sr-ink-soft);
         font-family: 'Inter', system-ui, sans-serif;
@@ -683,11 +741,61 @@ const styles = `
         border: none; border-top: 1px dashed #e5e7eb; 
     }
 
-    .sr-list-item { 
-        padding: var(--space-lg) var(--space-md); 
-        border-bottom: 1px solid #f3f4f6; 
-        display:flex; justify-content:space-between; 
-        align-items:center; transition: background 0.1s; 
+    /* ── hover system ─────────────────────────────────────────────────
+       One idea across every interactive surface: lift 1px, brighten the glass,
+       ring it in the accent that owns that control. Elevation and light change;
+       size and hue do not — so nothing shifts under the reader's eye. */
+    .sr-list-item:hover {
+        background: rgba(255,255,255,0.55);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
+    }
+    .sr-view-btn, .sr-delete-btn {
+        -webkit-backdrop-filter: blur(var(--space-lg));
+        backdrop-filter: blur(var(--space-lg));
+        background: var(--sr-gel), var(--sr-glass-soft);
+        border: 1px solid var(--sr-glass-line);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
+        transition: all var(--timing-fast);
+    }
+    .sr-view-btn:hover {
+        transform: translateY(-1px);
+        border-color: var(--sr-teal-line);
+        color: var(--sr-teal-deep);
+        background: var(--sr-gel), var(--sr-teal-veil);
+        box-shadow: 0 var(--space-sm) var(--space-lg) -3px var(--sr-teal-glow),
+                    inset 0 1px 0 rgba(255,255,255,0.95);
+    }
+    .sr-delete-btn:hover {
+        transform: translateY(-1px);
+        background: rgba(254,226,226,0.85);
+        box-shadow: 0 var(--space-sm) var(--space-lg) -3px rgba(239,68,68,0.28),
+                    inset 0 1px 0 rgba(255,255,255,0.9);
+    }
+    .sr-nav-btn {
+        background: var(--sr-gel), var(--sr-glass-soft);
+        -webkit-backdrop-filter: blur(var(--space-lg));
+        backdrop-filter: blur(var(--space-lg));
+        border: 1px solid var(--sr-glass-line);
+        border-radius: 100px;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
+        transition: all var(--timing-fast);
+    }
+    .sr-nav-btn:hover:not(:disabled) {
+        transform: translateY(-1px);
+        border-color: rgba(251,191,36,0.5);
+        background: var(--sr-gel), rgba(255,255,255,0.8);
+    }
+    .sr-details summary { transition: color var(--timing-fast); }
+    .sr-general-close:hover { transform: translateY(-1px); }
+    .sr-simple-box .sr-sub-text, .sr-general-box .sr-sub-text { transition: background var(--timing-fast); }
+
+    .sr-list-item {
+        padding: var(--space-lg) var(--space-md);
+        border-bottom: 1px solid rgba(255,255,255,0.5);
+        border-radius: var(--space-lg);
+        display:flex; justify-content:space-between;
+        align-items:center;
+        transition: background var(--timing-fast), box-shadow var(--timing-fast);
     }
     .sr-list-item:hover { background: #f9fafb; }
     .sr-list-item:last-child { border-bottom: none; }
@@ -720,38 +828,44 @@ const styles = `
         position: absolute;
         width: var(--space-xxl);
         height: var(--space-xxl);
-        /* dark glass puck: gloss on top, lit rim, amber bloom underneath */
+        /* Clear glass puck — Liquid Glass, not a dark disc. The mark's unlit
+           rods are ink rather than white, because white vanishes on clear glass
+           and because they depict text, which is dark. */
         background:
-          url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Cdefs%3E%3ClinearGradient id='l' x1='3' y1='10' x2='13' y2='13.6' gradientUnits='userSpaceOnUse'%3E%3Cstop offset='0' stop-color='%23FEF3C7'/%3E%3Cstop offset='0.45' stop-color='%23FCD34D'/%3E%3Cstop offset='1' stop-color='%23F59E0B'/%3E%3C/linearGradient%3E%3ClinearGradient id='f' x1='12' y1='4' x2='12' y2='20' gradientUnits='userSpaceOnUse'%3E%3Cstop offset='0' stop-color='%23FFFFFF' stop-opacity='0.62'/%3E%3Cstop offset='1' stop-color='%23FFFFFF' stop-opacity='0.30'/%3E%3C/linearGradient%3E%3Cfilter id='g' x='-0.7' y='-1.8' width='2.4' height='4.6'%3E%3CfeGaussianBlur stdDeviation='1.5' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Crect x='3.2' y='4.8' width='17.6' height='2.8' rx='1.4' fill='url(%23f)'/%3E%3Crect x='15.4' y='10.6' width='5.4' height='2.8' rx='1.4' fill='url(%23f)'/%3E%3Crect x='3.2' y='16.4' width='13.4' height='2.8' rx='1.4' fill='url(%23f)'/%3E%3Cg filter='url(%23g)'%3E%3Crect x='3.2' y='10.6' width='10.2' height='2.8' rx='1.4' fill='url(%23l)'/%3E%3C/g%3E%3Crect x='4.1' y='11.0' width='8.4' height='0.9' rx='0.45' fill='%23FFFDF5' opacity='0.55'/%3E%3C/svg%3E") no-repeat center / 18px 18px,
-          linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.02) 48%, rgba(0,0,0,0.10) 100%),
-          linear-gradient(160deg, #2a3242 0%, #151b28 55%, #0b0f18 100%);
-        -webkit-backdrop-filter: blur(var(--space-lg)) saturate(var(--sr-glass-sat));
-        backdrop-filter: blur(var(--space-lg)) saturate(var(--sr-glass-sat));
-        color: #fff; border-radius: 50%;
+          url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Cdefs%3E%3ClinearGradient id='l' x1='3' y1='10' x2='13' y2='13.6' gradientUnits='userSpaceOnUse'%3E%3Cstop offset='0' stop-color='%23FDE68A'/%3E%3Cstop offset='0.4' stop-color='%23F59E0B'/%3E%3Cstop offset='1' stop-color='%23D97706'/%3E%3C/linearGradient%3E%3ClinearGradient id='f' x1='12' y1='4' x2='12' y2='20' gradientUnits='userSpaceOnUse'%3E%3Cstop offset='0' stop-color='%23111827' stop-opacity='0.46'/%3E%3Cstop offset='1' stop-color='%23111827' stop-opacity='0.28'/%3E%3C/linearGradient%3E%3Cfilter id='g' x='-0.7' y='-1.8' width='2.4' height='4.6'%3E%3CfeGaussianBlur stdDeviation='1.4' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Crect x='3.2' y='4.8' width='17.6' height='2.8' rx='1.4' fill='url(%23f)'/%3E%3Crect x='15.4' y='10.6' width='5.4' height='2.8' rx='1.4' fill='url(%23f)'/%3E%3Crect x='3.2' y='16.4' width='13.4' height='2.8' rx='1.4' fill='url(%23f)'/%3E%3Cg filter='url(%23g)'%3E%3Crect x='3.2' y='10.6' width='10.2' height='2.8' rx='1.4' fill='url(%23l)'/%3E%3C/g%3E%3Crect x='4.3' y='11.1' width='8.0' height='0.8' rx='0.4' fill='%23FFFBEB' opacity='0.6'/%3E%3C/svg%3E") no-repeat center / 18px 18px,
+          linear-gradient(180deg, rgba(255,255,255,0.62) 0%, rgba(255,255,255,0.34) 52%, rgba(255,255,255,0.44) 100%);
+        -webkit-backdrop-filter: var(--sr-glass-fx-sm);
+        backdrop-filter: var(--sr-glass-fx-sm);
+        border: 1px solid rgba(255,255,255,0.75);
+        border-radius: 50%;
         display: none; align-items: center; justify-content: center;
         cursor: pointer; z-index: 2147483647;
         box-shadow:
-          0 0 var(--space-xl) -6px var(--sr-amber-glow),
-          0 var(--space-md) var(--space-xl) -6px rgba(17,24,39,0.55),
-          0 1px 2px rgba(17,24,39,0.28),
-          inset 0 1px 0 rgba(255,255,255,0.22),
-          inset 0 -1px 2px rgba(0,0,0,0.35);
+          0 0 var(--space-xl) -5px var(--sr-amber-glow),
+          0 var(--space-md) var(--space-xl) -7px rgba(17,24,39,0.35),
+          0 1px 3px rgba(17,24,39,0.18),
+          inset 0 1px 0 rgba(255,255,255,0.95),
+          inset 0 -2px 3px -1px rgba(17,24,39,0.07);
         transition: transform var(--timing-fast) cubic-bezier(0.16, 1, 0.3, 1),
                     box-shadow var(--timing-fast),
                     background-size var(--timing-normal) cubic-bezier(0.16, 1, 0.3, 1);
     }
     /* declared after the background shorthand, which resets background-size */
-    #smart-reader-trigger { background-size: 18px 18px, auto, auto; }
+    /* after the background shorthand, which resets background-size. Two layers:
+       the mark, then the glass gradient. */
+    #smart-reader-trigger { background-size: 18px 18px, auto; }
     #smart-reader-trigger:hover {
         transform: scale(1.1);
+        background-color: rgba(255,255,255,0.12);
+        border-color: rgba(255,255,255,0.9);
         box-shadow:
-          0 0 var(--space-xxl) -6px rgba(251,191,36,0.55),
-          0 var(--space-lg) var(--space-xxl) -6px rgba(17,24,39,0.6),
-          0 0 0 3px rgba(251,191,36,0.18),
-          inset 0 1px 0 rgba(255,255,255,0.3),
-          inset 0 -1px 2px rgba(0,0,0,0.35);
+          0 0 var(--space-xxl) -6px rgba(251,191,36,0.5),
+          0 var(--space-lg) var(--space-xxl) -8px rgba(17,24,39,0.4),
+          0 0 0 3px rgba(251,191,36,0.16),
+          inset 0 1px 0 rgba(255,255,255,1),
+          inset 0 -2px 3px -1px rgba(17,24,39,0.06);
     }
-    #smart-reader-trigger:hover { background-size: 19.5px 19.5px, auto, auto; }
+    #smart-reader-trigger:hover { background-size: 19.5px 19.5px, auto; }
     #smart-reader-trigger:active { transform: scale(1.02); }
     
     @keyframes popIn {

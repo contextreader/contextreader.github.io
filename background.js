@@ -508,9 +508,9 @@ CRITICAL: In Sinhala translations, wrap the key Sinhala word in <b> tags.
 Output ONLY this HTML (no markdown):
 <div class="sr-general-box">
     <p class="sr-def"><b>General Definition:</b> [Broad, general meaning that covers all uses]</p>
-    <p class="sr-sub-text" style="color:#0e7490;">[Sinhala general definition with <b>key word</b>]</p>
+    <p class="sr-sub-text">[Sinhala general definition with <b>key word</b>]</p>
     <div style="margin-top:12px;">
-        <span class="sr-label" style="color:#0e7490;">Other Common Uses:</span>
+        <span class="sr-label">Other Common Uses:</span>
         <ul style="margin:0; padding-left:18px; font-size:13px; color:#374151; line-height:1.8;">
             <li>[Example use in different context 1] - <span class="sr-gen-trans">[Sinhala with <b>word</b>]</span></li>
             <li>[Example use in different context 2] - <span class="sr-gen-trans">[Sinhala with <b>word</b>]</span></li>
@@ -696,9 +696,9 @@ CRITICAL: Wrap "${word}" in <b> tags every time it appears.
 Output ONLY this HTML (no markdown):
 <div class="sr-general-box">
     <p class="sr-def" style="font-family:'Noto Sans Sinhala', sans-serif;"><b>සම්පූර්ණ අර්ථ දැක්වීම:</b> [Comprehensive Sinhala definition covering all major senses]</p>
-    <p class="sr-sub-text" style="color:#0e7490; font-family:'Noto Sans Sinhala', sans-serif;">[Etymology/root word info — e.g., පාලි/සංස්කෘත මූලය, with <b>${word}</b>]</p>
+    <p class="sr-sub-text" style="font-family:'Noto Sans Sinhala', sans-serif;">[Etymology/root word info — e.g., පාලි/සංස්කෘත මූලය, with <b>${word}</b>]</p>
     <div style="margin-top:12px;">
-        <span class="sr-label" style="color:#0e7490;">වෙනත් භාවිත:</span>
+        <span class="sr-label">වෙනත් භාවිත:</span>
         <ul style="margin:0; padding-left:18px; font-size:13px; color:#374151; line-height:1.8; font-family:'Noto Sans Sinhala', sans-serif;">
             <li>[Sinhala example usage 1 in one context] - <span class="sr-gen-trans">[brief meaning note with <b>${word}</b>]</span></li>
             <li>[Sinhala example usage 2 in different context] - <span class="sr-gen-trans">[brief meaning note with <b>${word}</b>]</span></li>
