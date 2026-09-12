@@ -18,9 +18,9 @@ Not for the Chrome Web Store. For ~10 testers, each using their own free Gemini 
 | | Published `sinhala/` | This build |
 |---|---|---|
 | Request path | extension → Cloudflare Worker → Supabase cache → Gemini | extension → **Gemini, directly** |
-| Model | `gemini-2.5-flash-lite` | **`gemini-3.1-flash-lite`** |
+| Model | `gemini-2.5-flash-lite` | **user-selectable**, default `gemini-3.1-flash-lite` |
 | Auth | HMAC-SHA256 shared secret with the Worker | user's own API key |
-| Key storage | Worker env var | `chrome.storage.local`, entered in Settings |
+| Key storage | Worker env var | `chrome.storage.local`, optionally AES-GCM encrypted |
 | Rate limit | 50/day, server-enforced via KV | Google free tier (20 RPM per model) |
 | Response cache | Supabase `cache` table | none — every lookup hits Gemini |
 | Global counter | Worker KV | local count in `chrome.storage.local` |
@@ -34,8 +34,9 @@ stub that throws. Lookup modes A and B were deleted — they streamed through th
 ```
 highlight word → content.js captures word + surrounding context
   → background.js callGemini()
-  → POST generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent
+  → POST generativelanguage.googleapis.com/v1beta/models/<selected model>:generateContent
      with system_instruction + prompt + SCHEMA_TD + safetySettings
+  → on 429, replays down a chain of free-tier models (unless paidPlan is set)
   → returns {t, d} → content.js buildLookupHTML() → floating bubble
 ```
 
@@ -46,15 +47,57 @@ highlight word → content.js captures word + surrounding context
 1. **`SYSTEM_INSTRUCTION`** — verbatim from the old Worker. 1,004 chars of domain-matching
    rules (`"bank" in finance = බැංකුව, NOT ඉවුර`). Removing it measurably degrades output:
    without it the model returned `වගාව` instead of `රුධිර වගාව` for blood culture.
+   **Now the editable default, not a constant** — see Editable prompts below.
 2. **`LOOKUP_PROMPT_FULL` + `LOOKUP_JSON_CONTRACT`** — the production prompt plus an
-   explicit `{t,d}` contract.
+   explicit `{t,d}` contract. The prompt is also editable; the contract is not.
 3. **`SCHEMA_TD`** as `responseSchema` — guarantees the JSON shape. Without it, models
    emitted doubled JSON objects and the parse failed (~2 in 5 calls).
 4. **`temperature: 0.4, topK: 40, topP: 0.95`** + safety settings — the Worker's defaults,
    which the extension used to inherit server-side.
 
-Plus `thinkingConfig: { thinkingBudget: 0 }` for any `gemini-3*` model. These reason by
-default; thinking tokens add seconds to what is a single-hop lookup.
+Plus `thinkingConfig: { thinkingBudget: 0 }` — but only for models that accept it, which
+`modelAcceptsThinking()` puts at 2.5 and 3.x. These reason by default and thinking tokens
+add seconds to a single-hop lookup, but sending the parameter to a model that does not
+know it is a 400 INVALID_ARGUMENT that fails the request. `requestGemini()` retries once
+without it if the guess was wrong, so an unknown custom id degrades instead of dying.
+
+(Earlier revisions of this file claimed the `gemini-3*` keying already existed. It did
+not — the parameter was sent unconditionally, which was only safe while the model was
+hardcoded.)
+
+### Model selection and fallback
+
+`getModelConfig()` resolves the model from `chrome.storage.local`; `DEFAULT_MODEL` in
+`background.js` is only the default. The Settings dropdown is populated from a live
+`ListModels` call, so it lists what the tester's key can actually reach.
+
+On a 429 the lookup replays down a chain built from that list — the configured model,
+then `flash-lite`, then `flash`. **Pro models are never in the chain**: a silent fallback
+onto one could cost a tester money on a key they said was free. Exhausted models get a
+cooldown in `modelCooldowns`. Setting `paidPlan` disables the whole mechanism, because
+someone on a paid key chose their model deliberately.
+
+When a fallback happens the answer carries an `_m` key inside its JSON, and the bubble
+renders a note saying which model actually answered. That note is a **sibling** of
+`.sr-body`, never a child — `saveWord()` reads `.sr-section:nth-of-type(2)`, and
+`:nth-of-type` counts by tag, so a div added inside `.sr-body` silently changes what gets
+saved.
+
+### Editable prompts
+
+`getPrompts()` returns overrides from `chrome.storage.local` or the shipped defaults.
+Editable: the system instruction and the lookup prompt. Not editable:
+`LOOKUP_JSON_CONTRACT` and `SCHEMA_TD`, which control whether the response parses at all.
+
+The lookup default is **derived** — `LOOKUP_PROMPT_FULL('{{word}}', '{{context}}')` — so
+the editable default cannot drift from the shipped prompt. `test/prompt-equivalence` holds
+that line.
+
+Every save snapshots both prompts into `promptHistory` (capped at 50; index 0 is the
+shipped default and is never evicted). Restore appends rather than truncates.
+
+A third place stale `sr-*` class names can now hide is a tester's saved prompt override —
+and it is the one place neither grep nor this repo can see.
 
 ### One call, not two — this is deliberate
 
@@ -110,7 +153,15 @@ Without a key, lookups return a "key needed" card rather than failing silently.
 
 ## Conventions
 
-- The API key must never be hardcoded. It lives in `chrome.storage.local`, nowhere else.
+- The API key must never be hardcoded. It lives in `chrome.storage.local` — never
+  `chrome.storage.sync`, which replicates to Google's servers — and is read only in the
+  service worker, never passed to a content script. Settings shows it masked and never
+  prefills it. With a passphrase set it is AES-GCM encrypted at rest and the plaintext
+  lives in `chrome.storage.session` (which survives worker eviction; a module variable
+  would not). Never add a mode that encrypts with a key the extension also stores.
+- Run `npm test` after touching `background.js`, `options.js`, `content.js` or
+  `lib/diff.js`. 271 assertions, no dependencies. `node --check` cannot catch the failure
+  that matters — all bubble CSS is one template literal, so broken CSS is still valid JS.
 - `cloudfareworker*.js`, `wrangler.toml` and `.env` are gitignored — API keys have leaked
   through those files in a sibling repo before.
 - `word` in `content.js` is text selected from an arbitrary page. Escape it with
