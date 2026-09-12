@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setText('opt-ext-id', chrome.runtime.id);
 
     // ---- Links ----
-    // Privacy Policy and Discord are plain hrefs in the HTML; nothing to wire.
+    // The Privacy Policy link is a plain href in the HTML; nothing to wire.
 
     // ============================================
     // Gemini API key

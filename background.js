@@ -8,10 +8,6 @@
 const DEFAULT_MODEL = "gemini-3.1-flash-lite";
 const GEMINI_BASE   = "https://generativelanguage.googleapis.com/v1beta/models";
 
-// Disabled in this build. Lookup modes A/B and the study sheet went through the
-// Worker; LOOKUP_MODE is 'C', which routes entirely through callGemini().
-const PROXY_URL = "";
-
 // ============================================
 // 🔑 API KEY STORAGE
 // ============================================
@@ -346,11 +342,6 @@ function recordLatency(model, ms, now = Date.now()) {
 // Cached access info from /access endpoint
 let _accessCache = null;
 
-// 📊 GOOGLE ANALYTICS CONFIG
-const GA_MEASUREMENT_ID = "G-B53PH46FKB"; 
-const GA_API_SECRET = "0-aHoLvsQyeTKwXSuKDwQQ";
-const DEFAULT_SESSION_ID = Date.now();
-
 // ============================================
 // 🌍 GLOBAL COUNTER (Community Stats)
 // ============================================
@@ -365,46 +356,6 @@ async function incrementGlobalCounter() {
 async function getGlobalCounter() {
     const { localLookupCount = 0 } = await chrome.storage.local.get("localLookupCount");
     return localLookupCount;
-}
-
-// ============================================
-// 📊 ANALYTICS FUNCTIONS
-// ============================================
-
-async function getOrCreateClientId() {
-    const result = await chrome.storage.local.get('clientId');
-    let clientId = result.clientId;
-    if (!clientId) {
-        clientId = self.crypto.randomUUID();
-        await chrome.storage.local.set({ clientId });
-    }
-    return clientId;
-}
-
-async function trackEvent(eventName, params = {}) {
-    try {
-        const clientId = await getOrCreateClientId();
-        
-        const message = {
-            client_id: clientId,
-            events: [{
-                name: eventName,
-                params: {
-                    session_id: DEFAULT_SESSION_ID,
-                    engagement_time_msec: 100,
-                    ...params
-                }
-            }]
-        };
-
-        await fetch(`https://www.google-analytics.com/mp/collect?measurement_id=${GA_MEASUREMENT_ID}&api_secret=${GA_API_SECRET}`, {
-            method: "POST",
-            body: JSON.stringify(message)
-        });
-        
-    } catch (e) {
-        console.error("Analytics Error", e);
-    }
 }
 
 // ============================================
@@ -437,18 +388,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
     if (request.action === "generateStudySheetV2") {
         const tabId = sender.tab ? sender.tab.id : null;
-        generateStudySheetV3(request.chunks, request.level, request.lang, tabId, request.calibrationWords).then(sendResponse);
+        generateStudySheetV2(request.chunks, request.level, request.lang, tabId, request.calibrationWords).then(sendResponse);
         return true;
-    }
-    if (request.action === "fetchVideo") {
-        fetchVideoSimple(request.query).then(sendResponse);
-        return true;
-    }
-    
-    // 📊 ANALYTICS TRACKING
-    if (request.action === "track") {
-        trackEvent(request.event, request.params);
-        return false;
     }
     
     // 🌍 GLOBAL COUNTER
@@ -573,25 +514,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
 });
 
-// 🎉 CONSOLIDATED onInstalled: tracking, welcome, installId, context menus
+// onInstalled: welcome page + context menus. No uninstall ping, no install id —
+// there is nothing to correlate an install with and nothing listening.
 chrome.runtime.onInstalled.addListener((details) => {
     if (details.reason === "install") {
-        trackEvent("extension_installed", {
-            version: chrome.runtime.getManifest().version
-        });
         // Open welcome page on first install
         chrome.tabs.create({ url: chrome.runtime.getURL("welcome.html") });
-        // Open a sample page so user can try highlighting immediately
-        chrome.tabs.create({ url: "https://simple.wikipedia.org/wiki/Sri_Lanka", active: false });
     }
-    // Set uninstall survey URL
-    chrome.runtime.setUninstallURL("https://forms.gle/1uj8V6fZfmCfL65x8");
-    // Ensure installId exists (for both install and update)
-    chrome.storage.local.get('installId', (result) => {
-        if (!result.installId) {
-            chrome.storage.local.set({ installId: self.crypto.randomUUID() });
-        }
-    });
     // Create context menus (removeAll first to prevent duplicates on update)
     chrome.contextMenus.removeAll(() => {
         chrome.contextMenus.create({
@@ -608,19 +537,6 @@ chrome.runtime.onInstalled.addListener((details) => {
     });
 });
 
-async function getInstallId() {
-    const result = await chrome.storage.local.get('installId');
-    if (result.installId) return result.installId;
-    const id = self.crypto.randomUUID();
-    await chrome.storage.local.set({ installId: id });
-    return id;
-}
-
-// HMAC-SHA256 signing
-async function signRequest() {
-    throw new Error("signRequest: not available in direct mode (no Worker, no shared secret)");
-}
-
 // Fetch and cache access info from /access endpoint
 async function getAccessInfo() {
     // Direct mode: no server, so no gating. Limits are whatever Google's free tier gives.
@@ -632,27 +548,6 @@ async function getAccessInfo() {
 // ============================================
 // 🎬 VIDEO FETCHING (YARN)
 // ============================================
-
-async function fetchVideoSimple(word) {
-    try {
-        const searchUrl = `https://getyarn.io/yarn-find?text=${encodeURIComponent(word)}`;
-        const response = await fetch(searchUrl);
-        const html = await response.text();
-        const linkPattern = /href="\/yarn-clip\/([a-z0-9\-]+)"/g;
-        const matches = [...html.matchAll(linkPattern)];
-        if (matches.length === 0) return { success: false, error: "No clips found." };
-        const uniqueIds = [...new Set(matches.map(m => m[1]))];
-        const topIds = uniqueIds.slice(0, 10);
-        const videos = topIds.map(uuid => ({
-            url: `https://y.yarn.co/${uuid}.mp4`,
-            poster: `https://y.yarn.co/${uuid}_screenshot.jpg`
-        }));
-        return { success: true, videos: videos, text: word };
-    } catch (e) {
-        trackEvent("error_occurred", { error_type: "video_fetch", message: e.message });
-        return { success: false, error: "Network error" };
-    }
-}
 
 // ============================================
 // 🤖 AI LOOKUP FUNCTIONS
@@ -858,7 +753,6 @@ const SCHEMA_TD = {
 };
 
 async function lookupContext(word, context, url, tabId) {
-    trackEvent("word_lookup", { lang: "en" });
     incrementGlobalCounter();
 
     // modes A and B removed: they streamed via the Cloudflare Worker
@@ -1113,9 +1007,6 @@ Output ONLY this HTML structure (No markdown):
 // ============================================
 
 async function lookupContextSinhala(word, context, url) {
-    trackEvent("word_lookup", {
-        lang: "si"
-    });
     incrementGlobalCounter();
 
     const prompt = `You are a Sinhala Language Assistant helping a reader understand a difficult Sinhala word in context.
@@ -1626,108 +1517,6 @@ async function generateStudySheetV2(chunks, level, lang, tabId, calibrationWords
 // 📋 STUDY SHEET V3 — Hybrid Pipeline (Worker-side)
 // ============================================
 
-async function generateStudySheetV3(chunks, level, lang, tabId, calibrationWords) {
-    const levelInfo = STUDY_LEVELS[level] || STUDY_LEVELS.advanced;
-    const allWords = [];
-    const failedChunks = [];
-    const debugInfo = [];
-
-    const cefrLevel = levelInfo.cefr;
-    // Sinhala extension: always translate to Sinhala regardless of source text language
-    const langName = 'Sinhala';
-
-    for (let i = 0; i < chunks.length; i++) {
-        // Support both old format (string) and new format ({ chunk, context })
-        const chunkData = typeof chunks[i] === 'string' ? { chunk: chunks[i], context: chunks[i] } : chunks[i];
-
-        // Progress update
-        try {
-            chrome.tabs.sendMessage(tabId, {
-                action: "studyProgress",
-                current: i + 1,
-                total: chunks.length,
-                phase: "processing",
-                wordsFound: allWords.length
-            });
-        } catch (e) { /* tab may be closed */ }
-
-        // Retry with backoff: up to 2 retries (1s, then 2s delay)
-        const MAX_RETRIES = 2;
-        let success = false;
-
-        for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
-            try {
-                if (attempt > 0) {
-                    const backoff = attempt * 1000; // 1s, 2s
-                    console.log(`📋 Chunk ${i + 1}: Retry ${attempt}/${MAX_RETRIES} after ${backoff}ms`);
-                    await new Promise(r => setTimeout(r, backoff));
-                }
-
-                const installId = await getInstallId();
-                const extensionId = chrome.runtime.id;
-                const { timestamp, signature } = await signRequest(extensionId, installId);
-
-                const response = await fetch(PROXY_URL + "study-v2", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        chunk: chunkData.chunk,
-                        context: chunkData.context, // Larger 500-word window for translation accuracy
-                        level: cefrLevel,
-                        lang,
-                        langName,
-                        calibrationWords,
-                        installId,
-                        extensionId,
-                        timestamp,
-                        signature
-                    })
-                });
-
-                const data = await response.json();
-
-                if (data.error) {
-                    console.warn(`📋 Chunk ${i + 1} (attempt ${attempt + 1}): Error — ${data.error}`);
-                    if (attempt < MAX_RETRIES) continue; // retry
-                    failedChunks.push(i);
-                    break;
-                }
-
-                if (data.words && data.words.length > 0) {
-                    allWords.push(...data.words);
-                    success = true;
-                } else {
-                    console.warn(`📋 Chunk ${i + 1} (attempt ${attempt + 1}): No words returned`);
-                    if (attempt < MAX_RETRIES) continue; // retry
-                    failedChunks.push(i);
-                }
-
-                if (data.debug) {
-                    debugInfo.push({ chunk: i + 1, ...data.debug });
-                }
-                break; // success or final failure — exit retry loop
-
-            } catch (e) {
-                console.error(`📋 Chunk ${i + 1} (attempt ${attempt + 1}): Fetch error —`, e.message);
-                if (attempt >= MAX_RETRIES) {
-                    failedChunks.push(i);
-                }
-            }
-        }
-
-        // Delay between chunks
-        if (i < chunks.length - 1) {
-            await new Promise(r => setTimeout(r, 800));
-        }
-    }
-
-    if (debugInfo.length > 0) {
-        console.log('📋 Study Sheet V3 Debug:', JSON.stringify(debugInfo, null, 2));
-    }
-
-    return { words: allWords, failedChunks, totalChunks: chunks.length, pipelineDebug: debugInfo };
-}
-
 // ============================================
 // 🌐 GEMINI API CALL
 // ============================================
@@ -1868,10 +1657,6 @@ async function callGemini(prompt, word = "", context = "", url = "", generationC
 
         if (!data.candidates) {
             console.error(`❌ NO CANDIDATES — full response:`, JSON.stringify(data).substring(0, 500));
-            trackEvent("error_occurred", {
-                error_type: "ai_response",
-                message: "No candidates in response"
-            });
             return `<div style="text-align:center; padding:15px;">
                 <div style="font-size:20px; margin-bottom:8px;">😅</div>
                 <div style="font-weight:600; color:#374151; margin-bottom:6px;">AI is temporarily busy</div>
@@ -1880,30 +1665,10 @@ async function callGemini(prompt, word = "", context = "", url = "", generationC
             </div>`;
         }
 
-        // 📊 Track Usage & Cost
-        if (data.usageMetadata) {
-            const inputTokens = data.usageMetadata.promptTokenCount || 0;
-            const outputTokens = data.usageMetadata.candidatesTokenCount || 0;
-            const totalTokens = data.usageMetadata.totalTokenCount || 0;
-
-            const inputCost = (inputTokens / 1000000) * 0.30;
-            const outputCost = (outputTokens / 1000000) * 2.50;
-            const totalCost = inputCost + outputCost;
-
-            trackEvent("ai_usage", {
-                input_tokens: inputTokens,
-                output_tokens: outputTokens,
-                total_tokens: totalTokens,
-                estimated_cost_usd: totalCost.toFixed(7)
-            });
-
-        }
-
         // Save latency log
         const workerTiming = data._timing || {};
         const entry = {
             ts: Date.now(),
-            word: word || '(prompt)',
             model: usedModel,
             total: latencyMs,
             sign: tSign,
@@ -1929,10 +1694,6 @@ async function callGemini(prompt, word = "", context = "", url = "", generationC
 
     } catch (e) { 
         console.error("AI Request Failed", e);
-        trackEvent("error_occurred", { 
-            error_type: "network", 
-            message: e.message 
-        });
         return `<div style="text-align:center; padding:15px;">
             <div style="font-size:20px; margin-bottom:8px;">📡</div>
             <div style="font-weight:600; color:#374151; margin-bottom:6px;">Connection failed</div>

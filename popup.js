@@ -103,13 +103,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Link Handlers
-    const discordBtn = document.getElementById('join-discord');
-    if (discordBtn) {
-        discordBtn.addEventListener('click', () => {
-            chrome.tabs.create({ url: "https://discord.gg/tdwHWmmC" });
-        });
-    }
-
     const settingsBtn = document.getElementById('open-settings');
     if (settingsBtn) {
         settingsBtn.addEventListener('click', () => {

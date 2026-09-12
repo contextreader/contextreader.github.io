@@ -24,7 +24,7 @@ function seg(src, start, end, label) {
     return src.slice(a, b);
 }
 
-const head = seg(bg, 'const DEFAULT_MODEL', '// Disabled in this build', 'header');
+const head = seg(bg, 'const DEFAULT_MODEL', '// 🔑 API KEY STORAGE', 'header');
 
 let key = seg(bg, 'const KEY_ENC_VERSION', '// 🧠 MODEL SELECTION', 'key layer');
 key = key.slice(0, key.lastIndexOf('// ============================================'));

@@ -1133,7 +1133,6 @@ function fallbackNoteHTML(m) {
 let currentVideoRequestId = 0;
 let currentVideoList = [];
 let currentVideoIndex = 0;
-let sessionStartTracked = false; // NEW: Track first word
 
 // Highlight mode state (for Study Sheet calibration)
 let highlightModeActive = false;
@@ -1733,7 +1732,6 @@ document.addEventListener('mouseup', function(event) {
 
 // 📊 NEW: Track bubble close
 function closeBubble() {
-    chrome.runtime.sendMessage({ action: "track", event: "bubble_close" });
     bubble.style.display = "none";
     if (highlightModeActive) cleanupHighlights();
 }
@@ -1836,12 +1834,6 @@ function generateTypewriterHtml(word) {
 // 📊 MODIFIED: Track session start
 triggerBtn.addEventListener('mousedown', function(e) {
     e.preventDefault(); e.stopPropagation(); triggerBtn.style.display = "none";
-    
-    // 📊 Track Session Start (First Lookup)
-    if (!sessionStartTracked) {
-        chrome.runtime.sendMessage({ action: "track", event: "session_start" });
-        sessionStartTracked = true;
-    }
     
     const x = e.clientX; 
     const y = e.clientY;
@@ -2001,7 +1993,6 @@ function showSavedList() {
             document.querySelectorAll('.sr-delete-btn').forEach(btn => {
                 btn.onclick = (e) => {
                     const w = e.target.getAttribute('data-word');
-                    chrome.runtime.sendMessage({ action: "track", event: "word_delete" });
                     const filtered = list.filter(i => i.word !== w);
                     chrome.storage.local.set({ savedWords: filtered }, showSavedList);
                 };
@@ -2053,7 +2044,6 @@ function injectControls(word) {
     audioBtn.onclick = (e) => { 
         e.stopPropagation(); 
         playSmartAudio(word);
-        chrome.runtime.sendMessage({ action: "track", event: "click_audio" });
     };
     
     const googleBtn = document.createElement('button'); googleBtn.id = 'sr-google-btn'; googleBtn.className = 'sr-icon-btn'; googleBtn.title = "Google Pronunciation"; googleBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>`; 
@@ -2077,7 +2067,6 @@ function injectControls(word) {
         item.onclick = (ev) => {
             ev.stopPropagation();
             closeGMenu();
-            chrome.runtime.sendMessage({ action: "track", event: "click_google_search" });
             window.open(`https://www.google.com/search?q=${encodeURIComponent(q)}`, '_blank');
         };
         gMenu.appendChild(item);
@@ -2108,13 +2097,11 @@ function injectControls(word) {
     saveBtn.onclick = (e) => { 
         e.stopPropagation(); 
         saveWord(word); 
-        chrome.runtime.sendMessage({ action: "track", event: "click_save" });
     };
     
     const listBtn = document.createElement('button'); listBtn.id = 'sr-list-btn'; listBtn.className = 'sr-icon-btn'; listBtn.title = "My Words"; listBtn.innerHTML = '📂';
     listBtn.onclick = (e) => { 
         e.stopPropagation(); 
-        chrome.runtime.sendMessage({ action: "track", event: "click_my_list" });
         showSavedList(); 
     };
     
@@ -2124,13 +2111,11 @@ function injectControls(word) {
         const searchData = bubble.querySelector('#sr-video-data');
         const query = searchData ? searchData.getAttribute('data-query') : word;
         showVideoPlayer(query);
-        chrome.runtime.sendMessage({ action: "track", event: "click_video" });
     };
     
     const studyBtn = document.createElement('button'); studyBtn.id = 'sr-study-btn'; studyBtn.className = 'sr-icon-btn'; studyBtn.title = "Study Sheet"; studyBtn.innerHTML = '📋';
     studyBtn.onclick = (e) => {
         e.stopPropagation();
-        chrome.runtime.sendMessage({ action: "track", event: "click_study_sheet" });
         chrome.runtime.sendMessage({ action: "getAccessInfo" }, (access) => {
             if (access && access.studySheet) {
                 enterHighlightMode();
@@ -2189,7 +2174,6 @@ function setupMoreBtn(word) {
         btn.onclick = (e) => {
             e.stopPropagation();
             
-            chrome.runtime.sendMessage({ action: "track", event: "click_more_details" });
             
             btn.disabled = true;
             btn.innerHTML = `<span style="display:inline-flex; animation: spin 1s linear infinite;">${SR_ICONS.bolt}</span> Loading...`;
@@ -2229,7 +2213,6 @@ function setupGeneralBtn(word) {
         btn.onclick = (e) => {
             e.stopPropagation();
             
-            chrome.runtime.sendMessage({ action: "track", event: "click_general_mode" });
             
             btn.disabled = true;
             btn.innerText = "Loading...";
@@ -2258,7 +2241,6 @@ function setupSimpleBtn(word) {
         btn.onclick = (e) => {
             e.stopPropagation();
             
-            chrome.runtime.sendMessage({ action: "track", event: "click_simple_mode" });
             
             btn.disabled = true;
             btn.innerText = "Wait...";
@@ -2391,10 +2373,6 @@ function renderVideoUI(body, query) {
     const videoData = currentVideoList[currentVideoIndex];
     const displayText = videoData.text || query;
     const escapedWord = currentSelection.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    if (!sessionStartTracked) {
-        chrome.runtime.sendMessage({ action: "track", event: "session_start" });
-        sessionStartTracked = true;
-    }
     const highlightedSubtitle = displayText.replace(new RegExp(`(${escapedWord})`, 'gi'), '<span class="sr-hl-video">$1</span>');
     
     body.innerHTML = `
@@ -2423,7 +2401,6 @@ function renderVideoUI(body, query) {
     
     document.getElementById('sr-vid-prev').onclick = () => { 
         if (currentVideoIndex > 0) { 
-            chrome.runtime.sendMessage({ action: "track", event: "video_navigation", params: { direction: "prev" } });
             currentVideoIndex--; 
             renderVideoUI(body, query); 
         } 
@@ -2431,40 +2408,20 @@ function renderVideoUI(body, query) {
     
     document.getElementById('sr-vid-next').onclick = () => { 
         if (currentVideoIndex < currentVideoList.length - 1) { 
-            chrome.runtime.sendMessage({ action: "track", event: "video_navigation", params: { direction: "next" } });
             currentVideoIndex++; 
             renderVideoUI(body, query); 
         } 
     };
 }
 
-// UNCHANGED
-async function playSmartAudio(word) {
-    try {
-        const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`); 
-        const data = await response.json(); 
-        let audioUrl = null;
-        
-        if (data[0]?.phonetics) { 
-            for (let p of data[0].phonetics) { 
-                if (p.audio) { 
-                    audioUrl = p.audio; 
-                    break; 
-                } 
-            } 
-        }
-        
-        if (audioUrl) { 
-            new Audio(audioUrl).play(); 
-        } else { 
-            speakFallback(word); 
-        }
-    } catch (e) { 
-        speakFallback(word); 
-    }
+// Pronunciation is spoken by the browser, locally. This used to fetch a
+// recording from api.dictionaryapi.dev first, which meant every play sent the
+// word the user was reading to a third party — the one call in this extension
+// that leaked what someone was looking at. speechSynthesis needs no network.
+function playSmartAudio(word) {
+    speakFallback(word);
 }
 
-// UNCHANGED
 function speakFallback(text) { 
     const utterance = new SpeechSynthesisUtterance(text); 
     utterance.lang = 'en-US'; 
@@ -2533,15 +2490,6 @@ function showStudySheetDemoUI() {
             <p style="font-size:13px; color:#4b5563; line-height:1.5; margin-bottom:12px;">
                 The Study Sheet feature generates printable vocabulary lists from any page. It's currently in development.
             </p>
-
-            <div style="display:flex; flex-direction:column; gap:8px;">
-                <a href="https://forms.gle/1uj8V6fZfmCfL65x8" target="_blank" rel="noopener" style="display:block; padding:10px; background:#2563eb; color:white; border-radius:8px; font-size:13px; font-weight:600; text-decoration:none; text-align:center;">
-                    Request This Feature
-                </a>
-                <a href="https://discord.gg/tdwHWmmC" target="_blank" rel="noopener" style="display:block; padding:10px; background:#5865F2; color:white; border-radius:8px; font-size:13px; font-weight:600; text-decoration:none; text-align:center;">
-                    💬 Join Our Discord
-                </a>
-            </div>
 
             <button id="sr-demo-back" class="sr-secondary-btn" style="margin-top:12px; width:100%;">⬅ Back</button>
         </div>

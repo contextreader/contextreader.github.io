@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Context Reader (Direct) — Sinhala",
+  "name": "Context Reader (Direct) \u2014 Sinhala",
   "version": "2.1.0",
   "description": "Experiment build: calls Gemini directly with your own API key. No proxy, no cache.",
   "permissions": [
@@ -10,10 +10,6 @@
   ],
   "host_permissions": [
     "https://generativelanguage.googleapis.com/*",
-    "https://api.dictionaryapi.dev/*",
-    "https://getyarn.io/*",
-    "https://y.yarn.co/*",
-    "https://www.google-analytics.com/*",
     "https://cdn.jsdelivr.net/*"
   ],
   "content_security_policy": {
