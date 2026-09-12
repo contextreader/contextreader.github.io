@@ -49,14 +49,17 @@
               inset -1px -1px 0 rgba(17,24,39,0.06),
               inset 0 -9px 12px -11px rgba(17,24,39,0.10);
 
-            --amber:#fbbf24; --amber-hi:#fcd34d; --amber-deep:#b45309;
+            --amber:#fbbf24; --amber-hi:#fcd34d; --amber-deep:#a84e08;
             --amber-ink:#78350f; --amber-veil:rgba(251,191,36,0.10);
             --amber-glow:rgba(251,191,36,0.30);
             --teal:#0891b2; --teal-deep:#0e7490; --teal-line:rgba(8,145,178,0.28);
-            /* #16a34a was 3.3:1 on the card and is used at 10.5-11px, which
-               fails AA — same defect --amber-deep had at #d97706. #15803d is
-               5.0:1. --red at #dc2626 is 4.85:1 and passes as-is. */
-            --green:#15803d; --red:#dc2626;
+            /* Measured against the COMPOSITED card, not pure white — the glass
+               is translucent over a grey page, so the ground is ~(239,240,243)
+               at worst, never #fff. Against white these all looked fine; against
+               the real ground #16a34a was 3.02:1, #15803d 4.41:1 and #dc2626
+               4.24:1 — all failing AA at the 10.5-11px they are used at.
+               #166534 is 6.27:1 and #b91c1c 5.69:1 on that worst-case ground. */
+            --green:#166534; --red:#b91c1c;
 
             --ink:#111827; --ink-soft:#374151; --ink-mute:#6b7280; --ink-faint:#9ca3af;
             --shadow:rgba(17,24,39,0.16);

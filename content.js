@@ -122,7 +122,7 @@ const styles = `
 
       --sr-amber: #fbbf24;                        /* brand primary — fills, glows */
       --sr-amber-hi: #fcd34d;                     /* hover */
-      --sr-amber-deep: #b45309;                   /* text-safe amber on glass:
+      --sr-amber-deep: #a84e08;                   /* text-safe amber on glass:
                                                      #d97706 was ~3.0:1 on the new
                                                      milky surface and failed AA at
                                                      16px; this is ~4.6:1 */
@@ -1028,7 +1028,7 @@ const styles = `
     }
     #sr-highlight-bar .sr-hb-hint {
         font-size: 11px;
-        color: #b45309;
+        color: #a84e08;
         white-space: nowrap;
     }
     #sr-highlight-bar button {
@@ -1043,11 +1043,11 @@ const styles = `
     #sr-highlight-bar .sr-hb-done {
         background: var(--sr-glass-soft, rgba(255,255,255,0.70));
         border: 1px solid rgba(180,83,9,0.22);
-        color: var(--sr-amber-deep, #b45309);
+        color: var(--sr-amber-deep, #a84e08);
         box-shadow: var(--sr-spec-sm);
     }
     #sr-highlight-bar .sr-hb-done:hover:not(:disabled) {
-        background: #b45309;
+        background: #a84e08;
     }
     #sr-highlight-bar .sr-hb-done:disabled {
         opacity: 0.4;
@@ -2608,7 +2608,7 @@ function renderStudyLevelPicker(body, hasSelection, calibrationWords) {
             <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:10px; margin-bottom:10px; text-align:left;">
                 <div style="font-size:12px; font-weight:700; color:#92400e; margin-bottom:4px;">Calibrated with ${calibrationWords.length} marked words</div>
                 <div style="display:flex; flex-wrap:wrap; gap:2px;">${wordChips}</div>
-                <div style="font-size:10px; color:#b45309; margin-top:4px;">AI will find words at a similar difficulty level</div>
+                <div style="font-size:10px; color:#a84e08; margin-top:4px;">AI will find words at a similar difficulty level</div>
             </div>
         `;
     }
@@ -2627,15 +2627,15 @@ function renderStudyLevelPicker(body, hasSelection, calibrationWords) {
                 <input id="sr-page-range" type="text" placeholder="e.g. 1-5, 8, 12-15" style="width:100%; padding:7px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:12px; color:#374151;">
                 <div style="font-size:10px; color:#9ca3af; margin-top:2px;">Leave empty for all ${maxPage} pages</div>
             </div>` : ''}
-            ${!hasSelectedText && !hasCalibration ? '<div style="font-size:11px; color:#b45309; margin-bottom:10px; padding:6px 10px; background:#fffbeb; border-radius:6px; border:1px solid #fde68a;">Tip: highlight text on the page first for more targeted results</div>' : ''}
+            ${!hasSelectedText && !hasCalibration ? '<div style="font-size:11px; color:#a84e08; margin-bottom:10px; padding:6px 10px; background:#fffbeb; border-radius:6px; border:1px solid #fde68a;">Tip: highlight text on the page first for more targeted results</div>' : ''}
             <div style="display:flex; flex-direction:column; gap:8px;">
                 <button class="sr-study-level-btn" data-level="basic_all" style="padding:12px; border:1px solid #bbf7d0; background:#f0fdf4; border-radius:8px; cursor:pointer; text-align:left; transition:all 0.15s;">
                     <div style="font-weight:700; color:#166534; font-size:14px;">🌱 Basic</div>
-                    <div style="font-size:11px; color:#15803d; margin-top:2px;">Includes all levels (A1-C2)</div>
+                    <div style="font-size:11px; color:#166534; margin-top:2px;">Includes all levels (A1-C2)</div>
                 </button>
                 <button class="sr-study-level-btn" data-level="intermediate_up" style="padding:12px; border:1px solid #fde68a; background:#fffbeb; border-radius:8px; cursor:pointer; text-align:left; transition:all 0.15s;">
                     <div style="font-weight:700; color:#92400e; font-size:14px;">📚 Intermediate</div>
-                    <div style="font-size:11px; color:#b45309; margin-top:2px;">Includes Intermediate + Advanced (B1-C2)</div>
+                    <div style="font-size:11px; color:#a84e08; margin-top:2px;">Includes Intermediate + Advanced (B1-C2)</div>
                 </button>
                 <button class="sr-study-level-btn" data-level="advanced" style="padding:12px; border:1px solid #c4b5fd; background:#f5f3ff; border-radius:8px; cursor:pointer; text-align:left; transition:all 0.15s;">
                     <div style="font-weight:700; color:#5b21b6; font-size:14px;">🎓 Advanced</div>
@@ -2741,7 +2741,7 @@ function generateStudySheetNew(level, pageRangeStr, calibrationWords) {
             <div style="font-size:12px; color:#9ca3af; margin-top:4px;" id="sr-study-chunk">
                 Section 1 of ${chunks.length} · ${levelLabels[level] || level}
             </div>
-            <div style="font-size:13px; color:#b45309; font-weight:600; margin-top:8px;" id="sr-study-count">0 words found</div>
+            <div style="font-size:13px; color:#a84e08; font-weight:600; margin-top:8px;" id="sr-study-count">0 words found</div>
             <div style="font-size:11px; color:#9ca3af; margin-top:4px;">${wordCount.toLocaleString()} words · ${chunks.length} section${chunks.length > 1 ? 's' : ''}</div>
             <button id="sr-cancel-study" class="sr-cancel-btn" style="margin-top:15px;">Cancel</button>
         </div>
@@ -2820,7 +2820,7 @@ function showStudySheetResultsNew(data, level, lang, chunks, pageRangeStr) {
             </div>` : ''}
             <button id="sr-view-study" style="width:100%; padding:14px; border:1px solid #fde68a; background:#fffbeb; border-radius:8px; cursor:pointer; transition:all 0.15s;">
                 <div style="font-weight:700; color:#92400e; font-size:14px;">📖 View Study Sheet</div>
-                <div style="font-size:11px; color:#b45309; margin-top:2px;">Dense 2-column dictionary with contextual + simple translations</div>
+                <div style="font-size:11px; color:#a84e08; margin-top:2px;">Dense 2-column dictionary with contextual + simple translations</div>
             </button>
             <button id="sr-study-back4" class="sr-secondary-btn" style="margin-top:10px; width:100%;">⬅ Back</button>
         </div>
@@ -2906,7 +2906,7 @@ function generateStudySheetDocNew(data, level, lang) {
         .sticky-toolbar { position: sticky; top: 0; z-index: 100; padding: 8px 20px; background: #1f2937; display: flex; gap: 8px; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
         .sticky-toolbar button { padding: 7px 16px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 12px; color: #fff; transition: all 0.15s; }
         .sticky-toolbar button:hover { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.4); }
-        .sticky-toolbar .download-btn { background: #b45309; border-color: #b45309; }
+        .sticky-toolbar .download-btn { background: #a84e08; border-color: #a84e08; }
         .sticky-toolbar .download-btn:hover { background: #92400e; border-color: #92400e; }
         .sticky-toolbar .hint { font-size: 11px; color: rgba(255,255,255,0.5); margin-left: auto; }
         .page-container { width: 210mm; margin: 15px auto; background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.3); padding: 12mm 15mm; }
