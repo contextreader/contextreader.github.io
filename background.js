@@ -1,3 +1,5 @@
+importScripts('lib/languages.js');
+
 // background.js — DIRECT GEMINI MODE (experiment build)
 // No Cloudflare Worker, no Supabase cache, no HMAC, no server-side rate limit.
 // Each user supplies their own free Gemini API key in Settings.
@@ -157,6 +159,18 @@ const MODEL_PREF_DEFAULTS = {
     custom:   "",      // used only when selected === CUSTOM_MODEL
     paidPlan: false    // set by the tester; suppresses automatic model switching
 };
+
+// The language the reader wants explanations in. Packs live in lib/languages.js.
+async function getTargetLanguage() {
+    const { targetLanguage } = await chrome.storage.local.get('targetLanguage');
+    return CRLanguages.getLang(targetLanguage || CRLanguages.DEFAULT_LANG);
+}
+
+// Everything a prompt template needs to know about the target language.
+async function langVars() {
+    const lang = await getTargetLanguage();
+    return { langName: lang.name, examples: CRLanguages.examplesBlock(lang.code) };
+}
 
 async function getModelConfig() {
     const { modelPref } = await chrome.storage.local.get("modelPref");
@@ -470,13 +484,29 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "unlockKey")       { unlockKey(request.passphrase).then(sendResponse); return true; }
     if (request.action === "lockKey")         { lockKey().then(sendResponse); return true; }
 
+    // ---- target language (Settings + welcome) ----
+    if (request.action === "getLanguages") {
+        getTargetLanguage().then((lang) => sendResponse({
+            current: lang.code,
+            languages: CRLanguages.listLangs(),
+            defaultLang: CRLanguages.DEFAULT_LANG
+        }));
+        return true;
+    }
+    if (request.action === "setLanguage") {
+        const code = CRLanguages.LANGUAGES[request.code] ? request.code : CRLanguages.DEFAULT_LANG;
+        chrome.storage.local.set({ targetLanguage: code }, () =>
+            sendResponse({ ok: true, lang: CRLanguages.getLang(code) }));
+        return true;
+    }
+
     // ---- editable prompts (Settings) ----
     if (request.action === "getPrompts") {
-        Promise.all([getPrompts(), chrome.storage.local.get({ promptHistory: [] })])
-            .then(([p, { promptHistory }]) => sendResponse({
+        Promise.all([getPrompts(), chrome.storage.local.get({ promptHistory: [] }), getTargetLanguage()])
+            .then(([p, { promptHistory }, lang]) => sendResponse({
                 prompts: p,
                 defaults: promptDefaults(),
-                locked: { jsonContract: LOOKUP_JSON_CONTRACT, schema: SCHEMA_TD },
+                locked: { jsonContract: LOOKUP_JSON_CONTRACT, schema: schemaTD(lang.name) },
                 history: promptHistory || [],
                 placeholders: REQUIRED_PLACEHOLDERS
             }));
@@ -518,7 +548,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 // there is nothing to correlate an install with and nothing listening.
 chrome.runtime.onInstalled.addListener((details) => {
     if (details.reason === "install") {
-        // Open welcome page on first install
+        // Guess from the browser's UI language; the welcome page asks anyway.
+        chrome.storage.local.set({
+            targetLanguage: CRLanguages.detectDefault(chrome.i18n.getUILanguage())
+        });
         chrome.tabs.create({ url: chrome.runtime.getURL("welcome.html") });
     }
     // Create context menus (removeAll first to prevent duplicates on update)
@@ -557,21 +590,23 @@ async function getAccessInfo() {
 // Writing the explanation forces it to commit to the domain. Do not split.
 const LOOKUP_MODE = 'default';
 
-const LOOKUP_PROMPT_FULL = (word, context) => `TARGET WORD: "${word}"
-CONTEXT: "${context}"
+// {{examples}} expands to the language pack's contrastive pairs, or to nothing
+// for a language nobody has tuned yet. An empty block is the honest outcome —
+// better than inventing examples in a language we cannot check.
+const LOOKUP_PROMPT_FULL = `TARGET WORD: "{{word}}"
+CONTEXT: "{{context}}"
 
 STEP 1 — ANALYZE (think, don't write):
 - Domain/genre of the text?
-- Which SPECIFIC sense of "${word}" is used here?
-- What Sinhala register matches this domain?
+- Which SPECIFIC sense of "{{word}}" is used here?
+- What {{langName}} register matches this domain?
 
 STEP 2 — TRANSLATE:
-- Give the Sinhala word/phrase that fits THIS context only
+- Give the {{langName}} word/phrase that fits THIS context only
 - Not a generic dictionary translation
-- Example: "specimens" in paleontology = නිදර්ශක, NOT සාම්පල
-- Example: "bank" in finance = බැංකුව, NOT ඉවුර
+{{examples}}
 
-STEP 3 — EXPLAIN in casual spoken Sinhala:
+STEP 3 — EXPLAIN in casual spoken {{langName}}:
 - One sentence, like telling a friend what this means in what they're reading
 - Connect to the specific situation in the text`;
 
@@ -581,35 +616,33 @@ STEP 3 — EXPLAIN in casual spoken Sinhala:
 // Verbatim from the Cloudflare Worker (sinhala/cloudfareworker.js).
 // The Worker sent this as system_instruction on EVERY call; without it the
 // model loses the domain-matching rules and gets e.g. "culture" wrong.
-const SYSTEM_INSTRUCTION = `You are a Context-Aware Translation Assistant for Sinhala readers.
+const SYSTEM_INSTRUCTION = `You are a Context-Aware Translation Assistant for {{langName}} readers.
 
 BEFORE ANSWERING, ALWAYS DO THIS (think, don't write):
 1. What is the domain/genre? (science, history, politics, fiction, technical, etc.)
 2. Which SPECIFIC sense of the word is used in THIS context?
-3. What Sinhala register matches? (technical context → technical Sinhala, casual → casual)
+3. What {{langName}} register matches? (technical context → technical {{langName}}, casual → casual)
 
 TRANSLATION RULES:
 - Give ONLY the meaning that fits THIS context — never multiple meanings
-- Match the domain: "execute" in programming = ධාවනය කරනව, NOT ක්‍රියාත්මක කරනව
-- Match the domain: "settlement" in history = ජනාවාසය, NOT පියවීම
-- Match the domain: "bank" in finance = බැංකුව, NOT ඉවුර
+{{examples}}
 - If the word is a proper noun or species name, transliterate + briefly identify what it is
 
 EXPLANATION RULES:
-- Casual spoken Sinhala — like explaining to a friend, not a textbook
+- Casual spoken {{langName}} — like explaining to a friend, not a textbook
 - Connect to what they're reading — help them understand THIS sentence
 - No HTML tags in JSON responses. Use HTML only when the prompt explicitly requests HTML output.`;
 
 const LOOKUP_JSON_CONTRACT = `
 
-Output ONLY this JSON: {"t": "<Sinhala translation for THIS context>", "d": "<one casual Sinhala sentence>"}`;
+Output ONLY this JSON: {"t": "<{{langName}} translation for THIS context>", "d": "<one casual {{langName}} sentence>"}`;
 
 // ============================================
 // ✎ EDITABLE PROMPTS
 // ============================================
 //
 // The system instruction and the lookup prompt are user-editable in Settings.
-// The JSON contract above and SCHEMA_TD below are deliberately NOT: editing
+// The JSON contract above and the response schema below are deliberately NOT: editing
 // those breaks response parsing rather than answer quality.
 //
 // Why history exists. The Worker-era measurement recorded in CLAUDE.md is that
@@ -624,10 +657,14 @@ Output ONLY this JSON: {"t": "<Sinhala translation for THIS context>", "d": "<on
 
 const PROMPT_HISTORY_CAP = 50;
 
-// Derived from the same function the build has always used, with placeholders
-// substituted in place of the values. The editable default and the shipped
-// prompt therefore cannot drift apart.
-const DEFAULT_LOOKUP_TEMPLATE = LOOKUP_PROMPT_FULL('{{word}}', '{{context}}');
+// The shipped prompt IS the editable default — one string, so the two cannot
+// drift apart.
+const DEFAULT_LOOKUP_TEMPLATE = LOOKUP_PROMPT_FULL;
+
+// Bumped whenever the default templates gain a placeholder. A saved override
+// from an older version cannot know about the new one, so it is set aside
+// rather than applied — see getPrompts().
+const PROMPT_SCHEMA_VERSION = 2;
 
 function promptDefaults() {
     return { system: SYSTEM_INSTRUCTION, lookup: DEFAULT_LOOKUP_TEMPLATE };
@@ -640,12 +677,15 @@ function renderPrompt(tmpl, vars) {
     for (const [k, v] of Object.entries(vars)) {
         out = out.split('{{' + k + '}}').join(v == null ? '' : String(v));
     }
-    return out;
+    // {{examples}} is empty for a language nobody has tuned, which leaves the
+    // line it sat on blank and opens a gap mid-prompt. Nothing here wants three
+    // consecutive newlines, so collapse them.
+    return out.replace(/\n{3,}/g, '\n\n');
 }
 
 // A lookup prompt missing {{word}} asks the model about nothing, on every call,
 // silently. Refuse the save rather than let a tester find out days later.
-const REQUIRED_PLACEHOLDERS = { lookup: ['word', 'context'], system: [] };
+const REQUIRED_PLACEHOLDERS = { lookup: ['word', 'context', 'langName'], system: ['langName'] };
 
 function validatePrompt(kind, text) {
     const s = String(text == null ? '' : text);
@@ -659,10 +699,18 @@ async function getPrompts() {
     const { promptOverrides } = await chrome.storage.local.get('promptOverrides');
     const d = promptDefaults();
     const o = promptOverrides || {};
-    const use = (kind) => (typeof o[kind] === 'string' && o[kind].trim()) ? o[kind] : d[kind];
+
+    // An override saved before languages existed has no {{langName}}, so
+    // applying it would silently answer in Sinhala for someone who chose Hindi.
+    // Set it aside and report it, rather than honouring it or deleting it.
+    const stale = (o.system || o.lookup) && (o.v || 0) < PROMPT_SCHEMA_VERSION;
+    const src = stale ? {} : o;
+
+    const use = (kind) => (typeof src[kind] === 'string' && src[kind].trim()) ? src[kind] : d[kind];
     return {
         system: use('system'),
         lookup: use('lookup'),
+        stale: !!stale,
         customized: {
             system: use('system') !== d.system,
             lookup: use('lookup') !== d.lookup
@@ -704,6 +752,7 @@ async function savePrompts(next, label, source) {
     // reaches testers who never edited that field.
     await chrome.storage.local.set({
         promptOverrides: {
+            v: PROMPT_SCHEMA_VERSION,
             system: system === d.system ? null : system,
             lookup: lookup === d.lookup ? null : lookup
         }
@@ -729,22 +778,28 @@ async function restorePromptVersion(id) {
                              'Restored ' + (found.label || 'version'), 'restore');
 }
 
-const SCHEMA_T = {
-    type: "OBJECT",
-    properties: {
-        t: { type: "STRING", description: "Context-specific Sinhala translation. Must match the domain — not a generic dictionary word." }
-    },
-    required: ["t"]
-};
+// The schema descriptions are part of the instruction the model reads, so they
+// name the target language too.
+function schemaT(langName) {
+    return {
+        type: "OBJECT",
+        properties: {
+            t: { type: "STRING", description: `Context-specific ${langName} translation. Must match the domain — not a generic dictionary word.` }
+        },
+        required: ["t"]
+    };
+}
 
-const SCHEMA_TD = {
-    type: "OBJECT",
-    properties: {
-        t: { type: "STRING", description: "Context-specific Sinhala translation. Must match the domain — not a generic dictionary word." },
-        d: { type: "STRING", description: "One-sentence casual spoken Sinhala explanation of what this word means in THIS text. No HTML tags." }
-    },
-    required: ["t", "d"]
-};
+function schemaTD(langName) {
+    return {
+        type: "OBJECT",
+        properties: {
+            t: { type: "STRING", description: `Context-specific ${langName} translation. Must match the domain — not a generic dictionary word.` },
+            d: { type: "STRING", description: `One-sentence casual spoken ${langName} explanation of what this word means in THIS text. No HTML tags.` }
+        },
+        required: ["t", "d"]
+    };
+}
 
 async function lookupContext(word, context, url, tabId) {
     incrementGlobalCounter();
@@ -773,15 +828,16 @@ function attachMeta(raw, meta) {
 
 // ── DEFAULT: Single call, wait for full {t, d} ──
 async function lookupModeDefault(word, context, url, tabId) {
+    const lv = await langVars();
     const generationConfig = {
         maxOutputTokens: 1024,
         responseMimeType: "application/json",
-        responseSchema: SCHEMA_TD   // guarantees {t,d} shape; without it 2.5 emitted doubled JSON
+        responseSchema: schemaTD(lv.langName)   // guarantees {t,d} shape; without it 2.5 emitted doubled JSON
     };
     const { lookup: lookupTemplate } = await getPrompts();
     const meta = {};
     const raw = await callGemini(
-        renderPrompt(lookupTemplate, { word, context }) + LOOKUP_JSON_CONTRACT,
+        renderPrompt(lookupTemplate + LOOKUP_JSON_CONTRACT, Object.assign({ word, context }, lv)),
         word, context, url, generationConfig, meta);
     return attachMeta(raw, meta);
 }
@@ -792,11 +848,12 @@ async function lookupModeDefault(word, context, url, tabId) {
 async function lookupModeC(word, context, url, tabId) {
     const t0 = performance.now();
 
-    const tPrompt = renderPrompt((await getPrompts()).lookup, { word, context });
+    const lv = await langVars();
+    const tPrompt = renderPrompt((await getPrompts()).lookup, Object.assign({ word, context }, lv));
     const tConfig = {
         maxOutputTokens: 128,
         responseMimeType: "application/json",
-        responseSchema: SCHEMA_T
+        responseSchema: schemaT(lv.langName)
     };
 
     const tRaw = await callGemini(tPrompt, word, context, url, tConfig);
@@ -1551,7 +1608,8 @@ async function callGemini(prompt, word = "", context = "", url = "", generationC
             genCfg.thinkingConfig = { thinkingBudget: 0 };
         }
 
-        const { system: systemInstruction } = await getPrompts();
+        const { system: systemTemplate } = await getPrompts();
+        const systemInstruction = renderPrompt(systemTemplate, await langVars());
 
         const payload = {
             system_instruction: { parts: [{ text: systemInstruction }] },

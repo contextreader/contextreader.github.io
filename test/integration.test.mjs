@@ -33,7 +33,16 @@ const bag = (b) => {
     };
 };
 
-globalThis.self = globalThis;   // service-worker global, used by the analytics id
+globalThis.self = globalThis;   // service-worker global
+
+// background.js opens with importScripts('lib/languages.js'). Node has no such
+// function, so provide one that actually loads the real module — a stub here
+// would let a test pass against a language pack shape that no longer exists.
+const { createRequire } = await import('node:module');
+const req = createRequire(import.meta.url);
+globalThis.importScripts = (...paths) => {
+    for (const p of paths) Object.assign(globalThis, { CRLanguages: req(join(ROOT, p)) });
+};
 
 const noop = { addListener() {} };
 globalThis.chrome = {
@@ -146,15 +155,40 @@ ok('says locked, not "get a key"', out.includes('Key locked'), out.slice(0, 160)
 say('editable prompt actually reaches the wire:');
 reset();
 Object.assign(local, { geminiApiKey: 'AIza-test',
-    promptOverrides: { system: 'CUSTOM SYSTEM RULES', lookup: 'WORD={{word}} CTX={{context}}' } });
+    promptOverrides: { v: 2, system: 'CUSTOM RULES for {{langName}}',
+                       lookup: 'WORD={{word}} CTX={{context}} LANG={{langName}}' } });
 fetchPlan = [answer('x', 'y')];
 await BG.lookupModeDefault('culture', 'blood culture', 'http://x', 1);
-ok('custom system instruction sent',
-   fetchLog[0].body.system_instruction.parts[0].text === 'CUSTOM SYSTEM RULES',
+ok('custom system instruction sent, language filled in',
+   fetchLog[0].body.system_instruction.parts[0].text === 'CUSTOM RULES for Sinhala',
    fetchLog[0].body.system_instruction.parts[0].text);
 ok('custom lookup prompt sent with placeholders filled',
-   fetchLog[0].body.contents[0].parts[0].text.startsWith('WORD=culture CTX=blood culture'),
+   fetchLog[0].body.contents[0].parts[0].text.startsWith('WORD=culture CTX=blood culture LANG=Sinhala'),
    fetchLog[0].body.contents[0].parts[0].text.slice(0, 80));
+
+say('an override from before languages existed is set aside, not applied:');
+reset();
+Object.assign(local, { geminiApiKey: 'AIza-test',
+    promptOverrides: { system: 'OLD SINHALA-ONLY RULES', lookup: 'WORD={{word}} CTX={{context}}' } });
+fetchPlan = [answer('x', 'y')];
+await BG.lookupModeDefault('culture', 'blood culture', 'http://x', 1);
+ok('stale override NOT sent', fetchLog[0].body.system_instruction.parts[0].text !== 'OLD SINHALA-ONLY RULES');
+ok('default used instead, with the language applied',
+   fetchLog[0].body.system_instruction.parts[0].text.includes('Sinhala readers'),
+   fetchLog[0].body.system_instruction.parts[0].text.slice(0, 90));
+ok('the stale override is kept, not deleted', local.promptOverrides.system === 'OLD SINHALA-ONLY RULES');
+
+say('the chosen language reaches the prompt:');
+reset();
+Object.assign(local, { geminiApiKey: 'AIza-test', targetLanguage: 'hi' });
+fetchPlan = [answer('x', 'y')];
+await BG.lookupModeDefault('culture', 'blood culture', 'http://x', 1);
+const sys = fetchLog[0].body.system_instruction.parts[0].text;
+const usr = fetchLog[0].body.contents[0].parts[0].text;
+ok('system names Hindi', sys.includes('Hindi'));
+ok('no Sinhala examples leak into Hindi', !/[\u0D80-\u0DFF]/.test(sys + usr), sys.slice(0, 120));
+ok('response schema names Hindi',
+   JSON.stringify(fetchLog[0].body.generationConfig.responseSchema).includes('Hindi'));
 
 loud();
 console.log(`\n${pass} passed, ${fail} failed`);

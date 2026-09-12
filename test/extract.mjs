@@ -33,7 +33,7 @@ const model    = seg(bg, 'const CUSTOM_MODEL', '// =============================
 const fallback = seg(bg, 'const DEFAULT_COOLDOWN_MS', '// ============================================\n// ⏱️ LATENCY ROLLUP', 'fallback');
 const latency  = seg(bg, 'const LATENCY_RETENTION_DAYS', '// HMAC signing is gone', 'latency');
 const attach   = seg(bg, 'function attachMeta', '// ── DEFAULT: Single call', 'attachMeta');
-const prompts  = seg(bg, 'const PROMPT_HISTORY_CAP', 'const SCHEMA_T =', 'prompt layer');
+const prompts  = seg(bg, 'const PROMPT_HISTORY_CAP', 'function schemaT(', 'prompt layer');
 const lookupFn = seg(bg, 'const LOOKUP_PROMPT_FULL', '// Appended to LOOKUP_PROMPT_FULL', 'lookup prompt');
 const sysInst  = seg(bg, 'const SYSTEM_INSTRUCTION', 'const LOOKUP_JSON_CONTRACT', 'system instruction');
 const contract = seg(bg, 'const LOOKUP_JSON_CONTRACT', '// ============================================\n// ✎ EDITABLE PROMPTS', 'json contract');
@@ -44,7 +44,13 @@ const out = (name, body) => writeFileSync(join(HERE, '.generated', name), body);
 import { mkdirSync } from 'node:fs';
 mkdirSync(join(HERE, '.generated'), { recursive: true });
 
-out('model.mjs', head + key + model +
+// The model slice reads language packs; give the generated module the real ones
+// rather than a stub, so a test cannot pass against a pack shape that no longer
+// exists.
+const LANG_IMPORT = "import { createRequire as __cr } from 'node:module';\n"
+    + "const CRLanguages = __cr(import.meta.url)('../../lib/languages.js');\n";
+
+out('model.mjs', LANG_IMPORT + head + key + model +
   '\nexport { getApiKey, getKeyState, getModelConfig, modelAcceptsThinking, requestGemini, listModels, DEFAULT_MODEL, CUSTOM_MODEL };\n');
 
 out('fallback.mjs', head + fallback + attach +
