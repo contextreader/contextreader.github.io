@@ -409,11 +409,45 @@
                 on this device — it is never sent anywhere except Google.
                 <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Get a key →</a>
             </p>
-            <div class="key-row">
-                <input id="opt-api-key" class="field" type="password" placeholder="AIza…" autocomplete="off">
-                <button id="opt-save-key" class="btn btn-primary">Save</button>
+            <div id="opt-key-entry">
+                <div class="key-row">
+                    <input id="opt-api-key" class="field" type="password" placeholder="AIza…"
+                           autocomplete="off" spellcheck="false">
+                    <button id="opt-save-key" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+            <div id="opt-key-saved" hidden>
+                <div class="spread">
+                    <span class="mono" id="opt-key-masked">—</span>
+                    <span class="row">
+                        <button id="opt-key-replace" class="btn btn-sm">Replace</button>
+                        <button id="opt-key-revoke" class="btn btn-sm">Revoke</button>
+                    </span>
+                </div>
             </div>
             <div id="opt-key-status"></div>
+
+            <div id="opt-lock-box" style="margin-top:var(--space-xl);
+                 border-top:1px solid rgba(17,24,39,0.07); padding-top:var(--space-lg)" hidden>
+                <div class="spread">
+                    <div>
+                        <div class="field-label" style="margin-bottom:2px">At rest</div>
+                        <div id="opt-lock-state" style="font-size:12px; color:var(--ink-soft)"></div>
+                    </div>
+                    <span class="row" id="opt-lock-actions"></span>
+                </div>
+                <div id="opt-lock-form" hidden style="margin-top:var(--space-lg)">
+                    <div class="row row-wrap">
+                        <input id="opt-lock-pass" class="field grow" type="password"
+                               placeholder="Passphrase" autocomplete="off">
+                        <input id="opt-lock-pass2" class="field grow" type="password"
+                               placeholder="Confirm" autocomplete="off" hidden>
+                        <button id="opt-lock-go" class="btn btn-primary btn-sm">Go</button>
+                        <button id="opt-lock-cancel" class="btn btn-sm">Cancel</button>
+                    </div>
+                    <div id="opt-lock-hint" class="hint"></div>
+                </div>
+            </div>
         </div>
 
         <div class="card">

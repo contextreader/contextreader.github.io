@@ -37,41 +37,164 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================
     // Gemini API key
     // ============================================
-    const keyInput = $('opt-api-key');
+    //
+    // The field is never prefilled with the key any more. Showing it in full on
+    // every visit put the secret in the DOM for no reason — a mask is enough to
+    // tell you which key is loaded.
+
+    let keyState = null;
+    let lockMode = null;   // 'enable' | 'unlock' | 'disable'
 
     const setKeyStatus = (text, tone) => status('opt-key-status', text, tone);
 
-    if (keyInput) {
-        chrome.storage.local.get('geminiApiKey', ({ geminiApiKey }) => {
-            if (geminiApiKey) {
-                keyInput.value = geminiApiKey;
-                setKeyStatus('Key saved.', 'ok');
-            }
+    function renderKeyCard() {
+        const s = keyState || { hasKey: false, protection: 'plain', unlocked: false, masked: '' };
+
+        const entry = $('opt-key-entry');
+        const saved = $('opt-key-saved');
+        if (entry) entry.hidden = s.hasKey;
+        if (saved) saved.hidden = !s.hasKey;
+        setText('opt-key-masked', s.masked || '—');
+
+        const box = $('opt-lock-box');
+        if (box) box.hidden = !s.hasKey;
+        if (!s.hasKey) return;
+
+        const actions = $('opt-lock-actions');
+        if (s.protection === 'plain') {
+            setText('opt-lock-state', 'Stored unencrypted on this device.');
+            if (actions) actions.innerHTML =
+                '<button id="opt-lock-enable" class="btn btn-sm">Encrypt with a passphrase</button>';
+        } else if (s.unlocked) {
+            setText('opt-lock-state', 'Encrypted \u00b7 unlocked for this browser session.');
+            if (actions) actions.innerHTML =
+                '<button id="opt-lock-now" class="btn btn-sm">Lock now</button>'
+              + '<button id="opt-lock-off" class="btn btn-sm">Turn off</button>';
+        } else {
+            setText('opt-lock-state', 'Encrypted \u00b7 locked. Lookups will not run until you unlock.');
+            if (actions) actions.innerHTML =
+                '<button id="opt-lock-unlock" class="btn btn-primary btn-sm">Unlock</button>';
+        }
+
+        on('opt-lock-enable', 'click', () => openLockForm('enable'));
+        on('opt-lock-unlock', 'click', () => openLockForm('unlock'));
+        on('opt-lock-off',    'click', () => openLockForm('disable'));
+        on('opt-lock-now',    'click', async () => {
+            await send({ action: 'lockKey' });
+            setKeyStatus('Locked.', '');
+            await loadKeyState();
         });
     }
 
-    on('opt-save-key', 'click', async () => {
-        if (!keyInput) return;
-        const key = keyInput.value.trim();
+    function openLockForm(mode) {
+        lockMode = mode;
+        const form = $('opt-lock-form');
+        const p1 = $('opt-lock-pass'), p2 = $('opt-lock-pass2');
+        if (!form) return;
+        form.hidden = false;
+        if (p1) { p1.value = ''; p1.placeholder = mode === 'enable' ? 'New passphrase' : 'Passphrase'; }
+        if (p2) { p2.value = ''; p2.hidden = mode !== 'enable'; }
+        setText('opt-lock-hint',
+            mode === 'enable'
+                ? 'At least 8 characters. It is never stored, so there is no recovery — '
+                + 'forgetting it means entering your API key again. Protects against someone '
+                + 'reading this browser profile off the disk; not against software already '
+                + 'running as you.'
+          : mode === 'unlock'
+                ? 'Unlocks for this browser session only.'
+                : 'Confirms you could read the key anyway before the encryption comes off.');
+        if (p1) p1.focus();
+    }
 
-        if (!key) {
-            chrome.storage.local.remove('geminiApiKey');
-            setKeyStatus('Key cleared.');
-            return;
-        }
-
-        // Verify by listing models rather than generating: it proves the key
-        // works, costs no generateContent quota, and fills the dropdown.
-        setKeyStatus('Checking…');
-        const res = await send({ action: 'listModels', apiKey: key });
-        if (!res || !res.ok) {
-            setKeyStatus('Rejected: ' + ((res && res.error) || 'unreachable'), 'bad');
-            return;
-        }
-        await chrome.storage.local.set({ geminiApiKey: key });
-        setKeyStatus(`Key saved and verified — ${res.models.length} models available.`, 'ok');
-        renderModelOptions(res.models);
+    on('opt-lock-cancel', 'click', () => {
+        const form = $('opt-lock-form');
+        if (form) form.hidden = true;
+        lockMode = null;
     });
+
+    on('opt-lock-go', 'click', async () => {
+        const p1 = $('opt-lock-pass'), p2 = $('opt-lock-pass2');
+        const pass = p1 ? p1.value : '';
+        if (!pass) { setKeyStatus('Enter a passphrase.', 'bad'); return; }
+
+        if (lockMode === 'enable') {
+            if (!p2 || p2.value !== pass) { setKeyStatus('The two passphrases do not match.', 'bad'); return; }
+            const res = await send({ action: 'enablePassphrase', passphrase: pass });
+            if (!res || !res.ok) {
+                setKeyStatus(res && res.error === 'too_short'
+                    ? 'Use at least 8 characters.' : 'Could not encrypt.', 'bad');
+                return;
+            }
+            setKeyStatus('Encrypted. You will be asked for this once per browser session.', 'ok');
+        } else if (lockMode === 'unlock') {
+            const res = await send({ action: 'unlockKey', passphrase: pass });
+            if (!res || !res.ok) { setKeyStatus('That passphrase did not work.', 'bad'); return; }
+            setKeyStatus('Unlocked.', 'ok');
+        } else if (lockMode === 'disable') {
+            const res = await send({ action: 'disablePassphrase', passphrase: pass });
+            if (!res || !res.ok) { setKeyStatus('That passphrase did not work.', 'bad'); return; }
+            setKeyStatus('Encryption off. The key is stored unencrypted again.', '');
+        }
+
+        if (p1) p1.value = '';
+        if (p2) p2.value = '';
+        const form = $('opt-lock-form');
+        if (form) form.hidden = true;
+        lockMode = null;
+        await loadKeyState();
+        refreshModels({ quiet: true });
+    });
+
+    on('opt-key-replace', 'click', () => {
+        const entry = $('opt-key-entry'), saved = $('opt-key-saved');
+        if (entry) entry.hidden = false;
+        if (saved) saved.hidden = true;
+        const inp = $('opt-api-key');
+        if (inp) { inp.value = ''; inp.focus(); }
+    });
+
+    on('opt-key-revoke', 'click', async () => {
+        await send({ action: 'revokeKey' });
+        setKeyStatus('Key removed from this device.', '');
+        await loadKeyState();
+    });
+
+    on('opt-save-key', 'click', async () => {
+        const inp = $('opt-api-key');
+        if (!inp) return;
+        const key = inp.value.trim();
+        if (!key) { setKeyStatus('Paste a key first.', 'bad'); return; }
+
+        // Verify by listing models rather than generating: same proof the key
+        // works, no generateContent quota spent, and it fills the dropdown.
+        setKeyStatus('Checking\u2026');
+        const check = await send({ action: 'listModels', apiKey: key });
+        if (!check || !check.ok) {
+            setKeyStatus('Rejected: ' + ((check && check.error) || 'unreachable'), 'bad');
+            return;
+        }
+
+        const saveRes = await send({ action: 'saveApiKey', key });
+        if (!saveRes || !saveRes.ok) {
+            if (saveRes && saveRes.error === 'passphrase_required') {
+                setKeyStatus('Unlock first — the stored key is encrypted.', 'bad');
+            } else {
+                setKeyStatus('Could not save.', 'bad');
+            }
+            return;
+        }
+
+        inp.value = '';
+        setKeyStatus(`Saved and verified \u2014 ${check.models.length} models available.`, 'ok');
+        await chrome.storage.local.set({ modelListCache: { ts: Date.now(), models: check.models } });
+        await loadKeyState();
+        renderModelOptions(check.models);
+    });
+
+    async function loadKeyState() {
+        keyState = await send({ action: 'getKeyState' });
+        renderKeyCard();
+    }
 
     // ============================================
     // Model
@@ -443,6 +566,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ---- go ----
+    loadKeyState();
     initModel();
     renderPerf();
     loadPrompts();

@@ -12,9 +12,141 @@ const GEMINI_BASE   = "https://generativelanguage.googleapis.com/v1beta/models";
 // Worker; LOOKUP_MODE is 'C', which routes entirely through callGemini().
 const PROXY_URL = "";
 
+// ============================================
+// 🔑 API KEY STORAGE
+// ============================================
+//
+// Two modes, both honest about what they protect against.
+//
+//   plain      — chrome.storage.local, never .sync (.sync replicates to
+//                Google's servers). Read only here in the service worker,
+//                never handed to a content script, masked in Settings, never
+//                logged. Stops page scripts and accidental leaks. Does NOT
+//                stop someone who can read the browser profile off disk.
+//
+//   passphrase — AES-GCM, key derived by PBKDF2 from a passphrase the
+//                extension never stores. Ciphertext at rest; plaintext lives
+//                in chrome.storage.session while unlocked. This is the only
+//                mode that survives profile theft, and the cost is real: a
+//                forgotten passphrase means re-entering the API key, because
+//                there is nothing to recover it from.
+//
+// Encrypting with a key the extension also stores would be theatre — both
+// halves would sit side by side — so that option is deliberately absent.
+
+const KEY_ENC_VERSION = 1;
+const PBKDF2_ITERS = 600000;   // OWASP's 2023 floor for PBKDF2-SHA256
+
+const b64 = (buf) => btoa(String.fromCharCode.apply(null, new Uint8Array(buf)));
+const unb64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+
+async function deriveKey(passphrase, salt) {
+    const material = await crypto.subtle.importKey(
+        "raw", new TextEncoder().encode(passphrase), "PBKDF2", false, ["deriveKey"]);
+    return crypto.subtle.deriveKey(
+        { name: "PBKDF2", salt, iterations: PBKDF2_ITERS, hash: "SHA-256" },
+        material, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
+}
+
+async function encryptApiKey(plain, passphrase) {
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const key = await deriveKey(passphrase, salt);
+    const ct = await crypto.subtle.encrypt(
+        { name: "AES-GCM", iv }, key, new TextEncoder().encode(plain));
+    return { v: KEY_ENC_VERSION, salt: b64(salt), iv: b64(iv), ct: b64(ct) };
+}
+
+// Returns null on a wrong passphrase: AES-GCM authenticates, so a bad key
+// fails the tag check rather than yielding garbage.
+async function decryptApiKey(blob, passphrase) {
+    try {
+        const key = await deriveKey(passphrase, unb64(blob.salt));
+        const pt = await crypto.subtle.decrypt(
+            { name: "AES-GCM", iv: unb64(blob.iv) }, key, unb64(blob.ct));
+        return new TextDecoder().decode(pt);
+    } catch (e) {
+        return null;
+    }
+}
+
+async function getKeyState() {
+    const { geminiApiKey, geminiApiKeyEnc } =
+        await chrome.storage.local.get(["geminiApiKey", "geminiApiKeyEnc"]);
+    if (geminiApiKeyEnc) {
+        const { apiKeyPlain } = await chrome.storage.session.get("apiKeyPlain");
+        const plain = (apiKeyPlain || "").trim();
+        return { hasKey: true, protection: "passphrase", unlocked: !!plain, masked: mask(plain) };
+    }
+    const plain = (geminiApiKey || "").trim();
+    return { hasKey: !!plain, protection: "plain", unlocked: !!plain, masked: mask(plain) };
+}
+
+// Enough to recognise which key is loaded, not enough to use it.
+function mask(key) {
+    const k = String(key || "");
+    if (!k) return "";
+    if (k.length <= 10) return k.slice(0, 2) + "\u2026";
+    return k.slice(0, 4) + "\u2026" + k.slice(-3);
+}
+
+// chrome.storage.session, not a module variable: the MV3 service worker is
+// evicted between calls, which would drop an in-memory key and force a
+// re-unlock on every lookup.
 async function getApiKey() {
-    const { geminiApiKey } = await chrome.storage.local.get("geminiApiKey");
+    const { geminiApiKey, geminiApiKeyEnc } =
+        await chrome.storage.local.get(["geminiApiKey", "geminiApiKeyEnc"]);
+    if (geminiApiKeyEnc) {
+        const { apiKeyPlain } = await chrome.storage.session.get("apiKeyPlain");
+        return (apiKeyPlain || "").trim();
+    }
     return (geminiApiKey || "").trim();
+}
+
+async function enablePassphrase(passphrase) {
+    if (!passphrase || String(passphrase).length < 8) {
+        return { ok: false, error: "too_short" };
+    }
+    const plain = await getApiKey();
+    if (!plain) return { ok: false, error: "no_key" };
+    const blob = await encryptApiKey(plain, passphrase);
+    await chrome.storage.local.set({ geminiApiKeyEnc: blob });
+    await chrome.storage.local.remove("geminiApiKey");
+    await chrome.storage.session.set({ apiKeyPlain: plain });   // stay unlocked now
+    return { ok: true };
+}
+
+async function unlockKey(passphrase) {
+    const { geminiApiKeyEnc } = await chrome.storage.local.get("geminiApiKeyEnc");
+    if (!geminiApiKeyEnc) return { ok: false, error: "not_encrypted" };
+    const plain = await decryptApiKey(geminiApiKeyEnc, passphrase || "");
+    if (!plain) return { ok: false, error: "wrong_passphrase" };
+    await chrome.storage.session.set({ apiKeyPlain: plain });
+    return { ok: true };
+}
+
+async function lockKey() {
+    await chrome.storage.session.remove("apiKeyPlain");
+    return { ok: true };
+}
+
+// Needs the passphrase: turning encryption off must prove you could have read
+// the key anyway, otherwise it is a way to strip protection without it.
+async function disablePassphrase(passphrase) {
+    const { geminiApiKeyEnc } = await chrome.storage.local.get("geminiApiKeyEnc");
+    if (!geminiApiKeyEnc) return { ok: false, error: "not_encrypted" };
+    const plain = await decryptApiKey(geminiApiKeyEnc, passphrase || "");
+    if (!plain) return { ok: false, error: "wrong_passphrase" };
+    await chrome.storage.local.set({ geminiApiKey: plain });
+    await chrome.storage.local.remove("geminiApiKeyEnc");
+    await chrome.storage.session.remove("apiKeyPlain");
+    return { ok: true };
+}
+
+async function revokeKey() {
+    await chrome.storage.local.remove(["geminiApiKey", "geminiApiKeyEnc"]);
+    await chrome.storage.session.remove("apiKeyPlain");
+    return { ok: true };
 }
 
 // ============================================
@@ -358,6 +490,35 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         chrome.storage.local.set({ latencyLog: [] }, () => sendResponse({ ok: true }));
         return true;
     }
+
+    // ---- API key (Settings) ----
+    if (request.action === "getKeyState") {
+        getKeyState().then(sendResponse);
+        return true;
+    }
+    if (request.action === "saveApiKey") {
+        (async () => {
+            const key = String(request.key || "").trim();
+            if (!key) return { ok: false, error: "empty" };
+            const { geminiApiKeyEnc } = await chrome.storage.local.get("geminiApiKeyEnc");
+            if (geminiApiKeyEnc) {
+                // Already in passphrase mode — re-encrypt under the same one.
+                if (!request.passphrase) return { ok: false, error: "passphrase_required" };
+                const blob = await encryptApiKey(key, request.passphrase);
+                await chrome.storage.local.set({ geminiApiKeyEnc: blob });
+                await chrome.storage.session.set({ apiKeyPlain: key });
+                return { ok: true };
+            }
+            await chrome.storage.local.set({ geminiApiKey: key });
+            return { ok: true };
+        })().then(sendResponse);
+        return true;
+    }
+    if (request.action === "revokeKey")       { revokeKey().then(sendResponse); return true; }
+    if (request.action === "enablePassphrase"){ enablePassphrase(request.passphrase).then(sendResponse); return true; }
+    if (request.action === "disablePassphrase"){ disablePassphrase(request.passphrase).then(sendResponse); return true; }
+    if (request.action === "unlockKey")       { unlockKey(request.passphrase).then(sendResponse); return true; }
+    if (request.action === "lockKey")         { lockKey().then(sendResponse); return true; }
 
     // ---- editable prompts (Settings) ----
     if (request.action === "getPrompts") {
@@ -1569,6 +1730,16 @@ async function callGemini(prompt, word = "", context = "", url = "", generationC
 
         const apiKey = await getApiKey();
         if (!apiKey) {
+            // Locked is a different problem from missing, and telling someone to
+            // go and get a key they already have is the wrong instruction.
+            const ks = await getKeyState();
+            if (ks.protection === "passphrase" && !ks.unlocked) {
+                return `<div style="text-align:center; padding:20px;">
+                    <div style="font-size:24px; margin-bottom:10px;">🔒</div>
+                    <div style="font-weight:700; color:#92400e; margin-bottom:8px;">Key locked</div>
+                    <p style="font-size:13px; color:#78716c; line-height:1.5;">Your API key is encrypted. Open Settings and enter your passphrase to unlock it for this browser session.</p>
+                </div>`;
+            }
             return `<div style="text-align:center; padding:20px;">
                 <div style="font-size:24px; margin-bottom:10px;">🔑</div>
                 <div style="font-weight:700; color:#92400e; margin-bottom:8px;">API key needed</div>
