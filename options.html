@@ -236,6 +236,160 @@
         .key-row{display:flex; gap:var(--space-md); align-items:center}
         #opt-key-status{font-size:12px; margin-top:var(--space-lg); min-height:18px; font-weight:500}
 
+        /* ── controls added for model / prompts / performance ──────────
+           Colour layers stay LAST in every `background` shorthand and veils are
+           written as linear-gradient(0deg,c,c): a bare colour before another
+           layer makes the whole declaration invalid and it is dropped silently.
+           Two of those were found and fixed in the retune — don't reintroduce. */
+        .select{
+            width:100%; padding:var(--space-md) var(--space-xl) var(--space-md) var(--space-lg);
+            background:var(--gel),var(--glass-soft);
+            -webkit-backdrop-filter:blur(var(--space-lg));
+            backdrop-filter:blur(var(--space-lg));
+            border:1px solid var(--glass-line); border-radius:100px;
+            font-family:'JetBrains Mono',ui-monospace,monospace; font-size:12px;
+            color:var(--ink); cursor:pointer; outline:none;
+            appearance:none; -webkit-appearance:none;
+            /* caret drawn here because the native one cannot be themed */
+            background-image:
+              url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%236b7280' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"),
+              var(--gel);
+            background-repeat:no-repeat,repeat;
+            background-position:right var(--space-lg) center,0 0;
+            box-shadow:inset 0 1px 3px rgba(17,24,39,0.06);
+            transition:all var(--t-fast);
+        }
+        .select:focus{border-color:rgba(180,83,9,0.42)}
+
+        /* The pill radius of .field is built for one line. A prompt is not one
+           line, so this is the rounded-rect variant. */
+        .textarea{
+            width:100%; display:block; padding:var(--space-lg);
+            background:var(--glass-soft);
+            -webkit-backdrop-filter:blur(var(--space-lg));
+            backdrop-filter:blur(var(--space-lg));
+            border:1px solid var(--glass-line); border-radius:var(--space-lg);
+            font-family:'JetBrains Mono',ui-monospace,monospace;
+            font-size:11.5px; line-height:1.65; color:var(--ink);
+            outline:none; resize:vertical; min-height:120px;
+            box-shadow:inset 0 1px 3px rgba(17,24,39,0.06);
+            transition:border-color var(--t-fast);
+            tab-size:2;
+        }
+        .textarea:focus{border-color:rgba(180,83,9,0.42)}
+        .textarea[readonly]{color:var(--ink-mute); cursor:default}
+
+        .row{display:flex; gap:var(--space-md); align-items:center}
+        .row-wrap{flex-wrap:wrap}
+        .grow{flex:1; min-width:0}
+        .stack{display:flex; flex-direction:column; gap:var(--space-md)}
+        .spread{display:flex; justify-content:space-between; align-items:center; gap:var(--space-md)}
+        .field-label{
+            font-size:10px; font-weight:700; text-transform:uppercase;
+            letter-spacing:0.1em; color:var(--ink-mute); margin-bottom:var(--space-sm);
+        }
+        .hint{font-size:11px; color:var(--ink-mute); line-height:1.55; margin-top:var(--space-sm)}
+        .hint code{
+            font-family:'JetBrains Mono',ui-monospace,monospace; font-size:10.5px;
+            background:linear-gradient(0deg,var(--amber-veil),var(--amber-veil)),var(--glass-soft);
+            border-radius:var(--space-xs); padding:1px 4px; color:var(--amber-deep);
+        }
+        .warn{
+            font-size:11px; line-height:1.55; color:var(--amber-ink);
+            background:linear-gradient(0deg,var(--amber-veil),var(--amber-veil)),var(--glass-soft);
+            border:1px solid rgba(180,83,9,0.20); border-radius:var(--space-md);
+            padding:var(--space-md) var(--space-lg); margin:0 0 var(--space-lg);
+        }
+
+        .check{display:flex; gap:var(--space-md); align-items:flex-start; cursor:pointer}
+        .check input{margin:2px 0 0; accent-color:var(--amber-deep); cursor:pointer}
+        .check-text{font-size:12px; color:var(--ink-soft); line-height:1.5}
+        .check-text b{color:var(--ink); font-weight:600}
+
+        /* segmented control — 7d / 30d */
+        .seg{
+            display:inline-flex; padding:2px; gap:2px;
+            background:var(--glass-soft); border:1px solid var(--glass-line);
+            border-radius:100px; box-shadow:inset 0 1px 3px rgba(17,24,39,0.06);
+        }
+        .seg button{
+            appearance:none; border:none; background:transparent; cursor:pointer;
+            font-family:inherit; font-size:11px; font-weight:600; color:var(--ink-mute);
+            padding:var(--space-xs) var(--space-lg); border-radius:100px;
+            transition:all var(--t-fast);
+        }
+        .seg button[aria-pressed="true"]{
+            background:var(--gel),rgba(255,255,255,0.88);
+            color:var(--amber-deep); box-shadow:var(--spec-sm);
+        }
+
+        /* per-model latency rows */
+        .perf-row{
+            display:grid; grid-template-columns:1fr auto 62px auto;
+            gap:var(--space-lg); align-items:center;
+            padding:var(--space-md) 0; border-bottom:1px solid rgba(17,24,39,0.06);
+        }
+        .perf-row:last-child{border-bottom:none}
+        .perf-name{
+            font-family:'JetBrains Mono',ui-monospace,monospace; font-size:11px;
+            color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+        }
+        .perf-avg{font-size:13px; font-weight:700; color:var(--ink); font-variant-numeric:tabular-nums}
+        .perf-n{font-size:10.5px; color:var(--ink-faint); font-variant-numeric:tabular-nums; text-align:right}
+        .spark{display:flex; align-items:flex-end; gap:1px; height:18px}
+        .spark i{
+            display:block; width:3px; border-radius:1px; min-height:1px;
+            background:var(--amber-deep); opacity:0.55;
+        }
+        .spark i.empty{background:rgba(17,24,39,0.12)}
+        .perf-best{
+            font-size:11px; color:var(--green); font-weight:600; margin-top:var(--space-lg);
+        }
+
+        /* prompt history + diff */
+        .hist{display:flex; flex-direction:column; gap:var(--space-md); margin-top:var(--space-lg)}
+        .hist-item{
+            border:1px solid var(--glass-line); border-radius:var(--space-md);
+            background:var(--glass-soft); overflow:hidden;
+        }
+        .hist-head{
+            display:flex; align-items:center; gap:var(--space-md);
+            padding:var(--space-md) var(--space-lg); cursor:pointer;
+        }
+        .hist-when{font-size:11.5px; font-weight:600; color:var(--ink)}
+        .hist-label{font-size:11px; color:var(--ink-mute); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+        .hist-stat{margin-left:auto; font-size:10.5px; font-variant-numeric:tabular-nums; white-space:nowrap}
+        .hist-stat .p{color:var(--green); font-weight:700}
+        .hist-stat .m{color:var(--red); font-weight:700}
+        .tag{
+            font-size:9px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase;
+            color:var(--ink-mute); border:1px solid var(--glass-line);
+            border-radius:100px; padding:1px var(--space-sm);
+        }
+        .tag.cur{color:var(--amber-deep); border-color:rgba(180,83,9,0.3)}
+        .hist-body{border-top:1px solid rgba(17,24,39,0.07); padding:var(--space-lg)}
+        .diff{
+            font-family:'JetBrains Mono',ui-monospace,monospace; font-size:10.5px;
+            line-height:1.6; border-radius:var(--space-sm); overflow-x:auto;
+            background:rgba(255,255,255,0.5);
+        }
+        .diff div{padding:0 var(--space-md); white-space:pre-wrap; word-break:break-word}
+        .diff .add{background:rgba(22,163,74,0.13); color:#14532d}
+        .diff .del{background:rgba(220,38,38,0.11); color:#7f1d1d}
+        .diff .ctx{color:var(--ink-mute)}
+        .diff .gap{
+            color:var(--ink-faint); font-style:italic; text-align:center;
+            background:rgba(17,24,39,0.035); font-size:10px;
+        }
+        .diff-title{
+            font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em;
+            color:var(--ink-mute); margin:var(--space-lg) 0 var(--space-sm);
+        }
+        .diff-title:first-child{margin-top:0}
+        .hist-actions{display:flex; gap:var(--space-md); margin-top:var(--space-lg)}
+        .btn-sm{padding:var(--space-xs) var(--space-lg); font-size:11px}
+        .empty-note{font-size:12px; color:var(--ink-faint); padding:var(--space-lg) 0}
+
         @media(prefers-reduced-motion:reduce){*{transition:none!important}}
         :focus-visible{outline:2px solid var(--amber-deep); outline-offset:2px}
     </style>
@@ -260,6 +414,104 @@
                 <button id="opt-save-key" class="btn btn-primary">Save</button>
             </div>
             <div id="opt-key-status"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Model</div>
+            <p class="note">
+                The list is fetched from Google using your key, so it shows what you can
+                actually reach rather than a list baked into this build.
+            </p>
+            <div class="stack">
+                <div>
+                    <div class="field-label">Lookup model</div>
+                    <select id="opt-model" class="select"></select>
+                </div>
+                <div id="opt-model-custom-row" hidden>
+                    <div class="field-label">Custom model id</div>
+                    <input id="opt-model-custom" class="field" type="text"
+                           placeholder="gemini-…" autocomplete="off" spellcheck="false">
+                </div>
+                <div class="row row-wrap">
+                    <button id="opt-model-refresh" class="btn btn-sm">Refresh list</button>
+                    <span id="opt-model-status" class="hint" style="margin-top:0"></span>
+                </div>
+                <label class="check">
+                    <input id="opt-paid-plan" type="checkbox">
+                    <span class="check-text">
+                        <b>My key is on a paid plan.</b>
+                        Never switch models automatically — a quota error will surface as an
+                        error instead of falling back to another free-tier model.
+                    </span>
+                </label>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="spread">
+                <div class="card-title" style="margin:0">Model performance</div>
+                <div class="seg" role="group" aria-label="Time range">
+                    <button id="opt-perf-7" type="button" aria-pressed="true">7d</button>
+                    <button id="opt-perf-30" type="button" aria-pressed="false">30d</button>
+                </div>
+            </div>
+            <p class="note" style="margin-top:var(--space-lg)">
+                Measured on this device, from your own lookups. Averages are wall-clock time
+                for the whole request.
+            </p>
+            <div id="opt-perf-body"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Prompts</div>
+            <div class="warn">
+                The system instruction is sent on <b>every</b> call — word lookups, the
+                More / General / Simple panels, and study sheets alike. Editing it is not
+                scoped to lookups. Leave the <code>sr-</code> class names in any markup
+                examples alone: the bubble's CSS matches on them.
+            </div>
+            <div class="stack">
+                <div>
+                    <div class="field-label">System instruction</div>
+                    <textarea id="opt-prompt-system" class="textarea" spellcheck="false"></textarea>
+                    <div class="hint">
+                        Domain-matching rules. Weakening these measurably degrades answers —
+                        without them <code>blood culture</code> came back as
+                        වගාව instead of රුධිර වගාව.
+                    </div>
+                </div>
+                <div>
+                    <div class="field-label">Lookup prompt</div>
+                    <textarea id="opt-prompt-lookup" class="textarea" spellcheck="false"></textarea>
+                    <div class="hint">
+                        Must contain <code>{{word}}</code> and <code>{{context}}</code>; they are
+                        replaced at lookup time. A save without them is refused.
+                    </div>
+                </div>
+                <details>
+                    <summary class="field-label" style="cursor:pointer; margin:0">
+                        Locked — JSON contract &amp; response schema
+                    </summary>
+                    <div class="hint" style="margin-bottom:var(--space-md)">
+                        Read-only on purpose. These control whether the response parses at all,
+                        not how good it is.
+                    </div>
+                    <textarea id="opt-prompt-contract" class="textarea" readonly
+                              style="min-height:70px"></textarea>
+                    <textarea id="opt-prompt-schema" class="textarea" readonly
+                              style="min-height:110px; margin-top:var(--space-md)"></textarea>
+                </details>
+                <div class="row row-wrap">
+                    <button id="opt-prompt-save" class="btn btn-primary">Save</button>
+                    <button id="opt-prompt-reset" class="btn btn-sm">Reset to default</button>
+                    <span id="opt-prompt-status" class="hint" style="margin-top:0"></span>
+                </div>
+            </div>
+            <div class="spread" style="margin-top:var(--space-xl)">
+                <div class="card-title" style="margin:0">History</div>
+                <span id="opt-hist-count" class="tag"></span>
+            </div>
+            <div id="opt-prompt-history" class="hist"></div>
         </div>
 
         <div class="card">
@@ -300,7 +552,7 @@
             </div>
             <div class="about-row">
                 <span class="label">AI Model</span>
-                <span class="value mono">gemini-3.1-flash-lite</span>
+                <span class="value mono" id="opt-about-model">—</span>
             </div>
             <div class="about-row">
                 <span class="label">Request path</span>
@@ -309,6 +561,7 @@
         </div>
     </div>
 
+    <script src="lib/diff.js"></script>
     <script src="options.js"></script>
 </body>
 </html>
