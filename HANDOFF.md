@@ -23,8 +23,27 @@ The direction was chosen from a rendered preview rather than written blind:
 **Where amber survives, deliberately:** the Sinhala translation line (`.sr-translation`),
 the trigger's lit rod, the usage bar (quantity), step numbers on welcome (a real
 sequence), and primary actions — which are now primary *by weight and hue, not by fill*.
-`--sr-amber-deep` moved `#d97706` → `#b45309`: the old value was ~3.0:1 on the milkier
-surface and failed AA at 16px.
+**The accent palette, and how it was got wrong twice.** Final values are
+`--sr-amber-deep #a84e08`, `--green #166534`, `--red #b91c1c`.
+
+The first two attempts measured contrast against `#ffffff`. **The surface is never white.**
+It is translucent white over a grey page gradient, so the ground is `#f4f5f7` typically and
+`#eff0f3` at the card's most transparent stop. Measured properly:
+
+| | `#f4f5f7` typical | `#eff0f3` worst |
+|---|---|---|
+| `--amber-deep` `#b45309` | 4.60 pass | 4.41 **fail** |
+| `--green` `#15803d` | 4.60 pass | 4.40 **fail** |
+| `--red` `#dc2626` | 4.43 **fail** | 4.24 **fail** |
+
+So the accurate statement is *not* "all three were failing" — that overstates it, and
+`8ef6ee7`'s commit message says so wrongly by quoting the worst-stop column against the
+typical ground. Two passed by 0.10 and one failed outright. **A 0.10 margin that goes
+negative further down the card's ramp is the real argument for darkening all three**, not
+outright failure.
+
+This matters most on `.sr-translation`: 17px at weight 600 is not "large text" under WCAG,
+so it needs the full 4.5:1, and it is the one element the extension exists to produce.
 
 **Not touched, deliberately:** the three-panel colour coding (contextual / General teal /
 Simple green) is carrying information — it tells you which of the three explanations you
@@ -139,19 +158,25 @@ JSON. Model and call shape have to change together.
    `node --check` passes on a badly damaged stylesheet, because broken CSS is still a
    valid JS string. It happened once this session: a `s.index('url("data:image/svg+xml…')`
    matched the bubble's grain texture instead of the trigger's mark and ~116 brace pairs
-   were overwritten. **Take your own brace-count baseline before editing and assert it
-   after** — do not trust a number written down here, it moves every time a rule is added.
-   (It was 170/170 when this file was written; 172/172 after the retune.) Pair it with a
-   selector check, which is the stronger guard:
+   were overwritten. **The selector-set diff is the primary guard** — run it before and
+   after, the set of names must be identical:
 
    ```sh
-   # before, then again after — the set of names must be identical
    git show HEAD:content.js | grep -o 'sr-[a-zA-Z0-9_-]*' | sort -u > /tmp/before.txt
    grep -o 'sr-[a-zA-Z0-9_-]*' content.js | sort -u | diff /tmp/before.txt -
    ```
 
    Not line-anchored on purpose: a `^\s*[.#]` pattern misses `#smart-reader-bubble::before`,
    `> *` descendant rules and multi-selector lines — exactly what a mass overwrite destroys.
+
+   Brace counting is the weaker check and has now produced two false baselines. Take your
+   own before editing, never a number written down here, and **scope it to the block you
+   are editing, not the whole file**:
+   - `content.js` was 170/170 when this file was written, 172/172 after the retune,
+     174/174 once `.sr-fallback-note` landed. It moves whenever a rule is added.
+   - `options.html` counted whole-file reads 100/100 but the style block is 96/96 — the
+     four extra are `{{word}}` and `{{context}}` in the prompt-editor help text. A
+     whole-file count on that file now moves whenever the placeholder docs change.
 
 3. **The `@import` must stay the first statement** in that literal. Prepend anything and
    Noto Sans Sinhala silently stops loading.
