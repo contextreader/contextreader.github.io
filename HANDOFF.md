@@ -1,25 +1,58 @@
-# HANDOFF — UX pass is INCOMPLETE
+# HANDOFF — UX pass: direction settled, browser check still outstanding
 
-Tagged `ux-wip-2026-09-12`. The Liquid Glass work is written, verified structurally,
-and pushed — but **it has never been looked at in a browser.** Treat every visual claim
-below as unconfirmed.
+The first Liquid Glass pass (tag `ux-wip-2026-09-12`) was **rejected on sight**: it was
+chromatic and loud where the reference is monochrome and calm. It has been retuned.
 
-Read `CLAUDE.md` first for how the build works. This file is only about what is unfinished.
+**What changed, 2026-09-12 (second pass):**
+
+| | First pass | Now |
+|---|---|---|
+| Ambient light | `0 0 55px` amber bloom on bubble, popup, Settings | none — no coloured light in any scene |
+| Edge | `--sr-rim`, 5-stop amber↔teal iridescent | neutral, directional: bright white top-left → faint dark bottom-right |
+| Refraction | `--sr-fx-lens: blur(4px) brightness(1.32) saturate(1.75)` | `--sr-fx-lens: none` — lens band retired everywhere |
+| Body filter | `saturate(170%) brightness(1.10) contrast(0.94)` | `saturate(105%) brightness(1.06) contrast(0.97)` |
+| Surface | `0.38 / 0.26 / 0.30` — near-transparent | `0.66 / 0.54 / 0.58` — milky |
+| Depth | six insets, all white | dual-tone: light top-left **and a dark bottom-right** |
+| Trigger | clear glass, ink rods | the most opaque surface in the extension (0.80/0.68/0.72) |
+| Accent | amber fills, glows and gradients throughout | amber only where it carries meaning |
+
+The direction was chosen from a rendered preview rather than written blind:
+<https://claude.ai/code/artifact/3a28358e-9a63-41b1-b466-e642eb1a00cf> — variant A
+(neutral glass, amber on the word), at surface 0.66/0.54/0.58, blur 20px, lens off.
+
+**Where amber survives, deliberately:** the Sinhala translation line (`.sr-translation`),
+the trigger's lit rod, the usage bar (quantity), step numbers on welcome (a real
+sequence), and primary actions — which are now primary *by weight and hue, not by fill*.
+`--sr-amber-deep` moved `#d97706` → `#b45309`: the old value was ~3.0:1 on the milkier
+surface and failed AA at 16px.
+
+**Not touched, deliberately:** the three-panel colour coding (contextual / General teal /
+Simple green) is carrying information — it tells you which of the three explanations you
+are reading — so it stays.
+
+Read `CLAUDE.md` first for how the build works.
 
 ---
 
-## Verify before anything else
+## Still unverified — this is the gap
+
+The retune was checked structurally — `node --check` passes, the set of `sr-*` names is
+byte-identical to `HEAD`'s (nothing lost, nothing invented), braces balance, all three
+`@keyframes` survive, and the `@import` is still the first statement in the literal — and
+the direction was judged against a rendered preview. But the **extension itself has still
+not been loaded in a browser.** The preview could only answer checks #1 and part of #2; its "dark
+page" is an authored panel, not the PDF reader, and its triggers sit over authored text.
 
 Load unpacked (`chrome://extensions` → Developer mode → `sinhala-direct/`), add a Gemini
-key in Settings, then look at a lookup on each of these. The design was written blind.
+key in Settings, then look at a lookup on each of these.
 
 | # | Check | Why it's the risk |
 |---|---|---|
 | 1 | A lookup on a **white article** (Wikipedia) | Baseline. The refractive edge should be visible as a bright halo at the bubble border. If the border looks like a flat white line, `mask-composite` didn't apply and the lens is dead. |
-| 2 | A lookup on a **photo-heavy page** | The deliberate tradeoff. Tint is 38/26/30% — very clear. If Sinhala text is hard to read here, raise `--sr-glass-top/mid/bot` (`content.js`, `:root`) by ~0.1 each. One place, three numbers. |
+| 2 | A lookup on a **photo-heavy page** | The retune's main claim. Tint is now 66/54/58%. If Sinhala is still hard to read, raise `--sr-glass-top/mid/bot` (`content.js`, `:root`). One place, three numbers. |
 | 3 | A lookup on a **dark page** / the extension's PDF reader | `brightness(1.14) contrast(0.88)` is meant to normalise a dark backdrop upward. Unverified. |
 | 4 | **Scroll** while the bubble is open | Two nested `backdrop-filter`s per surface (body + lens). Repaint cost is unmeasured. If it janks, drop `saturate()` from `--sr-fx-body` first. |
-| 5 | The **trigger** over text | It is now clear glass with ink-coloured rods. On a busy background it may disappear — that is the most likely failure in the whole pass. |
+| 5 | The **trigger** over text | Was the predicted failure, and was addressed: it is now the most opaque surface in the extension rather than the least. Confirm it actually holds on a busy background. |
 | 6 | Click **More**, then **General**, then **Simple** | Gemini generates this markup. The panels got CSS for the first time; the prompts were edited in lockstep. Mismatch here means the two drifted. |
 | 7 | Sinhala → Sinhala lookup | Confirms the `@import` still loads Noto Sans Sinhala. Note: **the toolbar is hidden entirely for Sinhala words** (the Google chip is inside `if (!isSinhala)`). Intentional or not is undecided. |
 | 8 | **PubMed** | CSS-aggressive, and this build has no shadow DOM to protect it. |
@@ -29,15 +62,17 @@ key in Settings, then look at a lookup on each of these. The design was written 
 ## Known-incomplete, by area
 
 ### Visual
-- **Nothing has been seen rendered.** All of the above.
+- **The extension has not been seen rendered.** All of the above.
 - The `artifact-design` pass produced a trigger-mark study at
   `https://claude.ai/code/artifact/29ccb8bd-7250-49c7-9e1d-aaa7337432a9` —
   **Focus Brackets** is the chosen alternate if Lit Line reads as a text-formatting
   control once it's been used for a while.
-- `welcome.html` and `pdf-reader.html` were never redesigned. They still use the old
-  flat style and now clash with the bubble, popup and Settings.
-- The printable study-sheet document (`content.js`, its own standalone stylesheet near
-  the end of the file) shares no tokens with anything and is untouched.
+- `welcome.html` and `pdf-reader.html` are now on the shared tokens. welcome's stylesheet
+  was replaced wholesale (every class name preserved). pdf-reader is a *reading* surface,
+  so its page stays flat and white and only the toolbar — which genuinely floats over the
+  document — takes frost; its palette moved into the same neutral family.
+- The printable study sheet (`content.js`, standalone stylesheet near the end) keeps white
+  paper, since it exists to be printed; only its surround and the Save button moved.
 
 ### Code hygiene
 - **`--space-xs` … `--space-2xl` are not namespaced** and are injected into the host
@@ -104,9 +139,19 @@ JSON. Model and call shape have to change together.
    `node --check` passes on a badly damaged stylesheet, because broken CSS is still a
    valid JS string. It happened once this session: a `s.index('url("data:image/svg+xml…')`
    matched the bubble's grain texture instead of the trigger's mark and ~116 brace pairs
-   were overwritten. **After any scripted edit, assert the brace count** — currently
-   170/170 — and that a few known selectors survive. That check is the only thing that
-   catches it.
+   were overwritten. **Take your own brace-count baseline before editing and assert it
+   after** — do not trust a number written down here, it moves every time a rule is added.
+   (It was 170/170 when this file was written; 172/172 after the retune.) Pair it with a
+   selector check, which is the stronger guard:
+
+   ```sh
+   # before, then again after — the set of names must be identical
+   git show HEAD:content.js | grep -o 'sr-[a-zA-Z0-9_-]*' | sort -u > /tmp/before.txt
+   grep -o 'sr-[a-zA-Z0-9_-]*' content.js | sort -u | diff /tmp/before.txt -
+   ```
+
+   Not line-anchored on purpose: a `^\s*[.#]` pattern misses `#smart-reader-bubble::before`,
+   `> *` descendant rules and multi-selector lines — exactly what a mass overwrite destroys.
 
 3. **The `@import` must stay the first statement** in that literal. Prepend anything and
    Noto Sans Sinhala silently stops loading.

@@ -742,11 +742,14 @@ const styles = `
     .sr-secondary-btn {
         display: inline-flex; align-items: center; justify-content: center;
         gap: var(--space-sm);
-        background: rgba(255,255,255,0.16);
+        /* 0.16 here was the old clear-glass value; against the milky surface
+           these pills read as barely-there smudges. They also need a real
+           border-style, or .sr-btn-primary's border-color has nothing to set. */
+        background: var(--sr-glass-soft);
         -webkit-backdrop-filter: var(--sr-fx-sm);
         backdrop-filter: var(--sr-fx-sm);
-        border: none;
-        color: var(--sr-ink);
+        border: 1px solid var(--sr-glass-line);
+        color: var(--sr-ink-soft);
         font-family: 'Inter', system-ui, sans-serif;
         font-size: 12px; font-weight: 600;
         padding: var(--space-md) var(--space-lg);
@@ -759,18 +762,18 @@ const styles = `
           var(--sr-spec-sm);
     }
     .sr-secondary-btn:hover {
-        background: rgba(255,255,255,0.34);
+        background: rgba(255,255,255,0.86);
+        border-color: rgba(255,255,255,0.9);
+        color: var(--sr-ink);
         transform: translateY(-1px);
         box-shadow:
           0 var(--space-md) var(--space-xl) -6px rgba(17,24,39,0.30),
-          0 0 0 1px rgba(251,191,36,0.35),
           var(--sr-spec-sm);
     }
+    .sr-secondary-btn:focus-visible { outline: 2px solid var(--sr-amber-deep); outline-offset: 2px; }
     .sr-secondary-btn:active { transform: translateY(0); }
     .sr-secondary-btn svg { display: block; flex: 0 0 auto; }
 
-    /* Primary action (⚡ More) — amber gradient. Dark ink, because white text
-       on #fbbf24 fails contrast. */
     /* Primary by weight and hue, not by fill. A solid amber lozenge was the
        biggest block of colour on the surface and fought the Sinhala line for
        attention; the same glass as its siblings with amber text and a faint
@@ -883,7 +886,7 @@ const styles = `
     .sr-list-item:last-child { border-bottom: none; }
     
     .sr-list-word { font-weight: 800; color: #111827; font-size: 15px; }
-    .sr-list-trans { font-size: 13px; color: #d97706; font-weight: 600; margin-top:2px; }
+    .sr-list-trans { font-size: 13px; color: var(--sr-amber-deep); font-weight: 600; margin-top:2px; }
     
     .sr-action-group { 
         display: flex; 
@@ -986,10 +989,10 @@ const styles = `
         left: 50%;
         transform: translateX(-50%);
         z-index: 2147483647;
-        background: rgba(255,251,235,0.82);
-        -webkit-backdrop-filter: blur(var(--space-xxl, 34px)) saturate(180%);
-        backdrop-filter: blur(var(--space-xxl, 34px)) saturate(180%);
-        border: 1px solid rgba(251,191,36,0.35);
+        background: var(--sr-glass-soft, rgba(255,255,255,0.70));
+        -webkit-backdrop-filter: var(--sr-fx-body);
+        backdrop-filter: var(--sr-fx-body);
+        border: 1px solid var(--sr-glass-line, rgba(255,255,255,0.55));
         border-radius: 100px;
         padding: var(--space-lg, 13px) var(--space-xl, 21px);
         display: flex;
@@ -1022,11 +1025,10 @@ const styles = `
         border: none;
     }
     #sr-highlight-bar .sr-hb-done {
-        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-        color: #fff;
-        box-shadow:
-          0 2px var(--space-md, 8px) rgba(251,191,36,0.35),
-          inset 0 1px 0 rgba(255,255,255,0.3);
+        background: var(--sr-glass-soft, rgba(255,255,255,0.70));
+        border: 1px solid rgba(180,83,9,0.22);
+        color: var(--sr-amber-deep, #b45309);
+        box-shadow: var(--sr-spec-sm);
     }
     #sr-highlight-bar .sr-hb-done:hover:not(:disabled) {
         background: #b45309;
@@ -2599,7 +2601,7 @@ function renderStudyLevelPicker(body, hasSelection, calibrationWords) {
                 <input id="sr-page-range" type="text" placeholder="e.g. 1-5, 8, 12-15" style="width:100%; padding:7px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:12px; color:#374151;">
                 <div style="font-size:10px; color:#9ca3af; margin-top:2px;">Leave empty for all ${maxPage} pages</div>
             </div>` : ''}
-            ${!hasSelectedText && !hasCalibration ? '<div style="font-size:11px; color:#d97706; margin-bottom:10px; padding:6px 10px; background:#fffbeb; border-radius:6px; border:1px solid #fde68a;">Tip: highlight text on the page first for more targeted results</div>' : ''}
+            ${!hasSelectedText && !hasCalibration ? '<div style="font-size:11px; color:#b45309; margin-bottom:10px; padding:6px 10px; background:#fffbeb; border-radius:6px; border:1px solid #fde68a;">Tip: highlight text on the page first for more targeted results</div>' : ''}
             <div style="display:flex; flex-direction:column; gap:8px;">
                 <button class="sr-study-level-btn" data-level="basic_all" style="padding:12px; border:1px solid #bbf7d0; background:#f0fdf4; border-radius:8px; cursor:pointer; text-align:left; transition:all 0.15s;">
                     <div style="font-weight:700; color:#166534; font-size:14px;">🌱 Basic</div>
@@ -2713,7 +2715,7 @@ function generateStudySheetNew(level, pageRangeStr, calibrationWords) {
             <div style="font-size:12px; color:#9ca3af; margin-top:4px;" id="sr-study-chunk">
                 Section 1 of ${chunks.length} · ${levelLabels[level] || level}
             </div>
-            <div style="font-size:13px; color:#d97706; font-weight:600; margin-top:8px;" id="sr-study-count">0 words found</div>
+            <div style="font-size:13px; color:#b45309; font-weight:600; margin-top:8px;" id="sr-study-count">0 words found</div>
             <div style="font-size:11px; color:#9ca3af; margin-top:4px;">${wordCount.toLocaleString()} words · ${chunks.length} section${chunks.length > 1 ? 's' : ''}</div>
             <button id="sr-cancel-study" class="sr-cancel-btn" style="margin-top:15px;">Cancel</button>
         </div>
@@ -2872,12 +2874,14 @@ function generateStudySheetDocNew(data, level, lang) {
     <style>
         @page { size: A4; margin: 12mm 15mm; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', system-ui, sans-serif; color: #111827; background: #6b7280; padding: 0; margin: 0; font-size: 9pt; line-height: 1.4; }
+        /* The sheet is paper and stays white and flat — it exists to be printed.
+           Only the surround joins the neutral family the other surfaces use. */
+        body { font-family: 'Inter', system-ui, sans-serif; color: #111827; background: #aeb4be; padding: 0; margin: 0; font-size: 9pt; line-height: 1.4; }
         .sticky-toolbar { position: sticky; top: 0; z-index: 100; padding: 8px 20px; background: #1f2937; display: flex; gap: 8px; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
         .sticky-toolbar button { padding: 7px 16px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 12px; color: #fff; transition: all 0.15s; }
         .sticky-toolbar button:hover { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.4); }
-        .sticky-toolbar .download-btn { background: #d97706; border-color: #d97706; }
-        .sticky-toolbar .download-btn:hover { background: #b45309; }
+        .sticky-toolbar .download-btn { background: #b45309; border-color: #b45309; }
+        .sticky-toolbar .download-btn:hover { background: #92400e; border-color: #92400e; }
         .sticky-toolbar .hint { font-size: 11px; color: rgba(255,255,255,0.5); margin-left: auto; }
         .page-container { width: 210mm; margin: 15px auto; background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.3); padding: 12mm 15mm; }
         .doc-header { border-bottom: 1px solid #d1d5db; padding-bottom: 8px; margin-bottom: 10px; }

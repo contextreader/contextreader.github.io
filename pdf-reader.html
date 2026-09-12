@@ -25,19 +25,33 @@
             --space-xl: 21px;
             --space-xxl: 34px;
 
-            /* Palette */
-            --bg-canvas: #f9fafb;
+            /* Palette — retuned 2026-09-12 into the same neutral family as the
+               bubble, popup, Settings and welcome. This is a reading surface,
+               so the page itself stays flat and white: frost belongs on the
+               chrome that floats over the document, not under the text. */
+            --bg-canvas: #e4e7ec;
             --bg-surface: #ffffff;
-            --bg-hover: #f3f4f6;
+            --bg-hover: #eef0f3;
             --text-primary: #111827;
             --text-secondary: #6b7280;
             --text-tertiary: #9ca3af;
-            --accent-gold: #fbbf24;
-            --accent-gold-soft: rgba(251, 191, 36, 0.2);
-            --accent-blue: #0891b2;
-            --accent-blue-soft: rgba(8, 145, 178, 0.1);
-            --border-color: #e5e7eb;
-            --border-light: #f3f4f6;
+            --accent-gold: #b45309;                        /* text-safe accent */
+            --accent-gold-soft: rgba(251, 191, 36, 0.16);
+            --accent-blue: #6b7280;                        /* teal retired from chrome */
+            --accent-blue-soft: rgba(17, 24, 39, 0.06);
+            --border-color: #d7dbe2;
+            --border-light: #e7eaef;
+
+            /* frosted chrome, matching the other surfaces */
+            --glass-soft: rgba(255,255,255,0.70);
+            --glass-line: rgba(255,255,255,0.55);
+            --glass-fx: blur(20px) saturate(105%) brightness(1.06) contrast(0.97);
+            --spec-sm:
+              inset 0 1.2px 0 rgba(255,255,255,0.92),
+              inset 1.2px 0 0 rgba(255,255,255,0.50),
+              inset 0 9px 13px -10px rgba(255,255,255,0.70),
+              inset -1px -1px 0 rgba(17,24,39,0.06),
+              inset 0 -9px 12px -11px rgba(17,24,39,0.10);
 
             /* Selection Highlight */
             --highlight-color: rgba(251, 191, 36, 0.4);
@@ -67,13 +81,18 @@
         /* --- Header/Toolbar --- */
         .header {
             height: calc(var(--space-xxl) * 1.618);
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(12px);
+            /* This bar floats over the document, so it is the one place on the
+               reader that earns the frosted treatment. */
+            background: rgba(255, 255, 255, 0.82);
+            -webkit-backdrop-filter: var(--glass-fx);
+            backdrop-filter: var(--glass-fx);
             border-bottom: 1px solid var(--border-color);
             display: flex; align-items: center; justify-content: space-between;
             padding: 0 var(--space-xl);
             z-index: 20; flex-shrink: 0;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            box-shadow:
+              0 var(--space-md) var(--space-xl) -14px rgba(17,24,39,0.22),
+              var(--spec-sm);
             gap: var(--space-lg);
         }
 
@@ -123,7 +142,7 @@
         .icon-btn.active {
             background: var(--accent-blue-soft);
             color: var(--accent-blue);
-            border-color: rgba(8, 145, 178, 0.2);
+            border-color: rgba(17, 24, 39, 0.12);
         }
         .icon-btn svg { width: 16px; height: 16px; }
 
@@ -145,7 +164,7 @@
         .btn:hover {
             border-color: var(--accent-blue);
             color: var(--accent-blue);
-            background: #ecfeff;
+            background: var(--bg-hover);
             transform: translateY(-1px);
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
@@ -333,7 +352,7 @@
         }
         .thumbnail-item.active .thumbnail-label {
             color: var(--accent-gold);
-            background: rgba(251, 191, 36, 0.05);
+            background: var(--accent-gold-soft);
         }
 
         /* Outline Panel */
@@ -353,8 +372,8 @@
             border-left: 2px solid transparent;
         }
         .outline-item:hover {
-            background: #fdfceb;
-            color: #d97706;
+            background: var(--bg-hover);
+            color: var(--accent-gold);
             border-left-color: var(--accent-gold);
         }
 
@@ -594,7 +613,7 @@
             width: 64px; height: 64px;
             border-radius: 16px;
             animation: pulseFloat 2s infinite ease-in-out;
-            box-shadow: 0 8px 24px rgba(251, 191, 36, 0.2);
+            box-shadow: 0 8px 24px rgba(17, 24, 39, 0.18);
         }
         .loading-dots {
             display: flex; gap: var(--space-md);

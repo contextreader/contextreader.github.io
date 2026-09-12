@@ -1,8 +1,11 @@
 # Context Reader (Direct) — Sinhala
 
-> **⚠️ UX pass INCOMPLETE — see [HANDOFF.md](HANDOFF.md) before continuing.**
-> Tagged `ux-wip-2026-09-12`. The Liquid Glass redesign is written and pushed but has
-> never been rendered in a browser. Verify it before building anything on top.
+> **⚠️ UX pass: direction settled, browser check outstanding — see [HANDOFF.md](HANDOFF.md).**
+> The first Liquid Glass pass was rejected for being chromatic and loud. It has been
+> retuned to a calm monochrome frost with amber kept only where it carries meaning, chosen
+> from a rendered preview. The **extension itself still has not been loaded in a browser** —
+> verify before building on top. Never rename an `sr-*` class: `background.js` prompt
+> templates hardcode them and Gemini emits them as literal HTML.
 
 Experiment build. Forked from the published `sinhala/` v2.1.0 extension to answer one
 question: **is a newer Gemini model plus a user-supplied API key better than the
