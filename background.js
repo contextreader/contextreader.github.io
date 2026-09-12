@@ -2,8 +2,11 @@
 // No Cloudflare Worker, no Supabase cache, no HMAC, no server-side rate limit.
 // Each user supplies their own free Gemini API key in Settings.
 
-const GEMINI_MODEL = "gemini-3.1-flash-lite";
-const GEMINI_BASE  = "https://generativelanguage.googleapis.com/v1beta/models";
+// The model is a user setting now (Settings → Model). This is only the
+// default, and the head of the fallback chain. Changing it here changes what a
+// tester gets before they have ever opened Settings.
+const DEFAULT_MODEL = "gemini-3.1-flash-lite";
+const GEMINI_BASE   = "https://generativelanguage.googleapis.com/v1beta/models";
 
 // Disabled in this build. Lookup modes A/B and the study sheet went through the
 // Worker; LOOKUP_MODE is 'C', which routes entirely through callGemini().
@@ -12,6 +15,96 @@ const PROXY_URL = "";
 async function getApiKey() {
     const { geminiApiKey } = await chrome.storage.local.get("geminiApiKey");
     return (geminiApiKey || "").trim();
+}
+
+// ============================================
+// 🧠 MODEL SELECTION
+// ============================================
+
+// Sentinel for "the tester typed their own model id".
+const CUSTOM_MODEL = "__custom__";
+
+const MODEL_PREF_DEFAULTS = {
+    selected: DEFAULT_MODEL,
+    custom:   "",      // used only when selected === CUSTOM_MODEL
+    paidPlan: false    // set by the tester; suppresses automatic model switching
+};
+
+async function getModelConfig() {
+    const { modelPref } = await chrome.storage.local.get("modelPref");
+    const pref = Object.assign({}, MODEL_PREF_DEFAULTS, modelPref || {});
+    const picked = pref.selected === CUSTOM_MODEL ? pref.custom : pref.selected;
+    const model = String(picked || "").trim() || DEFAULT_MODEL;
+    return { model, paidPlan: !!pref.paidPlan, pref };
+}
+
+// thinkingConfig is understood only by the reasoning models — 2.5 and 3.x.
+// Sending it anywhere else is a 400 INVALID_ARGUMENT that fails the whole
+// request, so this cannot stay unconditional once the tester can pick a model.
+// Unknown ids get the benefit of the doubt and are rescued by the retry in
+// requestGemini() when the guess is wrong.
+function modelAcceptsThinking(model) {
+    const m = String(model);
+    if (/^gemini-2\.5/.test(m)) return true;
+    if (/^gemini-([3-9]|\d{2,})/.test(m)) return true;
+    return false;
+}
+
+// Ask Google which models this key can actually reach, rather than shipping a
+// hardcoded list that goes stale. Also doubles as key verification: it fails
+// loudly on a bad key and costs no generateContent quota.
+async function listModels(apiKey) {
+    const key = (apiKey || await getApiKey()).trim();
+    if (!key) return { ok: false, error: "no_key", models: [] };
+    try {
+        const r = await fetch(`${GEMINI_BASE.replace(/\/models$/, "")}/models?key=${encodeURIComponent(key)}&pageSize=200`);
+        const d = await r.json();
+        if (d.error) return { ok: false, error: d.error.status || String(d.error.code), models: [] };
+        const models = (d.models || [])
+            .filter(m => (m.supportedGenerationMethods || []).includes("generateContent"))
+            .map(m => ({
+                id: String(m.name || "").replace(/^models\//, ""),
+                label: m.displayName || "",
+                inputTokenLimit: m.inputTokenLimit || 0
+            }))
+            .filter(m => m.id);
+        return { ok: true, models };
+    } catch (e) {
+        return { ok: false, error: e.message, models: [] };
+    }
+}
+
+// One HTTP round trip. Returns { status, data, networkMs, parseMs } and never
+// throws on an API-level error — callers read data.error. Split out of
+// callGemini() so a fallback chain can replay the same payload on another model.
+async function requestGemini(model, payload, apiKey) {
+    const send = async (body) => {
+        const t0 = performance.now();
+        const r = await fetch(
+            `${GEMINI_BASE}/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body)
+            });
+        const networkMs = Math.round(performance.now() - t0);
+        const t1 = performance.now();
+        const data = await r.json();
+        return { status: r.status, data, networkMs, parseMs: Math.round(performance.now() - t1) };
+    };
+
+    let res = await send(payload);
+
+    // The modelAcceptsThinking() guess was wrong for this id. Retry once without
+    // it instead of failing the lookup — custom ids are the main beneficiary.
+    if (res.status === 400 &&
+        payload.generationConfig?.thinkingConfig &&
+        /thinking/i.test(res.data?.error?.message || "")) {
+        console.warn(`↻ ${model} rejected thinkingConfig — retrying without it`);
+        const { thinkingConfig, ...genRest } = payload.generationConfig;
+        res = await send({ ...payload, generationConfig: genRest });
+    }
+
+    return res;
 }
 
 // HMAC signing is gone in direct mode — the shared secret belonged to the
@@ -162,6 +255,24 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
     if (request.action === "clearLatencyLog") {
         chrome.storage.local.set({ latencyLog: [] }, () => sendResponse({ ok: true }));
+        return true;
+    }
+
+    // ---- model selection (Settings) ----
+    if (request.action === "getModelConfig") {
+        getModelConfig().then(({ model, paidPlan, pref }) =>
+            sendResponse({ model, paidPlan, pref, defaultModel: DEFAULT_MODEL }));
+        return true;
+    }
+    if (request.action === "setModelConfig") {
+        const pref = Object.assign({}, MODEL_PREF_DEFAULTS, request.pref || {});
+        chrome.storage.local.set({ modelPref: pref }, () => sendResponse({ ok: true, pref }));
+        return true;
+    }
+    // The key stays in the service worker — Settings asks for the list, it never
+    // reads the key itself.
+    if (request.action === "listModels") {
+        listModels(request.apiKey).then(sendResponse);
         return true;
     }
 });
@@ -1194,11 +1305,17 @@ async function callGemini(prompt, word = "", context = "", url = "", generationC
             </div>`;
         }
 
-        // gemini-3.x reasons by default; thinking tokens add seconds to a
-        // single-hop lookup, so switch it off unless the caller set it.
+        const { model } = await getModelConfig();
+
+        // The reasoning models think by default, and thinking tokens add seconds
+        // to what is a single-hop lookup — so switch it off, but only where the
+        // parameter exists. This used to be unconditional, which was safe only
+        // while the model was hardcoded.
         // Worker defaults — the extension previously inherited these server-side.
         const genCfg = Object.assign({ temperature: 0.4, topK: 40, topP: 0.95 }, generationConfig || {});
-        if (!genCfg.thinkingConfig) genCfg.thinkingConfig = { thinkingBudget: 0 };
+        if (!genCfg.thinkingConfig && modelAcceptsThinking(model)) {
+            genCfg.thinkingConfig = { thinkingBudget: 0 };
+        }
 
         const payload = {
             system_instruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
@@ -1212,21 +1329,11 @@ async function callGemini(prompt, word = "", context = "", url = "", generationC
             ]
         };
 
-        console.log(`📤 SENT → word:"${word}" model:${GEMINI_MODEL} prompt:`, prompt.substring(0, 200));
+        console.log(`📤 SENT → word:"${word}" model:${model} prompt:`, prompt.substring(0, 200));
         console.log(`📤 CONFIG →`, JSON.stringify(genCfg));
 
-        const tFetch0 = performance.now();
-        const response = await fetch(
-            `${GEMINI_BASE}/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(apiKey)}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            });
-        const tNetwork = Math.round(performance.now() - tFetch0);
-
-        const tParse0 = performance.now();
-        const data = await response.json();
-        const tParse = Math.round(performance.now() - tParse0);
+        const { data, networkMs: tNetwork, parseMs: tParse } =
+            await requestGemini(model, payload, apiKey);
         const latencyMs = Math.round(performance.now() - t0);
 
         // Debug: log raw Gemini response
@@ -1305,6 +1412,7 @@ async function callGemini(prompt, word = "", context = "", url = "", generationC
         const entry = {
             ts: Date.now(),
             word: word || '(prompt)',
+            model,
             total: latencyMs,
             sign: tSign,
             network: tNetwork,
