@@ -516,9 +516,7 @@ document.addEventListener('DOMContentLoaded', () => {
         promptState = res;
 
         const sys = $('opt-prompt-system');
-        const lkp = $('opt-prompt-lookup');
         if (sys) sys.value = res.prompts.system;
-        if (lkp) lkp.value = res.prompts.lookup;
 
         const contract = $('opt-prompt-contract');
         const schema = $('opt-prompt-schema');
@@ -530,13 +528,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     on('opt-prompt-save', 'click', async () => {
         const sys = $('opt-prompt-system');
-        const lkp = $('opt-prompt-lookup');
-        if (!sys || !lkp) return;
+        if (!sys || !promptState) return;
 
+        // Only the system instruction is editable. The lookup prompt still
+        // travels with every save so each history entry stays a complete
+        // snapshot and the diff view keeps working.
         status('opt-prompt-status', 'Saving…');
         const res = await send({
             action: 'savePrompts',
-            prompts: { system: sys.value, lookup: lkp.value }
+            prompts: { system: sys.value, lookup: promptState.prompts.lookup }
         });
 
         if (!res || !res.ok) {

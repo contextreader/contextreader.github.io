@@ -73,7 +73,8 @@ S.setResponder((msg) => {
 
   console.log('prompts:');
   ok('system textarea filled', S.els['opt-prompt-system'].value === defaults.system);
-  ok('lookup textarea filled', S.els['opt-prompt-lookup'].value === defaults.lookup);
+  ok('lookup prompt is NOT exposed for editing', S.els['opt-prompt-lookup'] === null ||
+     S.els['opt-prompt-lookup'] === undefined);
   ok('locked contract shown', S.els['opt-prompt-contract'].value.includes('Output ONLY this JSON'));
   ok('locked schema pretty-printed', S.els['opt-prompt-schema'].value.includes('"type": "OBJECT"'));
 

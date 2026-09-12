@@ -524,21 +524,13 @@
                         වගාව instead of රුධිර වගාව.
                     </div>
                 </div>
-                <div>
-                    <div class="field-label">Lookup prompt</div>
-                    <textarea id="opt-prompt-lookup" class="textarea" spellcheck="false"></textarea>
-                    <div class="hint">
-                        Must contain <code>{{word}}</code> and <code>{{context}}</code>; they are
-                        replaced at lookup time. A save without them is refused.
-                    </div>
-                </div>
                 <details>
                     <summary class="field-label" style="cursor:pointer; margin:0">
                         Locked — JSON contract &amp; response schema
                     </summary>
                     <div class="hint" style="margin-bottom:var(--space-md)">
-                        Read-only on purpose. These control whether the response parses at all,
-                        not how good it is.
+                        Read-only on purpose. These and the lookup prompt control whether the
+                        response parses at all, not how good it is.
                     </div>
                     <textarea id="opt-prompt-contract" class="textarea" readonly
                               style="min-height:70px"></textarea>
