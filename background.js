@@ -305,6 +305,31 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         return true;
     }
 
+    // ---- editable prompts (Settings) ----
+    if (request.action === "getPrompts") {
+        Promise.all([getPrompts(), chrome.storage.local.get({ promptHistory: [] })])
+            .then(([p, { promptHistory }]) => sendResponse({
+                prompts: p,
+                defaults: promptDefaults(),
+                locked: { jsonContract: LOOKUP_JSON_CONTRACT, schema: SCHEMA_TD },
+                history: promptHistory || [],
+                placeholders: REQUIRED_PLACEHOLDERS
+            }));
+        return true;
+    }
+    if (request.action === "savePrompts") {
+        savePrompts(request.prompts, request.label).then(sendResponse);
+        return true;
+    }
+    if (request.action === "resetPrompts") {
+        resetPrompts().then(sendResponse);
+        return true;
+    }
+    if (request.action === "restorePromptVersion") {
+        restorePromptVersion(request.id).then(sendResponse);
+        return true;
+    }
+
     // ---- model selection (Settings) ----
     if (request.action === "getModelConfig") {
         getModelConfig().then(({ model, paidPlan, pref }) =>
@@ -466,6 +491,131 @@ const LOOKUP_JSON_CONTRACT = `
 
 Output ONLY this JSON: {"t": "<Sinhala translation for THIS context>", "d": "<one casual Sinhala sentence>"}`;
 
+// ============================================
+// ✎ EDITABLE PROMPTS
+// ============================================
+//
+// The system instruction and the lookup prompt are user-editable in Settings.
+// The JSON contract above and SCHEMA_TD below are deliberately NOT: editing
+// those breaks response parsing rather than answer quality.
+//
+// Why history exists. The Worker-era measurement recorded in CLAUDE.md is that
+// weakening SYSTEM_INSTRUCTION degrades output — without its domain-matching
+// rules the model returned වගාව instead of රුධිර වගාව for "blood culture". An
+// editable prompt with no way back would put that regression one keystroke
+// away, so every save snapshots both prompts and any snapshot can be restored.
+//
+// Note SYSTEM_INSTRUCTION is sent on EVERY call — the lookup, the
+// More/General/Simple panels and the study-sheet builders alike. Settings says
+// so next to the editor; editing it is not scoped to word lookups.
+
+const PROMPT_HISTORY_CAP = 50;
+
+// Derived from the same function the build has always used, with placeholders
+// substituted in place of the values. The editable default and the shipped
+// prompt therefore cannot drift apart.
+const DEFAULT_LOOKUP_TEMPLATE = LOOKUP_PROMPT_FULL('{{word}}', '{{context}}');
+
+function promptDefaults() {
+    return { system: SYSTEM_INSTRUCTION, lookup: DEFAULT_LOOKUP_TEMPLATE };
+}
+
+// split/join rather than a regex: the substituted values are arbitrary page
+// text, and $& in a replacement string would corrupt the prompt.
+function renderPrompt(tmpl, vars) {
+    let out = String(tmpl);
+    for (const [k, v] of Object.entries(vars)) {
+        out = out.split('{{' + k + '}}').join(v == null ? '' : String(v));
+    }
+    return out;
+}
+
+// A lookup prompt missing {{word}} asks the model about nothing, on every call,
+// silently. Refuse the save rather than let a tester find out days later.
+const REQUIRED_PLACEHOLDERS = { lookup: ['word', 'context'], system: [] };
+
+function validatePrompt(kind, text) {
+    const s = String(text == null ? '' : text);
+    if (!s.trim()) return { ok: false, error: 'empty' };
+    const missing = (REQUIRED_PLACEHOLDERS[kind] || []).filter(p => !s.includes('{{' + p + '}}'));
+    if (missing.length) return { ok: false, error: 'missing_placeholders', missing };
+    return { ok: true };
+}
+
+async function getPrompts() {
+    const { promptOverrides } = await chrome.storage.local.get('promptOverrides');
+    const d = promptDefaults();
+    const o = promptOverrides || {};
+    const use = (kind) => (typeof o[kind] === 'string' && o[kind].trim()) ? o[kind] : d[kind];
+    return {
+        system: use('system'),
+        lookup: use('lookup'),
+        customized: {
+            system: use('system') !== d.system,
+            lookup: use('lookup') !== d.lookup
+        }
+    };
+}
+
+async function pushPromptVersion(entry) {
+    const { promptHistory } = await chrome.storage.local.get({ promptHistory: [] });
+    const hist = Array.isArray(promptHistory) ? promptHistory : [];
+    hist.push(Object.assign({
+        id: Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8),
+        ts: Date.now()
+    }, entry));
+    // Index 0 is the shipped default. It is the floor of every diff and the
+    // target of "reset", so it is never the entry that gets dropped.
+    if (hist.length > PROMPT_HISTORY_CAP) hist.splice(1, hist.length - PROMPT_HISTORY_CAP);
+    await chrome.storage.local.set({ promptHistory: hist });
+    return hist;
+}
+
+async function ensureBaseVersion() {
+    const { promptHistory } = await chrome.storage.local.get({ promptHistory: [] });
+    if (Array.isArray(promptHistory) && promptHistory.length) return promptHistory;
+    const d = promptDefaults();
+    return await pushPromptVersion({ label: 'Default', source: 'default', system: d.system, lookup: d.lookup });
+}
+
+async function savePrompts(next, label, source) {
+    const system = next && next.system;
+    const lookup = next && next.lookup;
+    for (const [kind, text] of [['system', system], ['lookup', lookup]]) {
+        const v = validatePrompt(kind, text);
+        if (!v.ok) return Object.assign({ ok: false, kind }, v);
+    }
+    await ensureBaseVersion();
+    const d = promptDefaults();
+    // null means "track the default", so a future change to the shipped prompt
+    // reaches testers who never edited that field.
+    await chrome.storage.local.set({
+        promptOverrides: {
+            system: system === d.system ? null : system,
+            lookup: lookup === d.lookup ? null : lookup
+        }
+    });
+    const history = await pushPromptVersion({
+        label: label || 'Edited', source: source || 'edit', system, lookup
+    });
+    return { ok: true, history };
+}
+
+async function resetPrompts() {
+    const d = promptDefaults();
+    return await savePrompts(d, 'Reset to default', 'default');
+}
+
+// Restoring pushes a new version rather than truncating, so walking back is
+// itself reversible.
+async function restorePromptVersion(id) {
+    const { promptHistory } = await chrome.storage.local.get({ promptHistory: [] });
+    const found = (promptHistory || []).find(v => v.id === id);
+    if (!found) return { ok: false, error: 'not_found' };
+    return await savePrompts({ system: found.system, lookup: found.lookup },
+                             'Restored ' + (found.label || 'version'), 'restore');
+}
+
 const SCHEMA_T = {
     type: "OBJECT",
     properties: {
@@ -499,8 +649,9 @@ async function lookupModeDefault(word, context, url, tabId) {
         responseMimeType: "application/json",
         responseSchema: SCHEMA_TD   // guarantees {t,d} shape; without it 2.5 emitted doubled JSON
     };
+    const { lookup: lookupTemplate } = await getPrompts();
     return await callGemini(
-        LOOKUP_PROMPT_FULL(word, context) + LOOKUP_JSON_CONTRACT,
+        renderPrompt(lookupTemplate, { word, context }) + LOOKUP_JSON_CONTRACT,
         word, context, url, generationConfig);
 }
 
@@ -510,7 +661,7 @@ async function lookupModeDefault(word, context, url, tabId) {
 async function lookupModeC(word, context, url, tabId) {
     const t0 = performance.now();
 
-    const tPrompt = LOOKUP_PROMPT_FULL(word, context);
+    const tPrompt = renderPrompt((await getPrompts()).lookup, { word, context });
     const tConfig = {
         maxOutputTokens: 128,
         responseMimeType: "application/json",
@@ -1364,8 +1515,10 @@ async function callGemini(prompt, word = "", context = "", url = "", generationC
             genCfg.thinkingConfig = { thinkingBudget: 0 };
         }
 
+        const { system: systemInstruction } = await getPrompts();
+
         const payload = {
-            system_instruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
+            system_instruction: { parts: [{ text: systemInstruction }] },
             contents: [{ parts: [{ text: prompt }] }],
             generationConfig: genCfg,
             safetySettings: [
