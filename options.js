@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setKeyStatus('Checking\u2026');
         const check = await send({ action: 'listModels', apiKey: key });
         if (!check || !check.ok) {
-            setKeyStatus('Rejected: ' + ((check && check.error) || 'unreachable'), 'bad');
+            setKeyStatus((check && check.message) || 'Could not reach Gemini.', 'bad');
             return;
         }
 
@@ -295,7 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (res && res.error === 'no_key') {
                 status('opt-model-status', 'Add an API key to load the model list.', quiet ? '' : 'bad');
             } else if (!quiet) {
-                status('opt-model-status', 'Could not fetch: ' + ((res && res.error) || 'unreachable'), 'bad');
+                status('opt-model-status', (res && res.message) || 'Could not fetch the model list.', 'bad');
             }
             return;
         }

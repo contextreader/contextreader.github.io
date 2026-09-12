@@ -191,7 +191,16 @@ async function listModels(apiKey) {
     try {
         const r = await fetch(`${GEMINI_BASE.replace(/\/models$/, "")}/models?key=${encodeURIComponent(key)}&pageSize=200`);
         const d = await r.json();
-        if (d.error) return { ok: false, error: d.error.status || String(d.error.code), models: [] };
+        if (d.error) {
+            // Google sends a readable sentence; the enum is for us, not the
+            // tester. Verified against a real INVALID_ARGUMENT response.
+            return {
+                ok: false,
+                error: d.error.status || String(d.error.code),
+                message: d.error.message || "",
+                models: []
+            };
+        }
         const models = (d.models || [])
             .filter(m => (m.supportedGenerationMethods || []).includes("generateContent"))
             .map(m => ({

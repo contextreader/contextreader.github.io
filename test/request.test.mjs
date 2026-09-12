@@ -75,5 +75,32 @@ store = {};
 lm = await M.listModels('');
 eq('no key -> no_key', lm.error, 'no_key');
 
+
+// --- regression: the real error envelope, captured from a live call ---
+// Verbatim body of a 400 from GET /v1beta/models with a bad key.
+console.log('real INVALID_ARGUMENT envelope:');
+calls.length = 0;
+globalThis.__next = async () => ({ status: 400, json: async () => ({
+  error: { code: 400, message: 'API key not valid. Please pass a valid API key.',
+    status: 'INVALID_ARGUMENT',
+    details: [
+      { '@type': 'type.googleapis.com/google.rpc.ErrorInfo', reason: 'API_KEY_INVALID',
+        domain: 'googleapis.com', metadata: { service: 'generativelanguage.googleapis.com' } },
+      { '@type': 'type.googleapis.com/google.rpc.LocalizedMessage', locale: 'en-US',
+        message: 'API key not valid. Please pass a valid API key.' } ] } }) });
+const bad = await M.listModels('bad-key');
+eq('ok:false', bad.ok, false);
+eq('enum kept for us', bad.error, 'INVALID_ARGUMENT');
+eq('readable message kept for the tester', bad.message, 'API key not valid. Please pass a valid API key.');
+eq('no models', bad.models, []);
+
+// details[] entries without a retryDelay must not confuse the cooldown parser
+const { cooldownFrom } = await import('./.generated/fallback.mjs');
+eq('@type-only details fall back to the default cooldown',
+   cooldownFrom({ data: { error: { details: [
+     { '@type': 'type.googleapis.com/google.rpc.ErrorInfo', reason: 'RATE_LIMIT_EXCEEDED' },
+     { '@type': 'type.googleapis.com/google.rpc.LocalizedMessage', locale: 'en-US', message: 'x' } ] } } }),
+   60000);
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
