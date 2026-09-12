@@ -107,6 +107,44 @@ async function requestGemini(model, payload, apiKey) {
     return res;
 }
 
+// ============================================
+// ⏱️ LATENCY ROLLUP
+// ============================================
+
+// latencyLog keeps the last 200 individual calls — roughly four days at fifty
+// lookups a day — so the 30-day per-model averages in Settings cannot be
+// derived from it. This is a parallel, permanently-small rollup:
+//   latencyDaily: { "YYYY-MM-DD": { "<model>": { count, sumMs } } }
+// Two numbers per model per day, pruned at 30 days.
+const LATENCY_RETENTION_DAYS = 30;
+
+function utcDay(ts) {
+    return new Date(ts).toISOString().slice(0, 10);
+}
+
+function pruneLatencyDaily(daily, now = Date.now()) {
+    const cutoff = utcDay(now - LATENCY_RETENTION_DAYS * 86400000);
+    for (const day of Object.keys(daily)) {
+        // ISO dates compare correctly as strings
+        if (day < cutoff) delete daily[day];
+    }
+    return daily;
+}
+
+function recordLatency(model, ms, now = Date.now()) {
+    if (!model || !Number.isFinite(ms)) return;
+    const day = utcDay(now);
+    chrome.storage.local.get({ latencyDaily: {} }, (res) => {
+        const daily = res.latencyDaily || {};
+        if (!daily[day]) daily[day] = {};
+        const cell = daily[day][model] || (daily[day][model] = { count: 0, sumMs: 0 });
+        cell.count += 1;
+        cell.sumMs += ms;
+        pruneLatencyDaily(daily, now);
+        chrome.storage.local.set({ latencyDaily: daily });
+    });
+}
+
 // HMAC signing is gone in direct mode — the shared secret belonged to the
 // Cloudflare Worker and is deliberately NOT present in this build.
 
@@ -251,6 +289,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     // ⏱️ LATENCY LOG (for testing)
     if (request.action === "getLatencyLog") {
         chrome.storage.local.get({ latencyLog: [] }, (res) => sendResponse(res.latencyLog));
+        return true;
+    }
+    if (request.action === "getLatencyDaily") {
+        chrome.storage.local.get({ latencyDaily: {} }, (res) =>
+            sendResponse({ daily: pruneLatencyDaily(res.latencyDaily || {}), retentionDays: LATENCY_RETENTION_DAYS }));
+        return true;
+    }
+    if (request.action === "clearLatencyDaily") {
+        chrome.storage.local.set({ latencyDaily: {} }, () => sendResponse({ ok: true }));
         return true;
     }
     if (request.action === "clearLatencyLog") {
@@ -1430,6 +1477,7 @@ async function callGemini(prompt, word = "", context = "", url = "", generationC
             if (log.length > 200) log.splice(0, log.length - 200);
             chrome.storage.local.set({ latencyLog: log });
         });
+        recordLatency(model, latencyMs);
         console.log(`⏱️ ${word || 'prompt'}: ${latencyMs}ms [sign:${tSign} net:${tNetwork} parse:${tParse} | worker→ hmac:${workerTiming.hmac||'?'} cache:${workerTiming.cache||'?'} gemini:${workerTiming.gemini||'?'}]`);
 
         return data.candidates[0].content.parts[0].text.replace(/```html/g, "").replace(/```/g, "").trim();
