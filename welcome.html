@@ -110,6 +110,20 @@
 
         .step-card { display: flex; gap: var(--space-xl); align-items: flex-start; }
 
+        .lang-select {
+            width: 100%; max-width: 320px; margin-top: var(--space-md);
+            padding: var(--space-md) var(--space-lg);
+            background: var(--glass-soft);
+            border: 1px solid var(--glass-line); border-radius: 100px;
+            font-family: inherit; font-size: 14px; color: var(--ink);
+            cursor: pointer; outline: none;
+            appearance: none; -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%236b7280' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right var(--space-lg) center;
+        }
+        .lang-note { font-size: 13px; color: var(--ink-mute); margin-top: var(--space-md); min-height: 20px; }
+
         /* The steps genuinely are a sequence, so the numbers stay numbers.
            Amber carries the ordinal — the one place it appears on this page
            besides the primary action. */
@@ -237,12 +251,23 @@
         <div class="hero">
             <div class="hero-icon">&#x26A1;</div>
             <h1>Welcome to Context Reader</h1>
-            <p>Your smart Sinhala dictionary that understands what you're reading.</p>
+            <p>Understands what you're reading, and explains it in your language.</p>
         </div>
 
-        <!-- Step 1: Pin -->
+        <!-- Step 1: Language -->
         <div class="step-card">
             <div class="step-num">1</div>
+            <div class="step-content">
+                <h3>Choose your language</h3>
+                <p>Words will be explained in the language you pick. You can change it any time in Settings.</p>
+                <select id="welcome-lang" class="lang-select"></select>
+                <p class="lang-note" id="welcome-lang-note"></p>
+            </div>
+        </div>
+
+        <!-- Step 2: Pin -->
+        <div class="step-card">
+            <div class="step-num">2</div>
             <div class="step-content">
                 <h3>Pin the extension</h3>
                 <p>Click the <strong>puzzle piece icon</strong> in your Chrome toolbar (top-right), find <strong>Context Reader</strong>, and click the <strong>pin icon</strong> next to it. This keeps it visible for quick access.</p>
@@ -252,7 +277,7 @@
 
         <!-- Step 2 -->
         <div class="step-card">
-            <div class="step-num">2</div>
+            <div class="step-num">3</div>
             <div class="step-content">
                 <h3>Highlight any word</h3>
                 <p>Select a word on any webpage by clicking and dragging over it.</p>
@@ -262,7 +287,7 @@
 
         <!-- Step 3 -->
         <div class="step-card">
-            <div class="step-num">3</div>
+            <div class="step-num">4</div>
             <div class="step-content">
                 <h3>Click the lightning bolt</h3>
                 <p>A small icon appears near your selection. Click it to get the definition.</p>
@@ -272,10 +297,10 @@
 
         <!-- Step 4 -->
         <div class="step-card">
-            <div class="step-num">4</div>
+            <div class="step-num">5</div>
             <div class="step-content">
                 <h3>Get a context-aware definition</h3>
-                <p>Unlike a dictionary, Context Reader gives you the meaning that fits <strong>what you're reading</strong> &mdash; in Sinhala.</p>
+                <p>Unlike a dictionary, Context Reader gives you the meaning that fits <strong>what you're reading</strong> &mdash; in the language you chose.</p>
                 <div class="step-visual">&#x1F4A1; &#x1F1F1;&#x1F1F0;</div>
             </div>
         </div>
@@ -301,8 +326,8 @@
                 </div>
                 <div class="feature-item">
                     <div class="emoji">&#x1F1F1;&#x1F1F0;</div>
-                    <div class="name">Sinhala Mode</div>
-                    <div class="desc">Simplify hard Sinhala</div>
+                    <div class="name">Simplify</div>
+                    <div class="desc">Hard words made plain</div>
                 </div>
                 <div class="feature-item">
                     <div class="emoji">&#x1F476;</div>

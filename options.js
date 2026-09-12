@@ -197,6 +197,46 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ============================================
+    // Language
+    // ============================================
+
+    function describeLang(lang) {
+        if (!lang) return '';
+        return lang.tuned
+            ? 'Tuned \u2014 ships worked examples checked by a speaker, which is what '
+              + 'makes the model pick the domain-correct sense.'
+            : 'Community language. Translation works, but there are no hand-checked '
+              + 'examples yet, so domain-specific senses may be less accurate. '
+              + 'Adding them is a small pull request.';
+    }
+
+    async function initLanguage() {
+        const sel = $('opt-language');
+        if (!sel) return;
+        const res = await send({ action: 'getLanguages' });
+        if (!res) return;
+
+        sel.innerHTML = res.languages.map((l) =>
+            `<option value="${esc(l.code)}">${esc(l.nativeName)} \u2014 ${esc(l.name)}`
+            + `${l.tuned ? '' : '  (community)'}</option>`).join('');
+        sel.value = res.current;
+        setText('opt-language-note', describeLang(res.languages.find((l) => l.code === res.current)));
+        const cur = res.languages.find((l) => l.code === res.current);
+        if (cur) setText('opt-about-language', `${cur.nativeName} — ${cur.name}`);
+    }
+
+    on('opt-language', 'change', async () => {
+        const sel = $('opt-language');
+        const res = await send({ action: 'setLanguage', code: sel.value });
+        if (res && res.lang) {
+            setText('opt-language-note', describeLang(res.lang));
+            setText('opt-about-language', `${res.lang.nativeName} — ${res.lang.name}`);
+        }
+        // The prompt editor shows the language name inside the locked schema.
+        loadPrompts();
+    });
+
+    // ============================================
     // Model
     // ============================================
     let modelPref = null;
@@ -567,6 +607,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ---- go ----
     loadKeyState();
+    initLanguage();
     initModel();
     renderPerf();
     loadPrompts();

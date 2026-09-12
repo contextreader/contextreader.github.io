@@ -376,28 +376,47 @@ async function getGlobalCounter() {
 // 🎯 MESSAGE LISTENERS
 // ============================================
 
+// The *Sinhala lookups are not "translate into Sinhala" — they are a monolingual
+// mode that rewrites a hard Sinhala word into easier Sinhala. Their section
+// labels and mandated openers are literal Sinhala strings, so they only make
+// sense when Sinhala is BOTH the source and the target. Selecting Sinhala text
+// while reading in Hindi must not route here.
+async function useMonolingual(requestLang) {
+    if (requestLang !== 'si') return false;
+    const lang = await getTargetLanguage();
+    return lang.code === 'si';
+}
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     const currentUrl = sender.tab ? sender.tab.url : "Unknown";
 
     if (request.action === "lookup") {
         const tabId = sender.tab ? sender.tab.id : null;
-        const fn = request.lang === 'si' ? lookupContextSinhala : lookupContext;
-        fn(request.text, request.context, currentUrl, tabId).then(sendResponse);
+        useMonolingual(request.lang).then((mono) => {
+            const fn = mono ? lookupContextSinhala : lookupContext;
+            fn(request.text, request.context, currentUrl, tabId).then(sendResponse);
+        });
         return true;
     }
     if (request.action === "lookupDetails") {
-        const fn = request.lang === 'si' ? lookupDetailsSinhala : lookupDetails;
-        fn(request.text, request.context, currentUrl).then(sendResponse);
+        useMonolingual(request.lang).then((mono) => {
+            const fn = mono ? lookupDetailsSinhala : lookupDetails;
+            fn(request.text, request.context, currentUrl).then(sendResponse);
+        });
         return true;
     }
     if (request.action === "lookupGeneral") {
-        const fn = request.lang === 'si' ? lookupGeneralSinhala : lookupGeneral;
-        fn(request.text).then(sendResponse);
+        useMonolingual(request.lang).then((mono) => {
+            const fn = mono ? lookupGeneralSinhala : lookupGeneral;
+            fn(request.text).then(sendResponse);
+        });
         return true;
     }
     if (request.action === "lookupSimple") {
-        const fn = request.lang === 'si' ? lookupSimpleSinhala : lookupSimple;
-        fn(request.text, request.context).then(sendResponse);
+        useMonolingual(request.lang).then((mono) => {
+            const fn = mono ? lookupSimpleSinhala : lookupSimple;
+            fn(request.text, request.context).then(sendResponse);
+        });
         return true;
     }
     if (request.action === "generateStudySheetV2") {

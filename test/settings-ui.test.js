@@ -1,4 +1,5 @@
 const S = require('./shim.cjs');
+const LANGS = require('../lib/languages.js');
 let pass = 0, fail = 0;
 const ok = (l, c, extra) => { c?pass++:fail++; console.log(`  ${c?'PASS':'FAIL'}  ${l}`); if(!c && extra) console.log('    ', extra); };
 
@@ -20,6 +21,9 @@ S.setResponder((msg) => {
       pref:{selected:'gemini-3.1-flash-lite',custom:'',paidPlan:false}, defaultModel:'gemini-3.1-flash-lite' };
     case 'listModels': return { ok:true, models:[
       {id:'gemini-2.5-pro'},{id:'gemini-3.1-flash-lite'},{id:'gemini-2.5-flash'},{id:'gemini-2.5-flash-lite'}] };
+    case 'getLanguages': return { current: 'si', languages: LANGS.listLangs(),
+      defaultLang: LANGS.DEFAULT_LANG };
+    case 'setLanguage': return { ok: true, lang: LANGS.getLang(msg.code) };
     case 'getLatencyDaily': return { daily: {
       [today]: { 'gemini-3.1-flash-lite': {count:10,sumMs:19000}, 'gemini-2.5-flash-lite': {count:5,sumMs:7000} },
       [yday]:  { 'gemini-3.1-flash-lite': {count:4, sumMs:8800} },
@@ -88,6 +92,23 @@ S.setResponder((msg) => {
   ok('collapsed by default (no diff yet)', !h.includes('class="diff"'));
   ok('version count label', S.els['opt-hist-count'].textContent === '2 versions',
      S.els['opt-hist-count'].textContent);
+
+  console.log('language picker:');
+  const lsel = S.els['opt-language'];
+  ok('populated from the real packs', lsel.innerHTML.includes('සිංහල') && lsel.innerHTML.includes('Sinhala'),
+     lsel.innerHTML.slice(0, 120));
+  ok('tuned language is not labelled community',
+     !/සිංහල[^<]*community/.test(lsel.innerHTML));
+  ok('untuned languages are labelled', /community/.test(lsel.innerHTML));
+  ok('current selection applied', lsel.value === 'si', lsel.value);
+  ok('note explains what tuned means', /worked examples/.test(S.els['opt-language-note'].textContent),
+     S.els['opt-language-note'].textContent);
+
+  lsel.value = 'hi';
+  await lsel.change(); for (let i=0;i<4;i++) await S.flush();
+  ok('switching language updates the note',
+     /Community language/.test(S.els['opt-language-note'].textContent),
+     S.els['opt-language-note'].textContent);
 
   console.log(`\n${pass} passed, ${fail} failed`);
   process.exit(fail ? 1 : 0);

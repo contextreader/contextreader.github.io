@@ -408,7 +408,7 @@
     <div class="container">
         <div class="header">
             <h1>Context Reader</h1>
-            <p>Smart Sinhala Dictionary — Settings &amp; Info</p>
+            <p>Settings &amp; Info</p>
         </div>
 
         <!-- API key first: nothing else works without it -->
@@ -458,6 +458,16 @@
                     <div id="opt-lock-hint" class="hint"></div>
                 </div>
             </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Language</div>
+            <p class="note">
+                Words are explained in this language. Everything else — the interface,
+                the words you look up — stays as it is.
+            </p>
+            <select id="opt-language" class="select"></select>
+            <div id="opt-language-note" class="hint"></div>
         </div>
 
         <div class="card">
@@ -579,8 +589,8 @@
                 <span class="value mono" id="opt-ext-id">—</span>
             </div>
             <div class="about-row">
-                <span class="label">Language Modes</span>
-                <span class="value">English → Sinhala, Sinhala → Sinhala</span>
+                <span class="label">Language</span>
+                <span class="value mono" id="opt-about-language">—</span>
             </div>
             <div class="about-row">
                 <span class="label">AI Model</span>

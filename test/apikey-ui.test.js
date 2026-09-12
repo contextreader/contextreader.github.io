@@ -1,4 +1,5 @@
 const S = require('./shim.cjs');
+const LANGS = require('../lib/languages.js');
 let pass=0, fail=0;
 const ok=(l,c,x)=>{c?pass++:fail++; console.log(`  ${c?'PASS':'FAIL'}  ${l}`); if(!c&&x)console.log('    ',x);};
 
@@ -11,6 +12,9 @@ S.setResponder((m) => {
     case 'listModels': return { ok:true, models:[{id:'gemini-3.1-flash-lite'}] };
     case 'getModelConfig': return { model:'gemini-3.1-flash-lite', paidPlan:false,
       pref:{selected:'gemini-3.1-flash-lite',custom:'',paidPlan:false}, defaultModel:'gemini-3.1-flash-lite' };
+    case 'getLanguages': return { current: 'si', languages: LANGS.listLangs(),
+      defaultLang: LANGS.DEFAULT_LANG };
+    case 'setLanguage': return { ok: true, lang: LANGS.getLang(m.code) };
     case 'getLatencyDaily': return { daily:{} };
     case 'getPrompts': return { prompts:{system:'s',lookup:'{{word}} {{context}}'},
       defaults:{system:'s',lookup:'{{word}} {{context}}'}, locked:{jsonContract:'c',schema:{}}, history:[] };

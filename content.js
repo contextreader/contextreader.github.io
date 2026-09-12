@@ -36,7 +36,7 @@ document.body.appendChild(triggerBtn);
 // (COMPLETELY UNCHANGED)
 // ========================================
 const styles = `
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Sinhala:wght@400;600;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
     /* ✨ NEW: Golden Ratio Design System */
     :root {
@@ -272,7 +272,7 @@ const styles = `
     
     .sr-general-sinhala { 
         color: #0891b2; font-weight: 700; 
-        font-family: 'Noto Sans Sinhala', sans-serif; 
+        font-family: var(--sr-lang-font, sans-serif); 
         margin-top: var(--space-md); 
         font-size: 13px; 
     }
@@ -299,7 +299,7 @@ const styles = `
     
     .sr-gen-trans { 
         color: #0891b2; font-weight: 700; 
-        font-family: 'Noto Sans Sinhala', sans-serif; 
+        font-family: var(--sr-lang-font, sans-serif); 
     }
     
     /* ✨ ENHANCED STAR LOADING ANIMATION */
@@ -405,7 +405,7 @@ const styles = `
        line is the one thing on the surface that has to stay razor-sharp. */
     .sr-translation {
         font-size: 17px; color: var(--sr-amber-deep);
-        font-family: 'Noto Sans Sinhala', sans-serif;
+        font-family: var(--sr-lang-font, sans-serif);
         font-weight: 600; margin-top: var(--space-xs);
         line-height: 1.5;
     }
@@ -577,6 +577,14 @@ const styles = `
     } 
     .sr-section:last-child { margin-bottom: 0; }
 
+    /* Right-to-left. The dir attribute is set from the language pack's rtl
+       flag, so adding Urdu or Hebrew needs no change here. */
+    #smart-reader-bubble[dir="rtl"] .sr-body { direction: rtl; text-align: right; }
+    #smart-reader-bubble[dir="rtl"] .sr-word,
+    #smart-reader-bubble[dir="rtl"] .sr-translation { text-align: right; }
+    #smart-reader-bubble[dir="rtl"] .sr-header-top { flex-direction: row-reverse; }
+    #smart-reader-bubble[dir="rtl"] .sr-icons { flex-direction: row-reverse; }
+
     /* Quota-fallback note. Deliberately a sibling of .sr-body, NOT a child:
        saveWord() reads '.sr-section:nth-of-type(2) .sr-sub-text', and
        :nth-of-type counts elements by TAG, not by class — so any div added
@@ -629,7 +637,7 @@ const styles = `
     
     .sr-sub-text {
         font-size: 14px; color: var(--sr-ink-soft);
-        font-family: 'Noto Sans Sinhala', sans-serif;
+        font-family: var(--sr-lang-font, sans-serif);
         margin: var(--space-md) 0 0 0;
         padding: var(--space-lg);
         background: rgba(254,243,199,0.62);
@@ -1130,6 +1138,55 @@ function fallbackNoteHTML(m) {
     return `<div class="sr-fallback-note">\u21b3 <span><code>${escapeHTML(short(m.from))}</code> `
          + `quota reached &middot; answered by <code>${escapeHTML(short(m.model))}</code></span></div>`;
 }
+// ============================================
+// LANGUAGE
+// ============================================
+//
+// CRLanguages is loaded by the manifest ahead of this file. The pack decides
+// the font, the text direction and — in the service worker — the prompt.
+
+let srLang = CRLanguages.getLang(CRLanguages.DEFAULT_LANG);
+
+// The script font is loaded on demand rather than baked into the stylesheet:
+// a Sinhala reader should not pay for Devanagari, and vice versa. Languages
+// covered by Inter (Latin, Cyrillic) load nothing extra.
+function applyLangFont(lang) {
+    document.documentElement.style.setProperty('--sr-lang-font', lang.font);
+
+    if (!lang.family) return;
+    const href = `https://fonts.googleapis.com/css2?family=${lang.family}&display=swap`;
+    let link = document.getElementById('sr-lang-font');
+    if (!link) {
+        link = document.createElement('link');
+        link.id = 'sr-lang-font';
+        link.rel = 'stylesheet';
+        document.head.appendChild(link);
+    }
+    if (link.href !== href) link.href = href;
+}
+
+// Direction comes from the pack, not from a hardcoded language check — adding
+// Urdu or Hebrew should be one entry in lib/languages.js, not a code change.
+function applyRTL(lang) {
+    if (!bubble) return;
+    if (lang.rtl) bubble.setAttribute('dir', 'rtl');
+    else bubble.removeAttribute('dir');
+}
+
+function setLang(code) {
+    srLang = CRLanguages.getLang(code);
+    applyLangFont(srLang);
+    applyRTL(srLang);
+}
+
+chrome.storage.local.get('targetLanguage', ({ targetLanguage }) => setLang(targetLanguage));
+
+// Settings and the welcome page write the same key; pick the change up without
+// needing a reload of every open tab.
+chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === 'local' && changes.targetLanguage) setLang(changes.targetLanguage.newValue);
+});
+
 let currentVideoRequestId = 0;
 let currentVideoList = [];
 let currentVideoIndex = 0;
@@ -1180,7 +1237,7 @@ function getWordAtPoint(x, y) {
     const offset = range.startOffset;
 
     // Find word boundaries (Latin + Sinhala)
-    const wordRegex = /[\w\u0D80-\u0DFF]+/g;
+    const wordRegex = /[\w\u0080-\uFFFF]+/g;   // every script, not just Latin + Sinhala
     let match;
     while ((match = wordRegex.exec(text)) !== null) {
         const start = match.index;
@@ -1195,7 +1252,7 @@ function getWordAtPoint(x, y) {
 // Fallback: walk text nodes, create ranges for each word, check if point is inside bounding rect
 function getWordFromElementAtPoint(el, x, y) {
     const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
-    const wordRegex = /[\w\u0D80-\u0DFF]+/g;
+    const wordRegex = /[\w\u0080-\uFFFF]+/g;   // every script, not just Latin + Sinhala
     let node;
 
     while ((node = walker.nextNode())) {
@@ -1824,7 +1881,7 @@ function generateTypewriterHtml(word) {
         chars = Array.from(word);
     }
     const isSinhala = detectLanguage(word) === 'si';
-    const fontStyle = isSinhala ? "font-family:'Noto Sans Sinhala', sans-serif; text-transform:none; letter-spacing:1px;" : "";
+    const fontStyle = isSinhala ? "font-family:var(--sr-lang-font, sans-serif); text-transform:none; letter-spacing:1px;" : "";
     return chars.map((char, i) => {
         const displayChar = char === ' ' ? '&nbsp;' : char;
         return `<span class="sr-char" style="animation-delay: ${i * 0.05}s; ${fontStyle}">${displayChar}</span>`;
@@ -1844,7 +1901,7 @@ triggerBtn.addEventListener('mousedown', function(e) {
     }
     const isSinhalaWord = detectLanguage(currentSelection) === 'si';
     const imprintStyle = isSinhalaWord
-        ? "font-family:'Noto Sans Sinhala', sans-serif; text-transform:none; letter-spacing:1px; font-size:20px;"
+        ? "font-family:var(--sr-lang-font, sans-serif); text-transform:none; letter-spacing:1px; font-size:20px;"
         : "";
     showBubble(x, y, `
         <div style="position:relative;">
@@ -2844,7 +2901,7 @@ function generateStudySheetDocNew(data, level, lang) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${title}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Sinhala:wght@400;600;800&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=${srLang.family || 'Inter:wght@400;600;700;800'}&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         @page { size: A4; margin: 12mm 15mm; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -2866,8 +2923,8 @@ function generateStudySheetDocNew(data, level, lang) {
         .entry { break-inside: avoid; border-bottom: 1px dotted #e5e7eb; padding: 3px 0; }
         .entry:last-child { border-bottom: none; }
         .e-word { font-weight: 700; font-size: 10pt; color: #111827; display: inline; margin-right: 4px; }
-        .e-ctx { font-family: 'Noto Sans Sinhala', 'Inter', sans-serif; font-size: 9pt; color: #92400e; display: inline; }
-        .e-simple { font-family: 'Noto Sans Sinhala', 'Inter', sans-serif; font-size: 9pt; color: #047857; font-style: italic; display: block; margin-top: 1px; padding-left: 8px; }
+        .e-ctx { font-family: ${srLang.font}, 'Inter', sans-serif; font-size: 9pt; color: #92400e; display: inline; }
+        .e-simple { font-family: ${srLang.font}, 'Inter', sans-serif; font-size: 9pt; color: #047857; font-style: italic; display: block; margin-top: 1px; padding-left: 8px; }
         @media print {
             body { background: #fff; }
             .sticky-toolbar { display: none; }

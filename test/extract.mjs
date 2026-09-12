@@ -37,7 +37,7 @@ const prompts  = seg(bg, 'const PROMPT_HISTORY_CAP', 'function schemaT(', 'promp
 const lookupFn = seg(bg, 'const LOOKUP_PROMPT_FULL', '// Appended to LOOKUP_PROMPT_FULL', 'lookup prompt');
 const sysInst  = seg(bg, 'const SYSTEM_INSTRUCTION', 'const LOOKUP_JSON_CONTRACT', 'system instruction');
 const contract = seg(bg, 'const LOOKUP_JSON_CONTRACT', '// ============================================\n// ✎ EDITABLE PROMPTS', 'json contract');
-const note     = seg(ct, 'function escapeHTML', 'let currentVideoRequestId', 'bubble note');
+const note     = seg(ct, 'function escapeHTML', '// ============================================\n// LANGUAGE', 'bubble note');
 
 const out = (name, body) => writeFileSync(join(HERE, '.generated', name), body);
 
