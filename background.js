@@ -524,12 +524,6 @@ chrome.runtime.onInstalled.addListener((details) => {
     // Create context menus (removeAll first to prevent duplicates on update)
     chrome.contextMenus.removeAll(() => {
         chrome.contextMenus.create({
-            id: "open-in-reader",
-            title: "Open with Context Reader PDF",
-            contexts: ["link"],
-            targetUrlPatterns: ["*://*/*.pdf", "*://*/*.pdf?*", "*://*/*.pdf#*", "file://*/*.pdf"]
-        });
-        chrome.contextMenus.create({
             id: "generate-study-sheet",
             title: "Generate Study Sheet",
             contexts: ["page", "selection"]
@@ -1710,55 +1704,10 @@ async function callGemini(prompt, word = "", context = "", url = "", generationC
 
 // 2. Handle the click
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-    if (info.menuItemId === "open-in-reader" && info.linkUrl) {
-        const viewerUrl = chrome.runtime.getURL("pdf-reader.html") + "?file=" + encodeURIComponent(info.linkUrl);
-        chrome.tabs.create({ url: viewerUrl });
-    }
     if (info.menuItemId === "generate-study-sheet" && tab?.id) {
         chrome.tabs.sendMessage(tab.id, {
             action: "triggerStudySheet",
             hasSelection: !!info.selectionText
         });
-    }
-});
-// ============================================
-// 🚨 SMART BADGE (Visual Cue for PDFs)
-// ============================================
-
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    // Check if the page is fully loaded and has a URL
-    if (changeInfo.status === 'complete' && tab.url) {
-
-        // Check if it is a PDF (Web or Local)
-        let isPdf = false;
-        try {
-            const parsedUrl = new URL(tab.url);
-            isPdf = parsedUrl.pathname.toLowerCase().endsWith('.pdf');
-        } catch (e) {
-            // Fallback for URLs that can't be parsed
-        }
-        // Also check the raw URL for file:// paths and simple .pdf endings
-        if (!isPdf) {
-            const lowerUrl = tab.url.toLowerCase();
-            isPdf = lowerUrl.endsWith('.pdf') || (lowerUrl.startsWith('file:') && lowerUrl.includes('.pdf'));
-        }
-        // Broadest check: .pdf anywhere followed by end, query, or hash
-        if (!isPdf) {
-            isPdf = /\.pdf([?#]|$)/i.test(tab.url);
-        }
-        
-        if (isPdf) {
-            // 1. Set the badge text to "PDF"
-            chrome.action.setBadgeText({ text: "PDF", tabId: tabId });
-            
-            // 2. Make it RED (Eye-catching)
-            chrome.action.setBadgeBackgroundColor({ color: "#e11d48", tabId: tabId });
-            
-            // 3. (Optional) Update title to give instruction
-            chrome.action.setTitle({ title: "📄 PDF Detected! Click to translate.", tabId: tabId });
-        } else {
-            // Clear badge for non-PDF pages
-            chrome.action.setBadgeText({ text: "", tabId: tabId });
-        }
     }
 });

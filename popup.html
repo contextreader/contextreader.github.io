@@ -201,9 +201,6 @@
             display: flex; align-items: center; gap: var(--space-sm);
             font-size: 12px; font-weight: 700; margin-bottom: var(--space-sm);
         }
-        #pdf-alert-box { background: rgba(255,241,242,0.75); border: 1px solid rgba(254,205,211,0.9); }
-        #pdf-alert-box .notice-title { color: #be123c; }
-        #pdf-alert-box p { color: #881337; margin: 0 0 var(--space-md); }
         #restricted-page-msg {
             background: rgba(240,249,255,0.75); border: 1px solid rgba(186,230,253,0.9);
             color: var(--teal-deep); text-align: center; margin-top: var(--space-lg);
@@ -220,15 +217,6 @@
 <body>
     <div class="logo">Context Reader</div>
     <div class="subtitle">Context-aware definitions in Sinhala</div>
-
-    <div id="pdf-alert-box" class="notice" style="display: none;">
-        <div class="notice-title">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6.5A1.5 1.5 0 0 0 5 3.5v17A1.5 1.5 0 0 0 6.5 22h11a1.5 1.5 0 0 0 1.5-1.5V7Z"/><path d="M14 2v5h5"/></svg>
-            PDF Detected
-        </div>
-        <p>Chrome's default viewer doesn't support translation.</p>
-        <button id="open-pdf-btn" class="btn btn-primary" style="font-size:12px;">Open in Context Reader</button>
-    </div>
 
     <div class="counter-card glass">
         <div class="label">Words looked up (this device)</div>

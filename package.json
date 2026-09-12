@@ -5,7 +5,8 @@
   "main": "background.js",
   "scripts": {
     "build": "node esbuild.config.mjs",
-    "test": "node test/run.mjs"
+    "test": "node test/run.mjs",
+    "package": "node scripts/package.mjs"
   },
   "repository": {
     "type": "git",
