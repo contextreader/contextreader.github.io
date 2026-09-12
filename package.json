@@ -1,27 +1,31 @@
 {
-  "name": "sinhala",
+  "name": "context-reader",
   "version": "1.0.0",
-  "description": "",
-  "main": "Readability.min.js",
-  "directories": {
-    "doc": "docs"
-  },
+  "description": "Context-aware word lookup that explains what you are reading, in your language. Free, open source, no server, no tracking.",
+  "main": "background.js",
   "scripts": {
     "build": "node esbuild.config.mjs",
     "test": "node test/run.mjs"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/IanXavierx/context-reader.git"
+    "url": "git+https://github.com/IanXavierx/context-reader-sinhala-direct.git"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "chrome-extension",
+    "translation",
+    "dictionary",
+    "sinhala",
+    "gemini",
+    "reading"
+  ],
+  "author": "Ian Xavier",
+  "license": "MIT",
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/IanXavierx/context-reader/issues"
+    "url": "https://github.com/IanXavierx/context-reader-sinhala-direct/issues"
   },
-  "homepage": "https://github.com/IanXavierx/context-reader#readme",
+  "homepage": "https://github.com/IanXavierx/context-reader-sinhala-direct#readme",
   "dependencies": {
     "@hyzyla/pdfium": "^2.1.12"
   },

@@ -1,0 +1,31 @@
+Context Reader
+Copyright (c) 2026 Ian Xavier
+
+This product bundles third-party software. The MIT licence covering Context
+Reader itself does not apply to these files; each is governed by its own
+licence, reproduced or referenced below.
+
+--------------------------------------------------------------------------------
+Mozilla Readability  —  Readability.min.js
+Apache License 2.0
+https://github.com/mozilla/readability
+
+--------------------------------------------------------------------------------
+Mozilla PDF.js  —  pdf.min.js, pdf.worker.min.js
+Apache License 2.0
+https://github.com/mozilla/pdf.js
+Copyright 2023 Mozilla Foundation
+
+--------------------------------------------------------------------------------
+Sinhala Unicode Converter  —  sinhala-unicode-converter.min.js
+MIT License
+https://github.com/Open-SL/sinhala-unicode-converter
+
+--------------------------------------------------------------------------------
+@hyzyla/pdfium  —  vendor/pdfium.wasm, pdfium-text-layer.bundle.js
+https://github.com/hyzyla/pdfium
+Wraps PDFium (BSD-3-Clause), Copyright The Chromium Authors.
+
+--------------------------------------------------------------------------------
+A full copy of the Apache License 2.0 is available at
+https://www.apache.org/licenses/LICENSE-2.0
