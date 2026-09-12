@@ -48,6 +48,19 @@ Everything visual still has to be checked by loading the extension — see
 | `settings-ui.test.js` | model dropdown, latency table, prompt history rendering |
 | `apikey-ui.test.js` | the key card state machine across all four states |
 | `bubble-note.test.js` | the fallback note, escaping, and the `saveWord()` placement hazard |
+| `integration.test.mjs` | loads the whole `background.js` and drives the real lookup path |
+
+`integration.test.mjs` is the one that covers the seams. Every other file slices
+a function out and tests it in isolation, which can leave a feature where each
+half works and nothing connects them — the fallback note was exactly that risk:
+the renderer was tested with a hand-made `_m` and nothing proved the pipeline
+ever produced one. It loads the whole service worker against a stubbed
+`chrome`/`fetch` and asserts the full path, including that the editable prompt
+reaches the wire and that a locked key stops the request.
+
+Note that `chrome.storage` accepts both a callback and a promise. `recordLatency`
+uses the callback form, so a promise-only stub silently skips it and the test
+passes for the wrong reason. The shim in `integration.test.mjs` supports both.
 
 `prompt-equivalence` and the placement assertion in `bubble-note` are the two
 worth keeping if anything is ever trimmed. The first catches silent prompt
