@@ -9,67 +9,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const $ = (id) => document.getElementById(id);
     const setText = (id, text) => { const el = $(id); if (el) el.textContent = text; };
     const on = (id, evt, fn) => { const el = $(id); if (el) el.addEventListener(evt, fn); };
-    const setHref = (id, url) => { const el = $(id); if (el) el.href = url; };
 
     // ---- About ----
     setText('opt-version', chrome.runtime.getManifest().version);
     setText('opt-ext-id', chrome.runtime.id);
 
     // ---- Links ----
-    on('opt-customize-shortcuts', 'click', (e) => {
-        e.preventDefault();
-        chrome.tabs.create({ url: 'chrome://extensions/shortcuts' });
-    });
-
-    setHref('opt-rate-link', `https://chromewebstore.google.com/detail/${chrome.runtime.id}`);
-    setHref('opt-feedback-link', 'https://discord.gg/tdwHWmmC');
-
-    // ---- Usage ----
-    // getUsage in background.js is a hardcoded stub that always answers
-    // { unlimited: true } — there is no server in this build. Only the unlimited
-    // branch below can ever run.
-    function renderUsage(response) {
-        if (!response) {
-            setText('opt-usage-label', 'Could not load usage data');
-            return;
-        }
-
-        const bar    = $('opt-usage-bar');
-        const circle = document.querySelector('.usage-circle');
-        const num    = document.querySelector('.usage-circle .num');
-
-        if (response.unlimited) {
-            setText('opt-remaining', '∞');
-            setText('opt-usage-label', 'Unlimited lookups (developer)');
-            if (bar) bar.style.width = '0%';
-            if (circle) circle.style.borderColor = '#22c55e';
-            if (num) num.style.color = '#16a34a';
-            return;
-        }
-
-        const used      = response.used || 0;
-        const limit     = response.limit || 20;
-        const remaining = Math.max(0, limit - used);
-
-        setText('opt-remaining', remaining);
-        setText('opt-usage-label', `${used} of ${limit} lookups used today`);
-        if (bar) bar.style.width = `${Math.min(100, (used / limit) * 100)}%`;
-
-        if (used >= limit) {
-            if (bar) bar.style.background = '#ef4444';
-            if (circle) circle.style.borderColor = '#ef4444';
-            if (num) num.style.color = '#dc2626';
-        }
-    }
-
-    chrome.runtime.sendMessage({ action: 'getUsage' }, renderUsage);
-
-    // Refresh — clears cached access info and re-fetches usage
-    on('opt-refresh-usage', 'click', () => {
-        chrome.runtime.sendMessage({ action: 'clearAccessCache' });
-        setText('opt-usage-label', 'Refreshing...');
-        chrome.runtime.sendMessage({ action: 'getUsage' }, renderUsage);
-    });
+    // Privacy Policy and Discord are plain hrefs in the HTML; nothing to wire.
 
     // ---- Gemini API key (direct mode) ----
     const keyInput  = $('opt-api-key');

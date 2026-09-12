@@ -6,10 +6,11 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
     <style>
         /* ═══════════════════════════════════════════════════════════════
-           Liquid Glass — settings
-           A full page, so the glass needs a field to refract: amber and teal
-           blooms over a warm neutral, plus grain. Same vocabulary as the
-           bubble — masked iridescent rim, gel pills, normalised backdrop.
+           Frosted glass — settings.  Retuned 2026-09-12, matching content.js.
+           A full page, so the glass needs a field of its own. That field is a
+           plain neutral gradient now, not amber and teal blooms: same call as
+           the bubble and the popup — the edge is shading, not refraction, and
+           the only accent is amber carrying information.
            ═══════════════════════════════════════════════════════════════ */
         :root {
             --space-xs:3px; --space-sm:5px; --space-md:8px;
@@ -18,22 +19,39 @@
             --t-fast:0.236s; --t-norm:0.382s;
             --ease:cubic-bezier(0.16,1,0.3,1);
 
-            --glass-top:rgba(255,255,255,0.46);
-            --glass-mid:rgba(255,255,255,0.32);
-            --glass-bot:rgba(255,255,255,0.36);
-            --glass-line:rgba(255,255,255,0.75);
-            --glass-fx:blur(24px) saturate(170%) brightness(1.10) contrast(0.94);
-            --fx-lens:blur(4px) brightness(1.32) saturate(1.75);
+            --glass-top:rgba(255,255,255,0.66);
+            --glass-mid:rgba(255,255,255,0.54);
+            --glass-bot:rgba(255,255,255,0.58);
+            --glass-line:rgba(255,255,255,0.55);
+            --glass-soft:rgba(255,255,255,0.70);
+            --glass-fx:blur(20px) saturate(105%) brightness(1.06) contrast(0.97);
+            --fx-lens:none;   /* lens band retired — see content.js */
             --gel:linear-gradient(180deg,rgba(255,255,255,0.85) 0%,rgba(255,255,255,0.34) 52%,rgba(255,255,255,0.50) 100%);
+            /* neutral directional rim: one light source, top-left */
             --rim:linear-gradient(140deg,
-                    rgba(255,255,255,0.98) 0%,
-                    rgba(251,191,36,0.45) 22%,
-                    rgba(255,255,255,0.75) 46%,
-                    rgba(8,145,178,0.32) 72%,
-                    rgba(255,255,255,0.95) 100%);
+                    rgba(255,255,255,0.95) 0%,
+                    rgba(255,255,255,0.42) 28%,
+                    rgba(255,255,255,0.18) 54%,
+                    rgba(17,24,39,0.05) 80%,
+                    rgba(17,24,39,0.11) 100%);
+            /* dual-tone depth: light top-left, soft dark bottom-right */
+            --spec:
+              inset 0 1.5px 0 rgba(255,255,255,0.92),
+              inset 1.5px 0 0 rgba(255,255,255,0.52),
+              inset 0 18px 28px -20px rgba(255,255,255,0.75),
+              inset -1.2px 0 0 rgba(17,24,39,0.05),
+              inset 0 -1.2px 0 rgba(17,24,39,0.07),
+              inset 0 -20px 26px -22px rgba(17,24,39,0.10);
+            --spec-sm:
+              inset 0 1.2px 0 rgba(255,255,255,0.92),
+              inset 1.2px 0 0 rgba(255,255,255,0.50),
+              inset 0 9px 13px -10px rgba(255,255,255,0.70),
+              inset -1px -1px 0 rgba(17,24,39,0.06),
+              inset 0 -9px 12px -11px rgba(17,24,39,0.10);
 
-            --amber:#fbbf24; --amber-hi:#fcd34d; --amber-deep:#d97706;
-            --amber-ink:#78350f; --amber-glow:rgba(251,191,36,0.30);
+            --amber:#fbbf24; --amber-hi:#fcd34d; --amber-deep:#b45309;
+            --amber-ink:#78350f; --amber-veil:rgba(251,191,36,0.10);
+            --amber-glow:rgba(251,191,36,0.30);
             --teal:#0891b2; --teal-deep:#0e7490; --teal-line:rgba(8,145,178,0.28);
             --green:#16a34a; --red:#dc2626;
 
@@ -47,10 +65,9 @@
             font-size:14px; line-height:var(--phi); color:var(--ink-soft);
             background:
               url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/></filter><rect width='140' height='140' filter='url(%23n)' opacity='0.04'/></svg>"),
-              radial-gradient(ellipse 55% 40% at 12% 0%, rgba(251,191,36,0.20) 0%, transparent 62%),
-              radial-gradient(ellipse 50% 45% at 92% 14%, rgba(8,145,178,0.16) 0%, transparent 60%),
-              radial-gradient(ellipse 70% 40% at 50% 100%, rgba(251,191,36,0.12) 0%, transparent 62%),
-              linear-gradient(180deg,#fdfcfa 0%,#f6f4f1 100%);
+              radial-gradient(ellipse 70% 48% at 16% -4%, rgba(255,255,255,0.95) 0%, transparent 64%),
+              radial-gradient(ellipse 80% 45% at 84% 104%, rgba(17,24,39,0.05) 0%, transparent 62%),
+              linear-gradient(158deg,#eef0f3 0%,#e4e7ec 52%,#dcdfe5 100%);
             background-attachment:fixed;
         }
         .container{max-width:620px; margin:0 auto}
@@ -74,16 +91,11 @@
             padding:var(--space-xl);
             margin-bottom:var(--space-xl);
             box-shadow:
-              0 0 var(--space-2xl) -18px var(--amber-glow),
-              0 var(--space-lg) var(--space-xxl) -12px var(--shadow),
-              inset 0 1px 0 rgba(255,255,255,0.95),
-              inset 0 -2px var(--space-md) -4px rgba(17,24,39,0.06);
+              0 var(--space-lg) var(--space-xxl) -14px var(--shadow),
+              var(--spec);
         }
-        /* ── the lens ────────────────────────────────────────────────
-           A band at the edge filtering the backdrop a SECOND time, sharper and
-           brighter than the card's own filter. That differential is refraction
-           — the thick rim of a glass slab. Here it refracts the page's amber
-           and teal blooms, which is why the field exists. */
+        /* Lens band retired (--fx-lens: none). The rule is kept so the masked
+           edge geometry stays available if the band is ever reinstated. */
         .card::before{
             content:''; position:absolute; inset:0;
             border-radius:inherit; padding:var(--space-lg);
@@ -105,53 +117,19 @@
         .card > *{position:relative}
         .card-title{
             font-size:11px; font-weight:700; text-transform:uppercase;
-            letter-spacing:0.12em; color:var(--amber-ink);
+            letter-spacing:0.12em; color:var(--ink-mute);
             margin-bottom:var(--space-lg);
         }
-        .card-title.teal{color:var(--teal-deep)}
-
-        /* ── usage ─────────────────────────────────────────────────── */
-        .usage-section{display:flex; gap:var(--space-xl); align-items:center}
-        .usage-circle{
-            flex:0 0 auto; width:82px; height:82px; border-radius:50%;
-            display:flex; flex-direction:column; align-items:center; justify-content:center;
-            background:var(--gel),rgba(255,255,255,0.5);
-            -webkit-backdrop-filter:blur(var(--space-xl));
-            backdrop-filter:blur(var(--space-xl));
-            border:2px solid var(--amber);
-            box-shadow:
-              0 0 var(--space-xl) -6px var(--amber-glow),
-              inset 0 1px 0 rgba(255,255,255,0.95);
-        }
-        .usage-circle .num{
-            font-size:26px; font-weight:800; line-height:1;
-            color:var(--amber-deep); font-variant-numeric:tabular-nums;
-        }
-        .usage-circle .label{
-            font-size:9px; text-transform:uppercase; letter-spacing:0.1em;
-            color:var(--ink-mute); font-weight:600; margin-top:2px;
-        }
-        .usage-info{flex:1; min-width:0}
-        #opt-usage-label{font-size:13px; font-weight:600; color:var(--ink)}
-        .bar-bg{
-            background:rgba(251,191,36,0.18); border-radius:100px;
-            height:6px; overflow:hidden; margin:var(--space-md) 0 var(--space-sm);
-            box-shadow:inset 0 1px 2px rgba(146,64,14,0.12);
-        }
-        .bar-fill{
-            height:100%; border-radius:100px; width:0%;
-            background:linear-gradient(90deg,var(--amber-hi),#f59e0b);
-            box-shadow:0 0 var(--space-md) var(--amber-glow);
-            transition:width var(--t-norm) var(--ease);
-        }
-        .bar-label{font-size:11px; color:var(--ink-mute)}
+        /* Kept as a hook — the markup still carries .teal on two card titles.
+           Section headings are structure, not accents, so both read the same. */
+        .card-title.teal{color:var(--ink-mute)}
 
         /* ── controls ──────────────────────────────────────────────── */
         .btn{
             display:inline-flex; align-items:center; justify-content:center;
             gap:var(--space-sm);
             padding:var(--space-md) var(--space-lg);
-            background:var(--gel),rgba(255,255,255,0.55);
+            background:var(--gel),var(--glass-soft);
             -webkit-backdrop-filter:blur(var(--space-xl));
             backdrop-filter:blur(var(--space-xl));
             border:1px solid var(--glass-line); border-radius:100px;
@@ -160,36 +138,35 @@
             transition:all var(--t-fast);
             box-shadow:
               0 1px 2px rgba(17,24,39,0.07),
-              inset 0 1px 0 rgba(255,255,255,0.95);
+              var(--spec-sm);
         }
         .btn:hover{
             transform:translateY(-1px); color:var(--ink);
-            border-color:rgba(251,191,36,0.5);
-            background:var(--gel),rgba(255,255,255,0.8);
+            border-color:rgba(255,255,255,0.9);
+            background:var(--gel),rgba(255,255,255,0.86);
             box-shadow:0 var(--space-sm) var(--space-lg) -3px rgba(17,24,39,0.13),
-                       inset 0 1px 0 rgba(255,255,255,0.95);
+                       var(--spec-sm);
         }
         .btn:active{transform:translateY(0)}
+        .btn:focus-visible{outline:2px solid var(--amber-deep); outline-offset:2px}
+        /* Primary by weight and hue, not by fill — same call as the bubble's
+           More pill and the popup's primary. */
         .btn-primary{
-            background:
-              linear-gradient(180deg,rgba(255,255,255,0.55) 0%,rgba(255,255,255,0.06) 52%,rgba(255,255,255,0.18) 100%),
-              linear-gradient(135deg,var(--amber-hi) 0%,#f59e0b 100%);
-            border-color:rgba(217,119,6,0.30); color:var(--amber-ink); font-weight:700;
+            background:var(--gel),var(--glass-soft);
+            border-color:rgba(180,83,9,0.22); color:var(--amber-deep); font-weight:700;
             box-shadow:
-              0 2px var(--space-md) var(--amber-glow),
-              0 var(--space-md) var(--space-xl) -8px rgba(217,119,6,0.45),
-              inset 0 1px 0 rgba(255,255,255,0.75),
-              inset 0 -1px 2px rgba(146,64,14,0.18);
+              0 1px 2px rgba(17,24,39,0.07),
+              var(--spec-sm);
         }
         .btn-primary:hover{
             background:
-              linear-gradient(180deg,rgba(255,255,255,0.62) 0%,rgba(255,255,255,0.08) 52%,rgba(255,255,255,0.2) 100%),
-              linear-gradient(135deg,#fde68a 0%,var(--amber) 100%);
-            border-color:rgba(217,119,6,0.45); color:var(--amber-ink);
+              linear-gradient(0deg,var(--amber-veil),var(--amber-veil)),
+              var(--gel),var(--glass-soft);
+            border-color:rgba(180,83,9,0.38); color:var(--amber-deep);
         }
         .field{
             width:100%; padding:var(--space-lg) var(--space-lg);
-            background:rgba(255,255,255,0.55);
+            background:var(--glass-soft);
             -webkit-backdrop-filter:blur(var(--space-lg));
             backdrop-filter:blur(var(--space-lg));
             border:1px solid var(--glass-line); border-radius:100px;
@@ -200,8 +177,8 @@
         }
         .field::placeholder{color:var(--ink-faint)}
         .field:focus{
-            border-color:rgba(251,191,36,0.65); background:rgba(255,255,255,0.78);
-            box-shadow:0 0 0 3px rgba(251,191,36,0.16), inset 0 1px 3px rgba(17,24,39,0.05);
+            border-color:rgba(180,83,9,0.55); background:rgba(255,255,255,0.86);
+            box-shadow:0 0 0 3px rgba(180,83,9,0.16), inset 0 1px 3px rgba(17,24,39,0.05);
         }
 
         /* ── shortcuts ─────────────────────────────────────────────── */
@@ -286,33 +263,10 @@
         </div>
 
         <div class="card">
-            <div class="card-title">Today's Usage</div>
-            <div class="usage-section">
-                <div class="usage-circle">
-                    <div class="num" id="opt-remaining">--</div>
-                    <div class="label">left</div>
-                </div>
-                <div class="usage-info">
-                    <div id="opt-usage-label">Loading…</div>
-                    <div class="bar-bg"><div class="bar-fill" id="opt-usage-bar"></div></div>
-                    <div class="bar-label">Limits come from Google's free tier — 20 requests per minute.</div>
-                    <button id="opt-refresh-usage" class="btn" style="margin-top:var(--space-lg);">Refresh</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
             <div class="card-title teal">Keyboard Shortcuts</div>
-            <div class="shortcut-row">
-                <span class="shortcut-desc">Activate extension</span>
-                <span class="shortcut-key">Alt+Shift+S</span>
-            </div>
             <div class="shortcut-row">
                 <span class="shortcut-desc">Close bubble</span>
                 <span class="shortcut-key">Esc</span>
-            </div>
-            <div style="margin-top:var(--space-lg)">
-                <a href="#" id="opt-customize-shortcuts" class="btn">Customize in Chrome settings →</a>
             </div>
         </div>
 
@@ -326,14 +280,6 @@
                 <a href="https://discord.gg/tdwHWmmC" target="_blank" rel="noopener">
                     <span class="icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 18.5 21 12a9 9 0 1 0-3.6 7.2Z"/><path d="M8.5 11h.01M12 11h.01M15.5 11h.01"/></svg></span>
                     Join Discord Community <span class="arrow">›</span>
-                </a>
-                <a href="#" id="opt-rate-link" target="_blank" rel="noopener">
-                    <span class="icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3.6 2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.8l5.9-.9Z"/></svg></span>
-                    Rate on Chrome Web Store <span class="arrow">›</span>
-                </a>
-                <a href="#" id="opt-feedback-link" target="_blank" rel="noopener">
-                    <span class="icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6 8.5-6"/></svg></span>
-                    Send Feedback <span class="arrow">›</span>
                 </a>
             </div>
         </div>

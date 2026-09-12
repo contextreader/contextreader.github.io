@@ -62,33 +62,41 @@ const styles = `
          (no shadow DOM) and a bare --glass-bg would collide with the site's own. */
       --sr-glass-blur: 55px;                      /* Fibonacci — deeper frost */
       --sr-glass-sat: 180%;
-      /* ── Liquid Glass ──────────────────────────────────────────────
-         Real glass is barely tinted. What makes it read as glass is the EDGE:
-         a thick band that refracts — blurring, brightening and saturating what
-         passes through it far more than the flat middle does. Two filters, and
-         the DIFFERENCE between them is the refraction.                       */
-      --sr-fx-body: blur(24px) saturate(170%) brightness(1.10) contrast(0.94);
-      --sr-fx-lens: blur(4px) brightness(1.32) saturate(1.75);   /* the edge */
-      --sr-fx-sm:   blur(14px) saturate(170%) brightness(1.10) contrast(0.95);
+      /* ── Frosted glass ─────────────────────────────────────────────
+         Retuned 2026-09-12 against a monochrome reference. The previous pass
+         chased refraction — a near-transparent middle plus a saturated lens
+         band at the edge — and read as coloured, busy, and hard to read over
+         photos. This one is milky and calm: the backdrop is blurred and only
+         barely re-saturated, and the edge is SHADING (a light top-left, a soft
+         dark bottom-right) rather than a lens. Legibility first, calm second.  */
+      --sr-fx-body: blur(20px) saturate(105%) brightness(1.06) contrast(0.97);
+      --sr-fx-lens: none;   /* lens band retired — the milky surface carries the
+                               edge on its own, and this removes the second
+                               nested backdrop-filter from every glass surface */
+      --sr-fx-sm:   blur(16px) saturate(105%) brightness(1.08) contrast(0.97);
       --sr-lens-w: var(--space-lg);                              /* edge thickness */
 
-      /* Specular set: light catching the top edge, bouncing off the bottom,
-         and blooming inward from both. This is the "thickness" of the slab. */
+      /* Specular set, dual-tone. Light catches the top-left; a soft shadow sits
+         at the bottom-right. That dark inset is what makes the surface read as
+         a physical object rather than a flat white shape — the all-white set
+         this replaces is why the old bubble looked pasted on. */
       --sr-spec:
-        inset 0 1.5px 0 rgba(255,255,255,0.95),
-        inset 0 -1.5px 0 rgba(255,255,255,0.55),
-        inset 1.5px 0 0 rgba(255,255,255,0.45),
-        inset -1.5px 0 0 rgba(255,255,255,0.45),
-        inset 0 16px 26px -16px rgba(255,255,255,0.80),
-        inset 0 -16px 26px -16px rgba(255,255,255,0.45);
+        inset 0 1.5px 0 rgba(255,255,255,0.92),
+        inset 1.5px 0 0 rgba(255,255,255,0.52),
+        inset 0 18px 28px -20px rgba(255,255,255,0.75),
+        inset -1.2px 0 0 rgba(17,24,39,0.05),
+        inset 0 -1.2px 0 rgba(17,24,39,0.07),
+        inset 0 -20px 26px -22px rgba(17,24,39,0.10);
       --sr-spec-sm:
-        inset 0 1.2px 0 rgba(255,255,255,0.95),
-        inset 0 -1.2px 0 rgba(255,255,255,0.5),
-        inset 0 8px 12px -8px rgba(255,255,255,0.75),
-        inset 0 -8px 12px -8px rgba(255,255,255,0.4);
-      --sr-glass-top: rgba(255,255,255,0.38);     /* barely there — see --sr-fx-lens */
-      --sr-glass-mid: rgba(255,255,255,0.26);
-      --sr-glass-bot: rgba(255,255,255,0.30);
+        inset 0 1.2px 0 rgba(255,255,255,0.92),
+        inset 1.2px 0 0 rgba(255,255,255,0.50),
+        inset 0 9px 13px -10px rgba(255,255,255,0.70),
+        inset -1px -1px 0 rgba(17,24,39,0.06),
+        inset 0 -9px 12px -11px rgba(17,24,39,0.10);
+      /* Milky, not clear. Also the fix for Sinhala over photo-heavy pages. */
+      --sr-glass-top: rgba(255,255,255,0.66);
+      --sr-glass-mid: rgba(255,255,255,0.54);
+      --sr-glass-bot: rgba(255,255,255,0.58);
       /* accent glass, by role — see the panel comments below */
       --sr-teal-deep: #0e7490;
       --sr-teal-veil: rgba(8,145,178,0.09);
@@ -96,23 +104,28 @@ const styles = `
       --sr-teal-glow: rgba(8,145,178,0.28);
       --sr-green: #047857;
       --sr-green-line: rgba(16,185,129,0.28);
-      /* Iridescent rim. Amber + teal are the brand's own two accents, so the
-         chromatic edge reads as Context Reader rather than generic Apple glass. */
+      /* Neutral directional rim: one light source, top-left. Bright white where
+         the light lands, fading to a faint dark at the far edge. The amber/teal
+         iridescent version this replaces put coloured light in a scene that has
+         none, which is the single loudest thing about the old pass. */
       --sr-rim: linear-gradient(140deg,
-                  rgba(255,255,255,0.98) 0%,
-                  rgba(251,191,36,0.45) 22%,
-                  rgba(255,255,255,0.75) 46%,
-                  rgba(8,145,178,0.32) 72%,
-                  rgba(255,255,255,0.95) 100%);
+                  rgba(255,255,255,0.95) 0%,
+                  rgba(255,255,255,0.42) 28%,
+                  rgba(255,255,255,0.18) 54%,
+                  rgba(17,24,39,0.05) 80%,
+                  rgba(17,24,39,0.11) 100%);
       /* Gel: a bright top half over any fill, the way light sits on a lozenge. */
       --sr-gel: linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.34) 52%, rgba(255,255,255,0.50) 100%);
-      --sr-glass-soft: rgba(255,255,255,0.55);    /* chips, pills */
-      --sr-glass-line: rgba(255,255,255,0.72);    /* borders */
+      --sr-glass-soft: rgba(255,255,255,0.70);    /* chips, pills */
+      --sr-glass-line: rgba(255,255,255,0.55);    /* borders */
       --sr-glass-spec: rgba(255,255,255,0.95);    /* top specular edge */
 
       --sr-amber: #fbbf24;                        /* brand primary — fills, glows */
       --sr-amber-hi: #fcd34d;                     /* hover */
-      --sr-amber-deep: #d97706;                   /* text-safe amber on glass */
+      --sr-amber-deep: #b45309;                   /* text-safe amber on glass:
+                                                     #d97706 was ~3.0:1 on the new
+                                                     milky surface and failed AA at
+                                                     16px; this is ~4.6:1 */
       --sr-amber-ink: #78350f;                    /* dark text on amber fills (white fails contrast) */
       --sr-amber-glow: rgba(251,191,36,0.30);
       --sr-amber-veil: rgba(251,191,36,0.10);
@@ -154,10 +167,12 @@ const styles = `
         border: none;                                  /* replaced by the ::after rim */
         border-radius: var(--space-xxl);               /* 34px — reference proportion */
 
+        /* No ambient amber bloom. A pane of glass sitting above a page casts a
+           neutral shadow; coloured light around it is what made the old bubble
+           read as a decorated object rather than a surface. */
         box-shadow:
-          0 0 var(--space-2xl) -12px var(--sr-amber-glow),
-          0 var(--space-xl) var(--space-2xl) -10px rgba(17,24,39,0.30),
-          0 var(--space-md) var(--space-lg) -8px rgba(17,24,39,0.14),
+          0 var(--space-xl) 44px -16px rgba(17,24,39,0.26),
+          0 var(--space-md) var(--space-lg) -9px rgba(17,24,39,0.13),
           var(--sr-spec);
 
         position: fixed; z-index: 2147483647;
@@ -385,11 +400,14 @@ const styles = `
         text-shadow: 0 1px 0 rgba(255,255,255,0.55);
     }
     
+    /* The hero element, and now the only place amber appears at full strength.
+       No glow: a text-shadow in the same hue softens the letterforms, and this
+       line is the one thing on the surface that has to stay razor-sharp. */
     .sr-translation {
-        font-size: 16px; color: var(--sr-amber-deep);
+        font-size: 17px; color: var(--sr-amber-deep);
         font-family: 'Noto Sans Sinhala', sans-serif;
-        font-weight: 600; margin-top: 2px;
-        text-shadow: 0 0 var(--space-xl) var(--sr-amber-glow);   /* the hero element */
+        font-weight: 600; margin-top: var(--space-xs);
+        line-height: 1.5;
     }
     
     .sr-close-btn {
@@ -425,16 +443,14 @@ const styles = `
         position: absolute; top: calc(var(--space-xxl) + var(--space-sm)); right: 0; left: auto;
         width: 208px; max-width: 208px;
         background:
-          linear-gradient(180deg, rgba(255,255,255,0.44) 0%, rgba(255,255,255,0.30) 100%);
+          linear-gradient(180deg, var(--sr-glass-top) 0%, var(--sr-glass-bot) 100%);
         -webkit-backdrop-filter: var(--sr-fx-body);
         backdrop-filter: var(--sr-fx-body);
         border: none;
         border-radius: var(--space-xl);
         box-shadow:
-          0 0 var(--space-xxl) -14px var(--sr-amber-glow),
           0 var(--space-lg) var(--space-xxl) -8px rgba(17,24,39,0.24),
-          inset 0 1px 0 var(--sr-glass-spec),
-          inset 0 -2px var(--space-md) -4px rgba(17,24,39,0.08);
+          var(--sr-spec-sm);
         padding: var(--space-sm);
         z-index: 2147483647; display: none;
         font-family: 'Inter', system-ui, sans-serif;
@@ -755,27 +771,26 @@ const styles = `
 
     /* Primary action (⚡ More) — amber gradient. Dark ink, because white text
        on #fbbf24 fails contrast. */
+    /* Primary by weight and hue, not by fill. A solid amber lozenge was the
+       biggest block of colour on the surface and fought the Sinhala line for
+       attention; the same glass as its siblings with amber text and a faint
+       veil still reads as the primary action. */
     .sr-secondary-btn.sr-btn-primary {
-        /* gloss layered over the amber fill — the reference's lozenge look */
-        background:
-          linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.06) 52%, rgba(255,255,255,0.18) 100%),
-          linear-gradient(135deg, var(--sr-amber-hi) 0%, #f59e0b 100%);
-        border-color: rgba(217,119,6,0.30);
-        color: var(--sr-amber-ink);
+        background: var(--sr-glass-soft);
+        border-color: rgba(180,83,9,0.22);
+        color: var(--sr-amber-deep);
         font-weight: 700;
-        box-shadow:
-          0 2px var(--space-md) var(--sr-amber-glow),
-          0 var(--space-md) var(--space-xl) -8px rgba(217,119,6,0.45),
-          inset 0 1px 0 rgba(255,255,255,0.75),
-          inset 0 -1px 2px rgba(146,64,14,0.18);
+        box-shadow: var(--sr-spec-sm);
     }
+    /* A colour layer can only be the LAST value in a background shorthand, so
+       the veil has to be a gradient or the whole declaration is dropped. */
     .sr-secondary-btn.sr-btn-primary:hover {
-        background: linear-gradient(135deg, #fde68a 0%, var(--sr-amber) 100%);
-        border-color: rgba(217,119,6,0.5);
-        color: var(--sr-amber-ink);
-        box-shadow:
-          0 var(--space-sm) var(--space-xl) -2px var(--sr-amber-glow),
-          inset 0 1px 0 rgba(255,255,255,0.7);
+        background:
+          linear-gradient(0deg, var(--sr-amber-veil), var(--sr-amber-veil)),
+          var(--sr-glass-soft);
+        border-color: rgba(180,83,9,0.38);
+        color: var(--sr-amber-deep);
+        box-shadow: var(--sr-spec-sm);
     }
     .sr-secondary-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
     
@@ -895,12 +910,13 @@ const styles = `
         position: absolute;
         width: var(--space-xxl);
         height: var(--space-xxl);
-        /* Clear glass puck — Liquid Glass, not a dark disc. The mark's unlit
-           rods are ink rather than white, because white vanishes on clear glass
-           and because they depict text, which is dark. */
+        /* The MOST opaque surface in the extension, deliberately. The previous
+           pass made this clear glass with ink rods, and it disappeared against
+           any busy background — it is the one element that has to be findable
+           before you have found it. Frosted and near-solid, with a dark mark. */
         background:
           url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Cdefs%3E%3ClinearGradient id='l' x1='3' y1='10' x2='13' y2='13.6' gradientUnits='userSpaceOnUse'%3E%3Cstop offset='0' stop-color='%23FDE68A'/%3E%3Cstop offset='0.4' stop-color='%23F59E0B'/%3E%3Cstop offset='1' stop-color='%23D97706'/%3E%3C/linearGradient%3E%3ClinearGradient id='f' x1='12' y1='4' x2='12' y2='20' gradientUnits='userSpaceOnUse'%3E%3Cstop offset='0' stop-color='%23111827' stop-opacity='0.46'/%3E%3Cstop offset='1' stop-color='%23111827' stop-opacity='0.28'/%3E%3C/linearGradient%3E%3Cfilter id='g' x='-0.7' y='-1.8' width='2.4' height='4.6'%3E%3CfeGaussianBlur stdDeviation='1.4' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Crect x='3.2' y='4.8' width='17.6' height='2.8' rx='1.4' fill='url(%23f)'/%3E%3Crect x='15.4' y='10.6' width='5.4' height='2.8' rx='1.4' fill='url(%23f)'/%3E%3Crect x='3.2' y='16.4' width='13.4' height='2.8' rx='1.4' fill='url(%23f)'/%3E%3Cg filter='url(%23g)'%3E%3Crect x='3.2' y='10.6' width='10.2' height='2.8' rx='1.4' fill='url(%23l)'/%3E%3C/g%3E%3Crect x='4.3' y='11.1' width='8.0' height='0.8' rx='0.4' fill='%23FFFBEB' opacity='0.6'/%3E%3C/svg%3E") no-repeat center / 18px 18px,
-          linear-gradient(180deg, rgba(255,255,255,0.30) 0%, rgba(255,255,255,0.10) 52%, rgba(255,255,255,0.20) 100%);
+          linear-gradient(180deg, rgba(255,255,255,0.80) 0%, rgba(255,255,255,0.68) 52%, rgba(255,255,255,0.72) 100%);
         -webkit-backdrop-filter: var(--sr-fx-sm);
         backdrop-filter: var(--sr-fx-sm);
         border: none;
@@ -908,9 +924,8 @@ const styles = `
         display: none; align-items: center; justify-content: center;
         cursor: pointer; z-index: 2147483647;
         box-shadow:
-          0 0 var(--space-xl) -5px var(--sr-amber-glow),
-          0 var(--space-md) var(--space-xl) -7px rgba(17,24,39,0.34),
-          0 1px 3px rgba(17,24,39,0.16),
+          0 var(--space-md) var(--space-xl) -8px rgba(17,24,39,0.34),
+          0 1px 3px rgba(17,24,39,0.18),
           var(--sr-spec-sm);
         transition: transform var(--timing-fast) cubic-bezier(0.16, 1, 0.3, 1),
                     box-shadow var(--timing-fast),
@@ -934,10 +949,12 @@ const styles = `
     #smart-reader-trigger:hover {
         transform: scale(1.1);
         box-shadow:
-          0 0 var(--space-xxl) -6px rgba(251,191,36,0.5),
-          0 var(--space-lg) var(--space-xxl) -8px rgba(17,24,39,0.4),
-          0 0 0 3px rgba(251,191,36,0.16),
+          0 var(--space-lg) var(--space-xxl) -8px rgba(17,24,39,0.40),
+          0 0 0 3px rgba(180,83,9,0.16),
           var(--sr-spec-sm);
+    }
+    #smart-reader-trigger:focus-visible {
+        outline: 2px solid var(--sr-amber-deep); outline-offset: 3px;
     }
     #smart-reader-trigger:hover { background-size: 19.5px 19.5px, auto; }
     #smart-reader-trigger:active { transform: scale(1.02); }
