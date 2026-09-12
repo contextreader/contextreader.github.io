@@ -576,6 +576,22 @@ const styles = `
         margin-bottom: var(--space-xl); 
     } 
     .sr-section:last-child { margin-bottom: 0; }
+
+    /* Quota-fallback note. Deliberately a sibling of .sr-body, NOT a child:
+       saveWord() reads '.sr-section:nth-of-type(2) .sr-sub-text', and
+       :nth-of-type counts elements by TAG, not by class — so any div added
+       inside .sr-body would shift which section gets saved. Neutral, because
+       it is a footnote about plumbing, not information about the word. */
+    .sr-fallback-note {
+        display: flex; align-items: flex-start; gap: var(--space-sm);
+        padding: 0 var(--space-xl) var(--space-lg);
+        font-size: 11px; line-height: 1.5;
+        color: var(--sr-ink-mute);
+    }
+    .sr-fallback-note code {
+        font-family: ui-monospace, SFMono-Regular, monospace;
+        font-size: 10.5px; color: var(--sr-ink-soft);
+    }
     
     .sr-subtitle-overlay { 
         position: absolute; bottom: 0; left: 0; width: 100%; 
@@ -1102,7 +1118,17 @@ function buildLookupHTML(word, json) {
         </div>
     </div>
     <div id="sr-details-placeholder"></div>
-</div>`;
+</div>${fallbackNoteHTML(data._m)}`;
+}
+
+// Rendered only when a lookup did not come from the configured model, so the
+// tester is not silently comparing one model's output while reading another's
+// name in Settings.
+function fallbackNoteHTML(m) {
+    if (!m || !m.from || !m.model) return '';
+    const short = (id) => String(id).replace(/^models\//, '').replace(/^gemini-/, '');
+    return `<div class="sr-fallback-note">\u21b3 <span><code>${escapeHTML(short(m.from))}</code> `
+         + `quota reached &middot; answered by <code>${escapeHTML(short(m.model))}</code></span></div>`;
 }
 let currentVideoRequestId = 0;
 let currentVideoList = [];

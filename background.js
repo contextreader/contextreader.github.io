@@ -108,6 +108,60 @@ async function requestGemini(model, payload, apiKey) {
 }
 
 // ============================================
+// ↩️ QUOTA FALLBACK
+// ============================================
+
+const DEFAULT_COOLDOWN_MS = 60000;
+const MAX_COOLDOWN_MS = 3600000;
+
+// Only the light models. A fallback that lands on a pro model could cost a
+// tester real money on a key they told us is free — worse than a failed lookup.
+async function buildFallbackChain(primary) {
+    const { modelListCache } = await chrome.storage.local.get('modelListCache');
+    const avail = ((modelListCache && modelListCache.models) || [])
+        .map(m => m && m.id).filter(Boolean);
+    const lite  = avail.filter(id => id.includes('flash-lite'));
+    const flash = avail.filter(id => id.includes('flash') && !id.includes('flash-lite'));
+    const chain = [primary];
+    for (const id of lite.concat(flash)) if (!chain.includes(id)) chain.push(id);
+    return chain;
+}
+
+function isQuotaError(res) {
+    if (!res) return false;
+    if (res.status === 429) return true;
+    const st = res.data && res.data.error && res.data.error.status;
+    return st === "RESOURCE_EXHAUSTED";
+}
+
+// Google may name its own retry delay in the error details. Prefer it over a
+// guess; fall back to a minute, which covers the per-minute limit.
+// NOTE: derived from the documented shape, not from an observed 429 body.
+function cooldownFrom(res) {
+    try {
+        const details = (res.data.error.details || []);
+        for (const d of details) {
+            const raw = d.retryDelay || d.retry_delay;
+            if (!raw) continue;
+            const secs = parseFloat(String(raw).replace(/s$/, ''));
+            if (Number.isFinite(secs) && secs > 0) {
+                return Math.min(MAX_COOLDOWN_MS, Math.round(secs * 1000));
+            }
+        }
+    } catch (e) { /* fall through to the default */ }
+    return DEFAULT_COOLDOWN_MS;
+}
+
+async function noteCooldown(model, ms) {
+    const { modelCooldowns } = await chrome.storage.local.get({ modelCooldowns: {} });
+    const cd = modelCooldowns || {};
+    const now = Date.now();
+    for (const k of Object.keys(cd)) if (!(cd[k] > now)) delete cd[k];
+    cd[model] = now + ms;
+    await chrome.storage.local.set({ modelCooldowns: cd });
+}
+
+// ============================================
 // ⏱️ LATENCY ROLLUP
 // ============================================
 
@@ -642,6 +696,23 @@ async function lookupContext(word, context, url, tabId) {
     return lookupModeDefault(word, context, url, tabId);
 }
 
+// The lookup response is a JSON string that content.js parses for {t,d}.
+// Fallback information rides along inside it as _m rather than changing the
+// message shape, so the existing sendMessage call sites keep working unchanged
+// and an older content.js simply ignores the extra key.
+function attachMeta(raw, meta) {
+    if (!meta || !meta.fellBackFrom) return raw;
+    if (typeof raw !== "string" || raw.startsWith("<")) return raw;   // error card
+    try {
+        const obj = JSON.parse(raw);
+        if (!obj || typeof obj !== "object" || Array.isArray(obj)) return raw;
+        obj._m = { model: meta.model, from: meta.fellBackFrom, reason: meta.reason };
+        return JSON.stringify(obj);
+    } catch (e) {
+        return raw;
+    }
+}
+
 // ── DEFAULT: Single call, wait for full {t, d} ──
 async function lookupModeDefault(word, context, url, tabId) {
     const generationConfig = {
@@ -650,9 +721,11 @@ async function lookupModeDefault(word, context, url, tabId) {
         responseSchema: SCHEMA_TD   // guarantees {t,d} shape; without it 2.5 emitted doubled JSON
     };
     const { lookup: lookupTemplate } = await getPrompts();
-    return await callGemini(
+    const meta = {};
+    const raw = await callGemini(
         renderPrompt(lookupTemplate, { word, context }) + LOOKUP_JSON_CONTRACT,
-        word, context, url, generationConfig);
+        word, context, url, generationConfig, meta);
+    return attachMeta(raw, meta);
 }
 
 // ── MODE A: Stream JSON from Gemini, parse t and d as they arrive ──
@@ -1489,7 +1562,7 @@ async function generateStudySheetV3(chunks, level, lang, tabId, calibrationWords
 // 🌐 GEMINI API CALL
 // ============================================
 
-async function callGemini(prompt, word = "", context = "", url = "", generationConfig = null) {
+async function callGemini(prompt, word = "", context = "", url = "", generationConfig = null, metaOut = null) {
     const t0 = performance.now();
     try {
         const tSign = 0;   // no HMAC in direct mode
@@ -1503,7 +1576,7 @@ async function callGemini(prompt, word = "", context = "", url = "", generationC
             </div>`;
         }
 
-        const { model } = await getModelConfig();
+        const { model, paidPlan } = await getModelConfig();
 
         // The reasoning models think by default, and thinking tokens add seconds
         // to what is a single-hop lookup — so switch it off, but only where the
@@ -1529,11 +1602,50 @@ async function callGemini(prompt, word = "", context = "", url = "", generationC
             ]
         };
 
-        console.log(`📤 SENT → word:"${word}" model:${model} prompt:`, prompt.substring(0, 200));
+        console.log(`📤 SENT → word:"${word}" model:${model}${paidPlan ? ' (paid, no fallback)' : ''} prompt:`, prompt.substring(0, 200));
         console.log(`📤 CONFIG →`, JSON.stringify(genCfg));
 
-        const { data, networkMs: tNetwork, parseMs: tParse } =
-            await requestGemini(model, payload, apiKey);
+        // Walk a chain of free-tier models so a quota wall does not end the
+        // lookup. A tester on a paid key opted out of this: they picked a model
+        // deliberately and a silent downgrade would corrupt their comparison.
+        const chain = paidPlan ? [model] : await buildFallbackChain(model);
+        const cooldowns = paidPlan ? {} : (await chrome.storage.local.get({ modelCooldowns: {} })).modelCooldowns || {};
+        const nowTs = Date.now();
+
+        let res = null, usedModel = model;
+        for (let i = 0; i < chain.length; i++) {
+            const candidate = chain[i];
+            const isLast = i === chain.length - 1;
+            // Skip a model we already know is limited — unless it is all we have.
+            if (!isLast && cooldowns[candidate] > nowTs) continue;
+
+            const cfg = Object.assign({}, genCfg);
+            if (!modelAcceptsThinking(candidate)) delete cfg.thinkingConfig;
+            else if (!cfg.thinkingConfig) cfg.thinkingConfig = { thinkingBudget: 0 };
+
+            res = await requestGemini(candidate, Object.assign({}, payload, { generationConfig: cfg }), apiKey);
+            usedModel = candidate;
+
+            if (!isQuotaError(res)) break;
+            await noteCooldown(candidate, cooldownFrom(res));
+            console.warn(`⏳ ${candidate} quota reached`);
+            if (isLast) break;
+        }
+
+        if (metaOut) {
+            metaOut.model = usedModel;
+            // Any answer that did not come from the configured model is a
+            // fallback worth surfacing — including one where the primary was
+            // skipped outright because a previous call had already cooled it.
+            if (usedModel !== model) {
+                metaOut.fellBackFrom = model;
+                metaOut.reason = 'quota';
+            }
+        }
+
+        const data = res.data;
+        const tNetwork = res.networkMs;
+        const tParse = res.parseMs;
         const latencyMs = Math.round(performance.now() - t0);
 
         // Debug: log raw Gemini response
@@ -1612,7 +1724,7 @@ async function callGemini(prompt, word = "", context = "", url = "", generationC
         const entry = {
             ts: Date.now(),
             word: word || '(prompt)',
-            model,
+            model: usedModel,
             total: latencyMs,
             sign: tSign,
             network: tNetwork,
@@ -1630,7 +1742,7 @@ async function callGemini(prompt, word = "", context = "", url = "", generationC
             if (log.length > 200) log.splice(0, log.length - 200);
             chrome.storage.local.set({ latencyLog: log });
         });
-        recordLatency(model, latencyMs);
+        recordLatency(usedModel, latencyMs);
         console.log(`⏱️ ${word || 'prompt'}: ${latencyMs}ms [sign:${tSign} net:${tNetwork} parse:${tParse} | worker→ hmac:${workerTiming.hmac||'?'} cache:${workerTiming.cache||'?'} gemini:${workerTiming.gemini||'?'}]`);
 
         return data.candidates[0].content.parts[0].text.replace(/```html/g, "").replace(/```/g, "").trim();
