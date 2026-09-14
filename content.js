@@ -973,13 +973,15 @@ const styles = `
         position: absolute;
         width: var(--space-xxl);
         height: var(--space-xxl);
-        /* The MOST opaque surface in the extension, deliberately. The previous
-           pass made this clear glass with ink rods, and it disappeared against
-           any busy background — it is the one element that has to be findable
-           before you have found it. Frosted and near-solid, with a dark mark. */
+        /* The MOST opaque surface in the extension, deliberately — it is the
+           one element that has to be findable before you have found it. Since
+           15 Sep it is the logo (icon.svg): an amber-glow disc with ink lines,
+           the lit word solid. The white disc it replaces was the weakest of
+           the three grounds checked — white on a white page. Amber-glow is
+           allowed here only because ink sits on it. */
         background:
-          url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Cdefs%3E%3ClinearGradient id='l' x1='3' y1='10' x2='13' y2='13.6' gradientUnits='userSpaceOnUse'%3E%3Cstop offset='0' stop-color='%23FDE68A'/%3E%3Cstop offset='0.4' stop-color='%23F59E0B'/%3E%3Cstop offset='1' stop-color='%23D97706'/%3E%3C/linearGradient%3E%3ClinearGradient id='f' x1='12' y1='4' x2='12' y2='20' gradientUnits='userSpaceOnUse'%3E%3Cstop offset='0' stop-color='%23111827' stop-opacity='0.46'/%3E%3Cstop offset='1' stop-color='%23111827' stop-opacity='0.28'/%3E%3C/linearGradient%3E%3Cfilter id='g' x='-0.7' y='-1.8' width='2.4' height='4.6'%3E%3CfeGaussianBlur stdDeviation='1.4' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Crect x='3.2' y='4.8' width='17.6' height='2.8' rx='1.4' fill='url(%23f)'/%3E%3Crect x='15.4' y='10.6' width='5.4' height='2.8' rx='1.4' fill='url(%23f)'/%3E%3Crect x='3.2' y='16.4' width='13.4' height='2.8' rx='1.4' fill='url(%23f)'/%3E%3Cg filter='url(%23g)'%3E%3Crect x='3.2' y='10.6' width='10.2' height='2.8' rx='1.4' fill='url(%23l)'/%3E%3C/g%3E%3Crect x='4.3' y='11.1' width='8.0' height='0.8' rx='0.4' fill='%23FFFBEB' opacity='0.6'/%3E%3C/svg%3E") no-repeat center / 18px 18px,
-          linear-gradient(180deg, rgba(255,255,255,0.80) 0%, rgba(255,255,255,0.68) 52%, rgba(255,255,255,0.72) 100%);
+          url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Crect x='3.2' y='4.8' width='17.6' height='2.8' rx='1.4' fill='%23111827' fill-opacity='0.34'/%3E%3Crect x='3.2' y='10.6' width='10.2' height='2.8' rx='1.4' fill='%23111827'/%3E%3Crect x='15.4' y='10.6' width='5.4' height='2.8' rx='1.4' fill='%23111827' fill-opacity='0.34'/%3E%3Crect x='3.2' y='16.4' width='13.4' height='2.8' rx='1.4' fill='%23111827' fill-opacity='0.34'/%3E%3C/svg%3E") no-repeat center / 18px 18px,
+          linear-gradient(180deg, #fcd34d 0%, #fbbf24 60%, #f8b81f 100%);
         -webkit-backdrop-filter: var(--sr-fx-sm);
         backdrop-filter: var(--sr-fx-sm);
         border: none;

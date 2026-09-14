@@ -46,7 +46,7 @@ the real `content.js` into pages with Playwright (see below); the three left nee
 | 3 | Target **English**, look up a hard English word | Needs a real key. Must simplify, not echo the word back. |
 | 4 | Target **Sinhala**, `blood culture` | Needs a real key. Must give `රුධිර වගාව`, not `වගාව`. |
 | 5 | A lookup on a **photo-heavy page** | ✓ **Was 3.86:1** over a worst-case striped ground; **5.21:1** with the same header fix. White page 5.49:1. |
-| 6 | The **trigger** over busy text | ✓ Findable on dark and photo. Weakest on white (white disc, shadow only) — revisit with the new logo, whose mark it should share. |
+| 6 | The **trigger** over busy text | ✓ Now the logo on an amber disc; clearly findable on white, dark and photo. (The white disc before it was weakest on white.) |
 | 7 | **Scroll** with the bubble open | Not measured. |
 | 8 | **PubMed** | ✓ **Three bugs, fixed.** The × was in the header's flow on *every* page (a later `position:relative` list overrode it); PubMed's `h2` rule set the word in Merriweather; its `button{padding:10px 20px}` left the Google button a 0px content box, so no icon. |
 
@@ -114,9 +114,13 @@ Full tokens in `~/.claude/commands/brand-guide.md`.
    page follow a language changed elsewhere (`setCurrent`, via `storage.onChanged`).
    The welcome page's step 1 was an **empty `<select>` from 13 to 14 Sep** — nothing
    populated it. `test/lang-picker.test.js` checks each page loads and attaches the picker.
-3. **New logo.** `icon128.png` is puzzle pieces around a **Sinhala glyph**, and mush at the
-   32px it mostly lives at. Generate several directions for review first.
-   *Blocked:* `MCP_DOCKER` has not connected — no image tooling.
+3. ~~**New logo.**~~ — done 15 Sep. **Lit Line on amber**: three lines of text on an
+   `#fbbf24` tile, the lit word solid ink, the rest ink at 34%. Chosen from five directions
+   (review page: https://claude.ai/code/artifact/0fa3acc0-6931-4225-80f9-f82865d75b38).
+   `icon.svg` is the source; `icon16/32/48/128.png` are rendered from it (128 is 96px art in
+   16px padding, per Web Store guidance). The on-page trigger now draws the same mark on an
+   amber disc — it was a white disc, weakest on white pages. No image tooling was needed:
+   it is geometry, and SVG renders crisper at 16px than a generated bitmap would.
 4. ~~**Rewrite `~/.claude/commands/brand-guide.md`**~~ — done 14 Sep; palette added 15 Sep.
    ~~**Welcome page drift**~~ — rewritten 15 Sep. It promised "30 free lookups per day",
    audio, video clips, saved words and an `Alt+Shift+S` shortcut — none of which this build

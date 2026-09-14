@@ -27,7 +27,10 @@ if (manifest.background?.service_worker) files.add(manifest.background.service_w
 if (manifest.action?.default_popup) files.add(manifest.action.default_popup);
 if (manifest.options_ui?.page) files.add(manifest.options_ui.page);
 Object.values(manifest.icons ?? {}).forEach((f) => files.add(f));
-if (manifest.action?.default_icon) files.add(manifest.action.default_icon);
+// default_icon may be one path or a {size: path} map.
+const di = manifest.action?.default_icon;
+if (typeof di === 'string') files.add(di);
+else if (di) Object.values(di).forEach((f) => files.add(f));
 
 const list = [...files].sort();
 const missing = list.filter((f) => !existsSync(join(ROOT, f)));

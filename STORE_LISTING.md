@@ -139,7 +139,7 @@ here; the privacy policy names the same address so the two agree.
 
 - [ ] Screenshots, 1280×800 or 640×400 — at least one, up to five
 - [ ] Small promo tile, 440×280
-- [ ] Icon 128×128 (`icon128.png` exists in the repo)
+- [x] Icon 128×128 — `icon128.png`, rendered from `icon.svg` (96px art, 16px padding)
 
 Suggested screenshots, in order:
 1. The bubble over a real article — the core moment
