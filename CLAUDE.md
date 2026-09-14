@@ -37,7 +37,7 @@ hide.
 | Response cache | Supabase `cache` table | none — every lookup hits Gemini |
 | Global counter | Worker KV | local count in `chrome.storage.local` |
 | Bubble toolbar | audio, Google, video, save, list, study sheet | Google (with a search dropdown) + a one-shot **EN** button |
-| Languages | Sinhala only | **13 packs**, English and Sinhala tuned; same-language input is simplified rather than translated |
+| Languages | Sinhala only | **110 languages** on 29 typesets, English and Sinhala tuned; same-language input is simplified rather than translated |
 | Analytics | GA4 on every lookup | none |
 
 There is **no Worker, no Supabase, and no HMAC secret in this repo**, and no longer any

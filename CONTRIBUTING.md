@@ -4,7 +4,7 @@ The most useful thing you can contribute is **your language**.
 
 ## Add examples for a language
 
-Eleven of the thirteen languages work but are untuned — they have no hand-checked worked
+108 of the 110 languages work but are untuned — they have no hand-checked worked
 examples, so the model is more likely to give the dictionary sense of a word rather than
 the one the sentence calls for.
 
@@ -16,9 +16,7 @@ wrong answer a dictionary would give.
 
 ```js
 ta: {
-    name: 'Tamil', nativeName: 'தமிழ்',
-    font: "'Noto Sans Tamil', sans-serif", family: 'Noto+Sans+Tamil:wght@400;600;800',
-    script: /[஀-௿]/, rtl: false, tuned: true,
+    name: 'Tamil', nativeName: 'தமிழ்', typeset: 'tamil', tuned: true,
     examples: [
         { term: 'bank', domain: 'finance', right: '…', wrong: '…' },
         // three or four more
@@ -46,22 +44,26 @@ Four or five is plenty. They are prepended to every lookup, so more is not bette
 
 ## Add a whole language
 
-Same file, same shape. You will also need:
+Every language Google lists for Gemini is already in. If that list grows, a language is
+one line in `LANGUAGES` naming a **typeset** — the font, detection and text direction for
+its writing system, defined once in `TYPESETS`:
 
-- **`font` / `family`** — a Google Fonts family covering the script, or `'inherit'` and
-  `null` if Inter already does (Latin and Cyrillic).
-- **`script`** — a regex matching the writing system. It decides whether the language's
-  font applies to a word you highlighted, so getting the range right matters.
-- **`rtl`** — `true` for right-to-left. The bubble's direction follows it; no code change
-  needed.
+```js
+xx: { name: 'English name', nativeName: 'Its own name', typeset: 'latin' },
+```
 
-Start untuned (`tuned: false`, `examples: []`) if you cannot supply examples. That is
-honest and the interface labels it.
+Only a writing system nobody uses yet needs a new `TYPESETS` entry: a Google Fonts Noto
+family (or `'inherit'` / `null` if Inter already covers it), a `\p{Script=…}` pattern with
+the `u` flag, and `rtl`. `test/languages.test.js` checks that the native name is detected
+as its own script, which catches pointing a language at the wrong typeset.
+
+Leave `tuned` and `examples` out if you cannot supply checked examples. That is honest,
+and the interface groups it under Community.
 
 ## Running it
 
 ```bash
-npm test        # 358 assertions, no dependencies
+npm test        # no dependencies
 npm run package # build the shipped zip
 ```
 

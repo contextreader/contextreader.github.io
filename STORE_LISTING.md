@@ -37,9 +37,11 @@ the one that fits.
 Select a word on any page. You get the meaning that matches the context, in your
 language, in about two seconds.
 
-**13 languages**
-English, සිංහල Sinhala, தமிழ் Tamil, हिन्दी Hindi, العربية Arabic, 简体中文 Chinese,
-日本語 Japanese, 한국어 Korean, Русский Russian, Español, Français, Português, Deutsch.
+**110 languages**
+Every language Google lists Gemini as supporting, from Afrikaans to Zulu — සිංහල, தமிழ்,
+हिन्दी, বাংলা, اردو, العربية, 简体中文, 繁體中文, 日本語, 한국어, Español, Français, Kiswahili
+and the rest. English and Sinhala are tuned with checked examples; the extension tells you
+which languages are and which aren't.
 
 **Already reading in your own language?** It won't translate a word into itself — it
 gives you a simpler word for the one you're stuck on.

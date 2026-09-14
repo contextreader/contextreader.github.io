@@ -47,15 +47,21 @@ choose *Load unpacked*, and select the folder.
 
 ## Languages
 
-English · සිංහල Sinhala · தமிழ் Tamil · हिन्दी Hindi · العربية Arabic · 简体中文 Chinese ·
-日本語 Japanese · 한국어 Korean · Русский Russian · Español · Français · Português · Deutsch
+**110** — every language Google documents all Gemini models as able to understand and
+respond in, with Chinese split into Simplified and Traditional.
+
+<details><summary>The full list</summary>
+
+English · සිංහල Sinhala · Afrikaans · Shqip Albanian · አማርኛ Amharic · العربية Arabic · Հայերեն Armenian · অসমীয়া Assamese · Azərbaycanca Azerbaijani · Euskara Basque · Беларуская Belarusian · বাংলা Bengali · Bosanski Bosnian · Български Bulgarian · Català Catalan · Cebuano · 简体中文 Chinese (Simplified) · 繁體中文 Chinese (Traditional) · Corsu Corsican · Hrvatski Croatian · Čeština Czech · Dansk Danish · ދިވެހި Dhivehi · Nederlands Dutch · Esperanto · Eesti Estonian · Filipino Filipino (Tagalog) · Suomi Finnish · Français French · Frysk Frisian · Galego Galician · ქართული Georgian · Deutsch German · Ελληνικά Greek · ગુજરાતી Gujarati · Kreyòl ayisyen Haitian Creole · Hausa · ʻŌlelo Hawaiʻi Hawaiian · עברית Hebrew · हिन्दी Hindi · Hmoob Hmong · Magyar Hungarian · Íslenska Icelandic · Igbo · Bahasa Indonesia Indonesian · Gaeilge Irish · Italiano Italian · 日本語 Japanese · Basa Jawa Javanese · ಕನ್ನಡ Kannada · Қазақ тілі Kazakh · ខ្មែរ Khmer · 한국어 Korean · Krio · Kurdî Kurdish (Kurmanji) · Кыргызча Kyrgyz · ລາວ Lao · Latina Latin · Latviešu Latvian · Lietuvių Lithuanian · Lëtzebuergesch Luxembourgish · Македонски Macedonian · Malagasy · Bahasa Melayu Malay · മലയാളം Malayalam · Malti Maltese · Māori Maori · मराठी Marathi · ꯃꯤꯇꯩꯂꯣꯟ Meiteilon (Manipuri) · Монгол Mongolian · မြန်မာ Myanmar (Burmese) · नेपाली Nepali · Norsk Norwegian · Chichewa Nyanja (Chichewa) · ଓଡ଼ିଆ Odia (Oriya) · پښتو Pashto · فارسی Persian · Polski Polish · Português Portuguese · ਪੰਜਾਬੀ Punjabi · Română Romanian · Русский Russian · Gagana Samoa Samoan · Gàidhlig Scots Gaelic · Српски Serbian · Sesotho · chiShona Shona · سنڌي Sindhi · Slovenčina Slovak · Slovenščina Slovenian · Soomaali Somali · Español Spanish · Basa Sunda Sundanese · Kiswahili Swahili · Svenska Swedish · Тоҷикӣ Tajik · தமிழ் Tamil · తెలుగు Telugu · ไทย Thai · Türkçe Turkish · Українська Ukrainian · اردو Urdu · ئۇيغۇرچە Uyghur · Oʻzbekcha Uzbek · Tiếng Việt Vietnamese · Cymraeg Welsh · isiXhosa Xhosa · ייִדיש Yiddish · Yorùbá Yoruba · isiZulu Zulu
+
+</details>
 
 **English and Sinhala are tuned.** A tuned language ships worked examples — contrastive
 pairs like *"bank" in finance is a financial institution, not the edge of a river* — that
 teach the model to pick the sense that matches the domain. Sinhala's are the measured set:
 without them the model returned වගාව instead of රුධිර වගාව for *blood culture*.
 
-The other eleven work, but have no hand-checked examples yet, so domain-specific senses may
+The other 108 work, but have no hand-checked examples yet, so domain-specific senses may
 be less accurate. The interface says so rather than pretending otherwise.
 
 **Adding examples for your language is the most useful contribution you can make**, and it

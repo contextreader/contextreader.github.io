@@ -5,8 +5,8 @@ Last updated 2026-09-14. Read this before changing anything.
 **Repo** `contextreader/contextreader.github.io` — private. Was public for about an hour on
 14 Sep; assume that window may have been cloned. Nothing sensitive was in it.
 
-**State** 45 commits · `npm test` → 443 assertions · `npm run package` → 136 KB ·
-13 languages on 9 typesets · 2 permissions · 1 host.
+**State** 48 commits · `npm test` → 536 assertions · `npm run package` → 142 KB ·
+110 languages on 29 typesets · 2 permissions · 1 host.
 
 ---
 
@@ -77,18 +77,23 @@ Full tokens in `~/.claude/commands/brand-guide.md`.
 
 ## Next session's work
 
-1. **Languages past 100.** The restructure is done (14 Sep): `TYPESETS` holds font, Google
-   Fonts family, detection regex and direction once; `LANGUAGES` entries name one. A language
-   on an existing typeset is now one line. `getLang()` still returns the old flat shape, so
-   no consumer changed — keep it that way. What's left is the data: add the languages, and a
-   `TYPESETS` entry per new script. Check as you go:
-   - **Every new `family` URL must return 200.** The css2 API rejects a request that asks for
-     a weight the family doesn't have, and every entry today asks for `400;600;800` — don't
-     assume a new Noto family has all three. `curl -sI` each one.
-   - Keep `tuned`/`examples` honest — at that scale it matters more, not less, and only
-     English and Sinhala have checked examples. **Do not machine-translate examples.**
-   - `sc` and `jp` overlap in Han on purpose. Typesets are render bundles, not Unicode
+1. ~~**Languages past 100.**~~ — done 15 Sep: **110**, exactly the list Google documents
+   every Gemini model as able to understand and respond in (Vertex AI docs, "Language
+   support"), with Chinese split into Simplified (`zh`) and Traditional (`zh-TW`). 29
+   typesets. `getLang()` still returns the old flat shape, and the original 13 were diffed
+   against a snapshot and are byte-identical — keep both of those true.
+   - **Correction to what this file said on 14 Sep:** the Google Fonts css2 API does *not*
+     reject a weight a family lacks (Lobster, 400-only, answers `400;800` with 200). What it
+     rejects is a family name that doesn't exist. All 25 Noto families were requested live
+     and exist.
+   - Only English and Sinhala are tuned. **Do not machine-translate examples** to change that.
+   - `sc`/`jp`/`tc` overlap in Han on purpose. Typesets are render bundles, not Unicode
      scripts; don't merge entries because their ranges overlap.
+   - Urdu renders in Noto Sans Arabic, not Nastaliq. Readers may notice; Noto Nastaliq Urdu
+     is the fix if one says so.
+   - Nobody has looked at output quality for any of the 97 new languages. They are labelled
+     Community, which is the honest claim; "Translation works" in that label is Google's
+     claim, not a measurement of ours.
 2. ~~**Search in the language picker**~~ — done 14 Sep. `lib/lang-picker.js` is the one
    picker for Settings, the popup and the welcome page: a search field in front of the native
    `<select>`, which becomes a visible list while searching. Matches code, then name prefix,

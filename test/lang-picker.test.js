@@ -84,9 +84,9 @@ console.log('grouping says tuned or not:');
     type(inp, 'zzzz-no'); type(inp, 'hindi');
     ok('a search with no tuned match renders no empty Tuned group', !/label="Tuned"/.test(sel.innerHTML), sel.innerHTML);
     // Option order must equal the order the note indexes by, or the note lies.
-    type(inp, 's');
+    type(inp, 'si');   // Sinhala (code), Sindhi, Chinese (Simplified)
     const order = sel.options.map((o) => o.value).join();
-    ok('search rows are grouped tuned-first', order === 'si,es,zh', order);
+    ok('search rows are grouped tuned-first', order === 'si,sd,zh', order);
 }
 
 console.log('attach — idle:');
@@ -122,10 +122,13 @@ console.log('attach — search and choose with Enter:');
 console.log('attach — arrows, Escape, no match:');
 {
     const { select, input, status, saved } = setup('si');
-    type(input, 's');    // Sinhala, Spanish, Chinese (Simplified)
+    type(input, 'si');   // Sinhala, Sindhi, Chinese (Simplified)
     const n = select.options.length;
     ok('several matches listed', n > 2, n);
     ok('list fits every match plus headings (3 + Tuned + Community)', select.attrs.size === '5', select.attrs.size);
+    type(input, 's');
+    ok('a long result list is capped at eight rows and scrolls', select.options.length > 8 && select.attrs.size === '8', [select.options.length, select.attrs.size]);
+    type(input, 'si');
     key(input, 'ArrowDown');
     ok('ArrowDown moves the highlight', select.selectedIndex === 1, select.selectedIndex);
     key(input, 'ArrowUp'); key(input, 'ArrowUp');
@@ -193,7 +196,7 @@ console.log('the note describes the language on screen, never a different one:')
     ok('idle: describes the saved tuned language', TUNED.test(note.textContent), note.textContent);
     type(input, 'espanol');
     ok('searching: follows the highlighted community language', COMMUNITY.test(note.textContent), note.textContent);
-    type(input, 's');   // Sinhala, Spanish, Chinese — Sinhala highlighted first
+    type(input, 'si');  // Sinhala, Sindhi, Chinese — Sinhala highlighted first
     ok('highlight on a tuned row says tuned', TUNED.test(note.textContent), note.textContent);
     key(input, 'ArrowDown');
     ok('arrow onto a community row updates the note', COMMUNITY.test(note.textContent), note.textContent);

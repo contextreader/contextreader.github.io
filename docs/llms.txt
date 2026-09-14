@@ -1,7 +1,7 @@
 # Context Reader
 
 > A free, open-source Chrome extension that explains a hard word using the sentence around
-> it, in 13 languages. It calls the Google Gemini API directly from the user's browser with
+> it, in 110 languages. It calls the Google Gemini API directly from the user's browser with
 > the user's own API key. There is no backend server, no analytics and no account.
 
 ## What it does
@@ -21,13 +21,14 @@ simplified rather than translated.
 - **No telemetry of any kind.** No analytics, no crash reporting, no identifiers.
 - **Tuned vs. community languages.** English and Sinhala ship contrastive worked examples
   checked by a speaker, which measurably improve domain-correct sense selection. The other
-  eleven languages work without them and the interface labels them as such rather than
+  108 languages work without them and the interface labels them as such rather than
   implying parity.
 
 ## Languages
 
-English and Sinhala (tuned); Tamil, Hindi, Arabic, Chinese (Simplified), Japanese, Korean,
-Russian, Spanish, French, Portuguese, German.
+110: every language Google documents all Gemini models as supporting, with Chinese split
+into Simplified and Traditional. English and Sinhala are tuned; the rest are labelled
+community.
 
 ## Licence
 
