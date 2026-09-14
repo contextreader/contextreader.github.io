@@ -5,7 +5,7 @@ Last updated 2026-09-14. Read this before changing anything.
 **Repo** `contextreader/contextreader.github.io` — private. Was public for about an hour on
 14 Sep; assume that window may have been cloned. Nothing sensitive was in it.
 
-**State** 43 commits · `npm test` → 360 assertions · `npm run package` → 132 KB ·
+**State** 44 commits · `npm test` → 437 assertions · `npm run package` → 136 KB ·
 13 languages on 9 typesets · 2 permissions · 1 host.
 
 ---
@@ -30,7 +30,8 @@ Four commitments that constrain everything else:
 
 ## The gap that matters
 
-**Almost none of this has been seen in a browser.** Only the Settings page and one lookup.
+**Almost none of this has been seen in a browser.** Only the Settings page, one lookup, and
+the language picker on all three pages (headless Chrome, 14 Sep — see below).
 Everything else is logic tested against a stubbed `chrome` and a DOM shim that renders
 nothing at all. `npm test` passing means the logic holds; it says nothing about whether the
 thing looks right or is readable.
@@ -47,6 +48,14 @@ Check these in a real browser, worst-first:
 | 6 | The **trigger** over busy text | Was the predicted failure of the first glass pass; the fix (most opaque surface rather than least) is untested. |
 | 7 | **Scroll** with the bubble open | Repaint cost unmeasured. The lens band was retired, which should have helped. |
 | 8 | **PubMed** | CSS-aggressive, and there is no shadow DOM protecting the bubble. |
+
+**Extension pages can be screenshotted without loading the extension.** Read the real
+`popup.html`/`welcome.html`/`options.html`, rewrite relative `src`/`href` to absolute
+`file://` paths, inject a `window.chrome` stub (answer `getLanguages` from
+`CRLanguages.listLangs()`) ahead of the page scripts, then
+`"Google Chrome" --headless=new --allow-file-access-from-files --screenshot=… file://…`.
+A driver script can read `location.hash` to type into a field. This does **not** cover the
+bubble — `content.js` needs a real page and a real selection.
 
 ---
 
@@ -80,14 +89,24 @@ Settings.
      English and Sinhala have checked examples. **Do not machine-translate examples.**
    - `sc` and `jp` overlap in Han on purpose. Typesets are render bundles, not Unicode
      scripts; don't merge entries because their ranges overlap.
-2. **Search in the language picker** — Settings and popup. Match native name, English name
-   and code. Not the bubble: it is `overflow:hidden` with no shadow DOM. At 100 entries a
-   plain `<select>` stops being usable, so this lands with or before item 1's data.
+2. ~~**Search in the language picker**~~ — done 14 Sep. `lib/lang-picker.js` is the one
+   picker for Settings, the popup and the welcome page: a search field in front of the native
+   `<select>`, which becomes a visible list while searching. Matches code, then name prefix,
+   then word prefix — deliberately not mid-word. Seen rendering in headless Chrome. Two things
+   still open:
+   - Long labels clip in the 300px popup list (`简体中文 — Chinese (Simplified) (comm…`).
+     Longer names arrive with item 1. Don't fix it by dropping the community tag — the UI
+     must say which languages are tuned.
+   - The welcome page's step 1 was an **empty `<select>` from 13 to 14 Sep** — nothing
+     populated it. Fixed; `test/lang-picker.test.js` now checks each page loads and attaches
+     the picker. Treat any other markup-only change to `welcome.html` with suspicion.
 3. **New logo.** `icon128.png` is puzzle pieces around a **Sinhala glyph**, and mush at the
    32px it mostly lives at. Generate several directions for review first.
    *Blocked:* `MCP_DOCKER` has not connected — no image tooling.
-4. **Rewrite `~/.claude/commands/brand-guide.md`** — user-level, not in this repo, and
-   actively misleading. Details in that file's own header once rewritten.
+4. ~~**Rewrite `~/.claude/commands/brand-guide.md`**~~ — done 14 Sep (its header says so).
+   **Still drifting:** `welcome.html` shows a 🇱🇰 flag as step 5's visual and as the
+   "Simplify" feature icon (`&#x1F1F1;&#x1F1F0;`). That is the Sinhala-default drift the
+   fourth commitment forbids; replace both.
 5. **Landing page.** `docs/index.html` is the old page and reads as Sinhala-first. A redesign
    exists as a preview but was not committed; it needs the 100+ language treatment and the
    brand colours before it lands.

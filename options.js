@@ -200,15 +200,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Language
     // ============================================
 
-    function describeLang(lang) {
-        if (!lang) return '';
-        return lang.tuned
-            ? 'Tuned \u2014 ships worked examples checked by a speaker, which is what '
-              + 'makes the model pick the domain-correct sense.'
-            : 'Community language. Translation works, but there are no hand-checked '
-              + 'examples yet, so domain-specific senses may be less accurate. '
-              + 'Adding them is a small pull request.';
-    }
+    // Shared with the popup and welcome page so all three say the same thing.
+    const describeLang = (lang) => CRLangPicker.describe(lang);
 
     async function initLanguage() {
         const sel = $('opt-language');
@@ -216,12 +209,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const res = await send({ action: 'getLanguages' });
         if (!res) return;
 
-        sel.innerHTML = res.languages.map((l) =>
-            `<option value="${esc(l.code)}">${esc(l.nativeName)} \u2014 ${esc(l.name)}`
-            + `${l.tuned ? '' : '  (community)'}</option>`).join('');
-        sel.value = res.current;
-        setText('opt-language-note', describeLang(res.languages.find((l) => l.code === res.current)));
+        // Renders the options and owns the search field; saving stays below.
+        CRLangPicker.attach({
+            select: sel, input: $('opt-language-search'), status: $('opt-language-count'),
+            languages: res.languages, current: res.current,
+        });
         const cur = res.languages.find((l) => l.code === res.current);
+        setText('opt-language-note', describeLang(cur));
         if (cur) setText('opt-about-language', `${cur.nativeName} — ${cur.name}`);
     }
 

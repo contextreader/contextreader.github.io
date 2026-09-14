@@ -237,6 +237,28 @@
             background-repeat: no-repeat;
             background-position: right var(--space-lg) center;
         }
+        /* Search sits above the select. While a search is active the picker
+           gives the select a size, turning it into a visible list of rows —
+           which needs a box radius and no caret. */
+        .lang-search {
+            width: 100%; box-sizing: border-box;
+            margin-bottom: var(--space-sm);
+            padding: var(--space-md) var(--space-lg);
+            background: var(--glass-soft);
+            border: 1px solid var(--glass-line); border-radius: 100px;
+            font-family: inherit; font-size: 12px; color: var(--ink); outline: none;
+        }
+        .lang-search::placeholder { color: var(--ink-mute); }
+        /* Chrome draws the clear button blue — colour that carries nothing. */
+        .lang-search::-webkit-search-cancel-button { filter: grayscale(1); opacity: 0.55; cursor: pointer; }
+        .lang-count { font-size: 11px; color: var(--ink-mute); margin: 0 0 var(--space-sm) var(--space-lg); }
+        .lang-count:empty { display: none; }
+        .lang-select[size] {
+            border-radius: var(--space-lg); padding: var(--space-sm);
+            background-image: none; cursor: default;
+        }
+        .lang-select[size] option { padding: var(--space-sm) var(--space-md); border-radius: var(--space-sm); }
+        .lang-select[hidden] { display: none; }
     </style>
 </head>
 <body>
@@ -245,6 +267,9 @@
 
     <div class="lang-card glass">
         <div class="label">Explain in</div>
+        <input id="popup-language-search" class="lang-search" type="search"
+               placeholder="Search languages" aria-label="Search languages" autocomplete="off" spellcheck="false">
+        <div id="popup-language-count" class="lang-count"></div>
         <select id="popup-language" class="lang-select"></select>
     </div>
 
@@ -266,6 +291,7 @@
         <span id="version-label">v2.0</span>
     </div>
 
+    <script src="lib/lang-picker.js"></script>
     <script src="popup.js"></script>
 </body>
 </html>

@@ -47,10 +47,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (langSelect) {
         chrome.runtime.sendMessage({ action: 'getLanguages' }, (res) => {
             if (!res || !res.languages) return;
-            langSelect.innerHTML = res.languages.map((l) =>
-                `<option value="${l.code}">${l.nativeName}${l.nativeName === l.name ? '' : ' — ' + l.name}`
-                + `${l.tuned ? '' : '  (community)'}</option>`).join('');
-            langSelect.value = res.current;
+            CRLangPicker.attach({
+                select: langSelect, input: document.getElementById('popup-language-search'),
+                status: document.getElementById('popup-language-count'),
+                languages: res.languages, current: res.current,
+            });
         });
         langSelect.addEventListener('change', () => {
             chrome.runtime.sendMessage({ action: 'setLanguage', code: langSelect.value });

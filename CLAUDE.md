@@ -158,6 +158,9 @@ invalid JSON.
   verified with a live Gemini call before it is saved. Script is external because MV3
   `script-src 'self'` blocks inline scripts on extension pages.
 - **welcome.html / welcome.js** — onboarding. Same inline-script constraint.
+- **lib/lang-picker.js** — the one language picker (Settings, popup, welcome): labels, the
+  tuned/community description, and search. Pages keep their own `change` handler for saving;
+  a new picker page must load this script before its own and call `CRLangPicker.attach`.
 
 ## Setup
 

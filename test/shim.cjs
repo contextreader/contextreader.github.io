@@ -11,6 +11,8 @@ function makeEl(id, tag) {
     get innerHTML() { return this._html; },
     set innerHTML(v) { this._html = String(v); },
     setAttribute(k, v) { this.attrs[k] = String(v); },
+    removeAttribute(k) { delete this.attrs[k]; },
+    dispatchEvent(e) { (this.listeners[e.type] || []).forEach(f => f(e)); },
     getAttribute(k) { return this.attrs[k]; },
     addEventListener(evt, fn) { (this.listeners[evt] = this.listeners[evt] || []).push(fn); },
     querySelectorAll(sel) {
@@ -78,6 +80,7 @@ globalThis.chrome = {
 };
 
 globalThis.CRDiff = require(path.join(DIR, 'lib/diff.js'));
+globalThis.CRLangPicker = require(path.join(DIR, 'lib/lang-picker.js'));
 
 module.exports = {
   els, store, sess,

@@ -123,6 +123,28 @@
             background-position: right var(--space-lg) center;
         }
         .lang-note { font-size: 13px; color: var(--ink-mute); margin-top: var(--space-md); min-height: 20px; }
+        /* While a search is active the picker gives the select a size, turning
+           it into a visible list of rows — box radius, no caret. */
+        .lang-search {
+            display: block; width: 100%; max-width: 320px; box-sizing: border-box;
+            margin-top: var(--space-md);
+            padding: var(--space-md) var(--space-lg);
+            background: var(--glass-soft);
+            border: 1px solid var(--glass-line); border-radius: 100px;
+            font-family: inherit; font-size: 14px; color: var(--ink); outline: none;
+        }
+        .lang-search::placeholder { color: var(--ink-mute); }
+        /* Chrome draws the clear button blue — colour that carries nothing. */
+        .lang-search::-webkit-search-cancel-button { filter: grayscale(1); opacity: 0.55; cursor: pointer; }
+        .lang-count { font-size: 12px; color: var(--ink-mute); margin: var(--space-sm) 0 0 var(--space-lg); }
+        .lang-count:empty { display: none; }
+        .lang-select { display: block; }
+        .lang-select[size] {
+            border-radius: var(--space-lg); padding: var(--space-sm);
+            background-image: none; cursor: default;
+        }
+        .lang-select[size] option { padding: var(--space-sm) var(--space-md); border-radius: var(--space-sm); }
+        .lang-select[hidden] { display: none; }
 
         /* The steps genuinely are a sequence, so the numbers stay numbers.
            Amber carries the ordinal — the one place it appears on this page
@@ -260,6 +282,9 @@
             <div class="step-content">
                 <h3>Choose your language</h3>
                 <p>Words will be explained in the language you pick. You can change it any time in Settings.</p>
+                <input id="welcome-lang-search" class="lang-search" type="search"
+                       placeholder="Search languages" aria-label="Search languages" autocomplete="off" spellcheck="false">
+                <div id="welcome-lang-count" class="lang-count"></div>
                 <select id="welcome-lang" class="lang-select"></select>
                 <p class="lang-note" id="welcome-lang-note"></p>
             </div>
@@ -375,6 +400,7 @@
         </div>
     </div>
 
+    <script src="lib/lang-picker.js"></script>
     <script src="welcome.js"></script>
 </body>
 </html>

@@ -104,6 +104,17 @@ S.setResponder((msg) => {
   ok('note explains what tuned means', /worked examples/.test(S.els['opt-language-note'].textContent),
      S.els['opt-language-note'].textContent);
 
+  console.log('language search (through options.js, not the module alone):');
+  const lsearch = S.els['opt-language-search'];
+  ok('search field is wired', (lsearch.listeners.input || []).length === 1 && (lsearch.listeners.keydown || []).length === 1);
+  lsearch.value = 'hindi'; lsearch.listeners.input.forEach((f) => f({}));
+  ok('typing filters the real select', /Hindi/.test(lsel.innerHTML) && !/සිංහල/.test(lsel.innerHTML), lsel.innerHTML);
+  ok('and turns it into a list', lsel.attrs.size === '2', lsel.attrs.size);
+  ok('count shown', /^1 of \d+/.test(S.els['opt-language-count'].textContent), S.els['opt-language-count'].textContent);
+  lsearch.listeners.keydown.forEach((f) => f({ key: 'Escape', preventDefault() {} }));
+  ok('Escape restores the full list', /සිංහල/.test(lsel.innerHTML) && !('size' in lsel.attrs));
+  ok('Escape keeps the saved language', lsel.value === 'si', lsel.value);
+
   lsel.value = 'hi';
   await lsel.change(); for (let i=0;i<4;i++) await S.flush();
   ok('switching language updates the note',

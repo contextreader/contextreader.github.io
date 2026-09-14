@@ -17,7 +17,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const manifest = JSON.parse(readFileSync(join(ROOT, 'manifest.json'), 'utf8'));
 
 // Anything an HTML page pulls in that the manifest never names.
-const EXTRA = ['lib/diff.js', 'options.js', 'popup.js', 'welcome.js'];
+const EXTRA = ['lib/diff.js', 'lib/lang-picker.js', 'options.js', 'popup.js', 'welcome.js'];
 
 const files = new Set(['manifest.json', ...EXTRA]);
 
