@@ -5,7 +5,7 @@ Last updated 2026-09-14. Read this before changing anything.
 **Repo** `contextreader/contextreader.github.io` — private. Was public for about an hour on
 14 Sep; assume that window may have been cloned. Nothing sensitive was in it.
 
-**State** 48 commits · `npm test` → 536 assertions · `npm run package` → 142 KB ·
+**State** 53 commits · `npm test` → 548 assertions · `npm run package` → 112 KB ·
 110 languages on 29 typesets · 2 permissions · 1 host.
 
 ---
@@ -143,9 +143,12 @@ Full tokens in `~/.claude/commands/brand-guide.md`.
    the two drift. **The site makes no third-party requests**: Inter is self-hosted in
    `docs/fonts/` (OFL). The logo's lit-word device is the one bold element. Not yet seen by
    a human in a browser; Pages is still off.
-6. **Then publish** — public repo, Pages from `main` `/docs`, store submission. Screenshots
-   (1280×800 plus a 440×280 tile) are the hard blocker; `STORE_LISTING.md` lists the four
-   worth taking.
+6. **Then publish** — public repo, Pages from `main` `/docs`, store submission. **Needs Ian's
+   go-ahead; nothing outward-facing has been done.** Store assets now: the 440×280 promo tile
+   and one 1280×800 screenshot (Settings → language picker), from
+   `scripts/store-assets.cjs`. Still to capture, from the real extension with a real key:
+   the bubble over a real article (the one that sells it) and the model speed table. Do not
+   stage those with invented answers or timings.
 
 ---
 

@@ -138,8 +138,12 @@ here; the privacy policy names the same address so the two agree.
 
 ## Assets still required
 
-- [ ] Screenshots, 1280×800 or 640×400 — at least one, up to five
-- [ ] Small promo tile, 440×280
+- [~] Screenshots, 1280×800 — **one of four**: `store/screenshot-language.png` (#2 below).
+  #1 and #3 show a model answer or measured speeds, so they must be captured from the real
+  extension with a real key, not staged. #4 needs the real shipped prompts loaded.
+- [x] Small promo tile, 440×280 — `store/promo-440x280.png`
+
+`node scripts/store-assets.cjs` re-renders both (needs `PLAYWRIGHT_CORE`, see its header).
 - [x] Icon 128×128 — `icon128.png`, rendered from `icon.svg` (96px art, 16px padding)
 
 Suggested screenshots, in order:
