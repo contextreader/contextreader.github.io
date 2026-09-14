@@ -47,6 +47,13 @@ ok('no stray "Sinhala"', !hi.includes('Sinhala'));
 ok('no placeholders left', !/\{\{/.test(hi));
 ok('no empty bullet left where examples would be', !/\n\n\n/.test(hi), JSON.stringify(hi.slice(0, 200)));
 
+console.log('the same-language branch is present and language-neutral:');
+const branch = render(d.lookup, 'en');
+ok('tells the model not to translate a word into itself', /ALREADY English/.test(branch), branch.slice(0, 200));
+ok('asks for a simpler word instead', /simpler, more common English/.test(branch));
+const sbranch = render(d.lookup, 'si');
+ok('same branch for Sinhala', /ALREADY Sinhala/.test(sbranch));
+
 console.log('substitution stays literal (values are arbitrary page text):');
 for (const [word, context] of [
     ['quote"inside', 'has "quotes" and $& and ${notATemplate}'],
@@ -59,7 +66,8 @@ for (const [word, context] of [
 }
 
 console.log('the contract and schema follow the language too:');
-ok('si pack is the only tuned one', L.listLangs().filter((l) => l.tuned).map((l) => l.code).join() === 'si');
+ok('exactly en and si are tuned', L.listLangs().filter((l) => l.tuned).map((l) => l.code).sort().join() === 'en,si',
+   L.listLangs().filter((l) => l.tuned).map((l) => l.code).join());
 ok('every pack has a font and a native name',
    L.listLangs().every((l) => l.font && l.nativeName && typeof l.rtl === 'boolean'));
 ok('arabic is the rtl one', L.getLang('ar').rtl === true && L.getLang('si').rtl === false);

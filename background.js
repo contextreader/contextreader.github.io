@@ -620,9 +620,12 @@ STEP 1 — ANALYZE (think, don't write):
 - Which SPECIFIC sense of "{{word}}" is used here?
 - What {{langName}} register matches this domain?
 
-STEP 2 — TRANSLATE:
-- Give the {{langName}} word/phrase that fits THIS context only
-- Not a generic dictionary translation
+STEP 2 — ANSWER:
+- If "{{word}}" is ALREADY {{langName}}: do NOT translate it to itself. Give a
+  simpler, more common {{langName}} word or short phrase meaning the same thing
+  in THIS context.
+- Otherwise: give the {{langName}} word/phrase that fits THIS context only.
+- Either way, never a generic dictionary answer.
 {{examples}}
 
 STEP 3 — EXPLAIN in casual spoken {{langName}}:
@@ -654,7 +657,7 @@ EXPLANATION RULES:
 
 const LOOKUP_JSON_CONTRACT = `
 
-Output ONLY this JSON: {"t": "<{{langName}} translation for THIS context>", "d": "<one casual {{langName}} sentence>"}`;
+Output ONLY this JSON: {"t": "<the {{langName}} answer for THIS context — a translation, or a simpler {{langName}} word if the target is already {{langName}}>", "d": "<one casual {{langName}} sentence>"}`;
 
 // ============================================
 // ✎ EDITABLE PROMPTS
@@ -803,7 +806,7 @@ function schemaT(langName) {
     return {
         type: "OBJECT",
         properties: {
-            t: { type: "STRING", description: `Context-specific ${langName} translation. Must match the domain — not a generic dictionary word.` }
+            t: { type: "STRING", description: `The ${langName} answer for this context: a translation, or a simpler ${langName} word when the target is already ${langName}. Must match the domain — not a generic dictionary word.` }
         },
         required: ["t"]
     };
@@ -813,7 +816,7 @@ function schemaTD(langName) {
     return {
         type: "OBJECT",
         properties: {
-            t: { type: "STRING", description: `Context-specific ${langName} translation. Must match the domain — not a generic dictionary word.` },
+            t: { type: "STRING", description: `The ${langName} answer for this context: a translation, or a simpler ${langName} word when the target is already ${langName}. Must match the domain — not a generic dictionary word.` },
             d: { type: "STRING", description: `One-sentence casual spoken ${langName} explanation of what this word means in THIS text. No HTML tags.` }
         },
         required: ["t", "d"]

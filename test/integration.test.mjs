@@ -155,7 +155,7 @@ ok('says locked, not "get a key"', out.includes('Key locked'), out.slice(0, 160)
 
 say('editable prompt actually reaches the wire:');
 reset();
-Object.assign(local, { geminiApiKey: 'AIza-test',
+Object.assign(local, { geminiApiKey: 'AIza-test', targetLanguage: 'si',
     promptOverrides: { v: 2, system: 'CUSTOM RULES for {{langName}}',
                        lookup: 'WORD={{word}} CTX={{context}} LANG={{langName}}' } });
 fetchPlan = [answer('x', 'y')];
@@ -169,7 +169,7 @@ ok('custom lookup prompt sent with placeholders filled',
 
 say('an override from before languages existed is set aside, not applied:');
 reset();
-Object.assign(local, { geminiApiKey: 'AIza-test',
+Object.assign(local, { geminiApiKey: 'AIza-test', targetLanguage: 'si',
     promptOverrides: { system: 'OLD SINHALA-ONLY RULES', lookup: 'WORD={{word}} CTX={{context}}' } });
 fetchPlan = [answer('x', 'y')];
 await BG.lookupModeDefault('culture', 'blood culture', 'http://x', 1);
