@@ -5,7 +5,7 @@ Last updated 2026-09-14. Read this before changing anything.
 **Repo** `contextreader/contextreader.github.io` — private. Was public for about an hour on
 14 Sep; assume that window may have been cloned. Nothing sensitive was in it.
 
-**State** 53 commits · `npm test` → 548 assertions · `npm run package` → 112 KB ·
+**State** 55 commits · `npm test` → 551 assertions · `npm run package` → 112 KB ·
 110 languages on 29 typesets · 2 permissions · 1 host.
 
 ---

@@ -65,6 +65,21 @@ eq('ok', lm.ok, true);
 eq('filters to generateContent', lm.models.map(m => m.id), ['gemini-3.1-flash-lite','gemini-2.5-flash']);
 eq('strips models/ prefix', lm.models[0].id, 'gemini-3.1-flash-lite');
 
+console.log('listModels keeps only models that can answer a lookup:');
+calls.length = 0;
+const gc = ['generateContent'];
+globalThis.__next = async () => ({ status: 200, json: async () => ({ models: [
+  'gemini-3.1-flash-lite', 'gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-flash-latest', 'gemini-2.0-flash-lite',
+  'gemini-2.5-flash-image', 'gemini-3-pro-image-preview', 'gemini-2.5-flash-preview-tts', 'gemini-2.5-pro-preview-tts',
+  'gemini-2.5-flash-native-audio-preview', 'gemini-live-2.5-flash-preview', 'gemini-2.0-flash-live-001',
+  'gemini-embedding-001', 'gemini-robotics-er-1.5-preview', 'gemini-2.5-computer-use-preview',
+  'gemma-3-27b-it', 'nano-banana-pro-preview', 'learnlm-2.0-flash-experimental', 'aqa',
+].map((id) => ({ name: 'models/' + id, supportedGenerationMethods: gc })) }) });
+lm = await M.listModels('AIza-test');
+eq('text models kept, image/speech/audio/live/embedding/robotics/computer-use/gemma dropped', lm.models.map(m => m.id),
+   ['gemini-3.1-flash-lite', 'gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-flash-latest', 'gemini-2.0-flash-lite']);
+eq('a name merely containing a word is not dropped', ['gemini-2.5-flash-lite', 'gemini-exp-imagery'].filter(M.isLookupModel), ['gemini-2.5-flash-lite', 'gemini-exp-imagery']);
+
 calls.length = 0;
 globalThis.__next = async () => ({ status: 400, json: async () => ({ error: { status: 'INVALID_ARGUMENT', code: 400 } }) });
 lm = await M.listModels('bad');

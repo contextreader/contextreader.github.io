@@ -27,6 +27,13 @@ eq('no cache -> chain is just the primary', await M.buildFallbackChain('gemini-x
 store = { modelListCache: { models: [null, {}, {id:''}] } };
 eq('malformed cache entries ignored', await M.buildFallbackChain('gemini-x'), ['gemini-x']);
 
+console.log('the chain never falls back onto a model that cannot answer:');
+// A cache written before the filter existed still holds these.
+store = { modelListCache: { models: ['gemini-2.5-flash-image', 'gemini-2.5-flash-preview-tts', 'gemini-2.5-flash-lite',
+  'gemini-2.0-flash-live-001', 'gemini-2.5-flash-native-audio-preview', 'gemini-2.5-flash', 'gemma-3-27b-it'].map((id) => ({ id })) } };
+eq('stale cache: image, tts, live, audio and gemma skipped',
+   await M.buildFallbackChain('gemini-3.1-flash-lite'), ['gemini-3.1-flash-lite', 'gemini-2.5-flash-lite', 'gemini-2.5-flash']);
+
 console.log('quota detection:');
 eq('429 status', M.isQuotaError({status:429,data:{}}), true);
 eq('RESOURCE_EXHAUSTED body', M.isQuotaError({status:200,data:{error:{status:'RESOURCE_EXHAUSTED'}}}), true);

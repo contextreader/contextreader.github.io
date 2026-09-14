@@ -51,7 +51,7 @@ const LANG_IMPORT = "import { createRequire as __cr } from 'node:module';\n"
     + "const CRLanguages = __cr(import.meta.url)('../../lib/languages.js');\n";
 
 out('model.mjs', LANG_IMPORT + head + key + model +
-  '\nexport { getApiKey, getKeyState, getModelConfig, modelAcceptsThinking, requestGemini, listModels, DEFAULT_MODEL, CUSTOM_MODEL };\n');
+  '\nexport { getApiKey, getKeyState, getModelConfig, modelAcceptsThinking, requestGemini, listModels, isLookupModel, DEFAULT_MODEL, CUSTOM_MODEL };\n');
 
 out('fallback.mjs', head + fallback + attach +
   '\nexport { buildFallbackChain, isQuotaError, cooldownFrom, noteCooldown, attachMeta, DEFAULT_COOLDOWN_MS, MAX_COOLDOWN_MS };\n');

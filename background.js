@@ -10,6 +10,20 @@ importScripts('lib/languages.js');
 const DEFAULT_MODEL = "gemini-3.1-flash-lite";
 const GEMINI_BASE   = "https://generativelanguage.googleapis.com/v1beta/models";
 
+// Can this model answer a lookup? ListModels offers everything that accepts
+// generateContent, which includes models that return images, speech or live
+// audio, and Gemma, which rejects the system_instruction and JSON schema every
+// lookup sends. Those are useless in the model menu and harmful in the quota
+// fallback, whose "flash" match used to take gemini-2.5-flash-image and
+// …-flash-preview-tts. Names are matched by hyphen-separated part, following
+// Google's naming; anything this lets through can still fail on its own, and
+// Settings → Custom… still accepts any id.
+const NON_LOOKUP_PARTS = /(^|-)(image|tts|audio|live|embedding|robotics|computer|aqa)(-|$)/;
+function isLookupModel(id) {
+    const s = String(id || "");
+    return s.startsWith("gemini-") && !NON_LOOKUP_PARTS.test(s);
+}
+
 // ============================================
 // 🔑 API KEY STORAGE
 // ============================================
@@ -221,7 +235,7 @@ async function listModels(apiKey) {
                 label: m.displayName || "",
                 inputTokenLimit: m.inputTokenLimit || 0
             }))
-            .filter(m => m.id);
+            .filter(m => isLookupModel(m.id));
         return { ok: true, models };
     } catch (e) {
         return { ok: false, error: e.message, models: [] };
@@ -272,8 +286,10 @@ const MAX_COOLDOWN_MS = 3600000;
 // tester real money on a key they told us is free — worse than a failed lookup.
 async function buildFallbackChain(primary) {
     const { modelListCache } = await chrome.storage.local.get('modelListCache');
+    // Filtered again here: a cache written before isLookupModel existed can
+    // still hold image and speech models.
     const avail = ((modelListCache && modelListCache.models) || [])
-        .map(m => m && m.id).filter(Boolean);
+        .map(m => m && m.id).filter(isLookupModel);
     const lite  = avail.filter(id => id.includes('flash-lite'));
     const flash = avail.filter(id => id.includes('flash') && !id.includes('flash-lite'));
     const chain = [primary];
