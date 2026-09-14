@@ -48,7 +48,7 @@ the real `content.js` into pages with Playwright (see below); the three left nee
 | 5 | A lookup on a **photo-heavy page** | ✓ **Was 3.86:1** over a worst-case striped ground; **5.21:1** with the same header fix. White page 5.49:1. |
 | 6 | The **trigger** over busy text | ✓ Now the logo on an amber disc; clearly findable on white, dark and photo. (The white disc before it was weakest on white.) |
 | 7 | **Scroll** with the bubble open | Not measured. |
-| 8 | **PubMed** | ✓ **Three bugs, fixed.** The × was in the header's flow on *every* page (a later `position:relative` list overrode it); PubMed's `h2` rule set the word in Merriweather; its `button{padding:10px 20px}` left the Google button a 0px content box, so no icon. |
+| 8 | **PubMed** | ✓ **Three bugs, fixed.** The × was in the header's flow on *every* page (a later `position:relative` list overrode it); PubMed's `h2` rule set the word in Merriweather; its `button{padding:10px 20px}` left the Google button a 0px content box, so no icon. Re-run **without** `bypassCSP`: PubMed sends no CSP, and Inter and Noto Sans Devanagari both load. |
 
 **Fonts were leaking browsing (found and fixed 15 Sep).** `content.js` runs on every page and
 put an `@import` of Inter in its stylesheet at load, plus a Noto `<link>` for non-Latin
@@ -57,6 +57,13 @@ targets — so `fonts.googleapis.com` got a request carrying the page's origin a
 only in `showBubble()` via `enableFonts()`, with `referrerPolicy = 'no-referrer'`; the
 re-recorded load makes 0 font requests. `test/copy.test.js` holds it. Bundling the fonts
 would remove the request entirely and is the open improvement.
+
+**Fonts on strict-CSP sites fall back to system faces.** Content-script *code* bypasses a page's
+CSP; a `<link>` it inserts into the page does not. GitHub sends `font-src github.githubassets.com`,
+so Google Fonts is refused there and the bubble renders in system fonts — legible, not
+on-brand, and for rarer scripts possibly tofu where the OS lacks a face. This was equally
+true of the old `@import`. The fix is the same open improvement as the privacy one: bundle
+the faces in the extension and load them from `chrome.runtime.getURL`.
 
 **How the bubble was measured.** `playwright-core` from `~/Desktop/interactive app/node_modules`
 (Chromium is in `~/Library/Caches/ms-playwright`). New page → `addScriptTag` a `window.chrome`
