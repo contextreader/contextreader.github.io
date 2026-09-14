@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/IanXavierx/contextreader.git"
+    "url": "git+https://github.com/contextreader/contextreader.github.io.git"
   },
   "keywords": [
     "chrome-extension",
@@ -24,9 +24,9 @@
   "license": "MIT",
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/IanXavierx/contextreader/issues"
+    "url": "https://github.com/contextreader/contextreader.github.io/issues"
   },
-  "homepage": "https://github.com/IanXavierx/contextreader#readme",
+  "homepage": "https://github.com/contextreader/contextreader.github.io#readme",
   "dependencies": {
     "@hyzyla/pdfium": "^2.1.12"
   },

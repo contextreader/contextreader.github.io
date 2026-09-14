@@ -63,7 +63,7 @@ and can be encrypted with a passphrase.
 
 **Open source (MIT).** Adding examples for your language is a few lines in one file.
 
-Source and privacy policy: https://github.com/IanXavierx/contextreader
+Source and privacy policy: https://github.com/contextreader/contextreader.github.io
 
 ---
 
