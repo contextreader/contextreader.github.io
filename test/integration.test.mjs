@@ -69,7 +69,8 @@ globalThis.fetch = async (url, opts) => {
 mkdirSync(join(HERE, '.generated'), { recursive: true });
 const src = readFileSync(join(ROOT, 'background.js'), 'utf8');
 const mod = join(HERE, '.generated', 'background.full.mjs');
-writeFileSync(mod, src + '\nexport { lookupModeDefault, attachMeta, callGemini, getModelConfig };\n');
+writeFileSync(mod, src + '\nexport { lookupModeDefault, attachMeta, callGemini, getModelConfig,'
+    + ' lookupDetails, lookupGeneral, lookupSimple, lookupContextSinhala };\n');
 quiet();
 const BG = await import(mod);
 
@@ -189,6 +190,37 @@ ok('system names Hindi', sys.includes('Hindi'));
 ok('no Sinhala examples leak into Hindi', !/[\u0D80-\u0DFF]/.test(sys + usr), sys.slice(0, 120));
 ok('response schema names Hindi',
    JSON.stringify(fetchLog[0].body.generationConfig.responseSchema).includes('Hindi'));
+
+say('EVERY panel follows the language, not just the first bubble:');
+// This is the regression that shipped in Phase 2a: lookupContext was
+// parameterised and the three panels were not, so a Hindi reader got a correct
+// bubble and then three panels arguing with their own system instruction.
+for (const [label, call] of [
+    ['More',    () => BG.lookupDetails('culture', 'blood culture test', 'http://x')],
+    ['General', () => BG.lookupGeneral('culture')],
+    ['Simple',  () => BG.lookupSimple('culture', 'blood culture test')],
+]) {
+    reset();
+    Object.assign(local, { geminiApiKey: 'AIza-test', targetLanguage: 'hi' });
+    fetchPlan = [{ status: 200, body: { candidates: [{ content: { parts: [{ text: '<div>ok</div>' }] } }] } }];
+    await call();
+    const sent = fetchLog[0].body.contents[0].parts[0].text;
+    const sys = fetchLog[0].body.system_instruction.parts[0].text;
+    ok(`${label}: prompt names Hindi`, sent.includes('Hindi'), sent.slice(0, 100));
+    ok(`${label}: no "Sinhala" in the prompt`, !sent.includes('Sinhala'),
+       (sent.match(/.{0,40}Sinhala.{0,40}/) || [''])[0]);
+    ok(`${label}: no Sinhala script in the prompt`, !/[\u0D80-\u0DFF]/.test(sent));
+    ok(`${label}: agrees with its system instruction`, sys.includes('Hindi') && !sys.includes('Sinhala'));
+}
+
+say('the Sinhala monolingual family is untouched and still Sinhala:');
+reset();
+Object.assign(local, { geminiApiKey: 'AIza-test', targetLanguage: 'si' });
+fetchPlan = [{ status: 200, body: { candidates: [{ content: { parts: [{ text: '<div>ok</div>' }] } }] } }];
+await BG.lookupContextSinhala('\u0db4\u0dbb\u0dd2\u0dc3\u0dbb\u0dba', 'ctx', 'http://x');
+const mono = fetchLog[0].body.contents[0].parts[0].text;
+ok('monolingual prompt still speaks Sinhala', mono.includes('Sinhala'));
+ok('and still carries its Sinhala section labels', /[\u0D80-\u0DFF]/.test(mono));
 
 loud();
 console.log(`\n${pass} passed, ${fail} failed`);

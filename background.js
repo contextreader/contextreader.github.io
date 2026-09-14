@@ -891,9 +891,9 @@ async function lookupModeC(word, context, url, tabId) {
 
     // Fire d call in background — don't block the response
     callGemini(
-        `TARGET WORD: "${word}" (Sinhala: "${tData.t}")\nCONTEXT: "${context}"\n\nExplain what "${word}" means in THIS context in one sentence of casual spoken Sinhala. Like telling a friend. No HTML.`,
+        `TARGET WORD: "${word}" (${lv.langName}: "${tData.t}")\nCONTEXT: "${context}"\n\nExplain what "${word}" means in THIS context in one sentence of casual spoken ${lv.langName}. Like telling a friend. No HTML.`,
         word, context, url,
-        { maxOutputTokens: 192, responseMimeType: "application/json", responseSchema: { type: "OBJECT", properties: { d: { type: "STRING", description: "Casual Sinhala explanation" } }, required: ["d"] } }
+        { maxOutputTokens: 192, responseMimeType: "application/json", responseSchema: { type: "OBJECT", properties: { d: { type: "STRING", description: `Casual ${lv.langName} explanation` } }, required: ["d"] } }
     ).then(dRaw => {
         const totalTime = Math.round(performance.now() - t0);
         if (dRaw.startsWith('<')) {
@@ -918,7 +918,8 @@ async function lookupModeC(word, context, url, tabId) {
 }
 
 async function lookupDetails(word, context, url) {
-    const prompt = `You are creating immersive learning content for a Sinhala reader who just encountered "${word}" while reading.
+    const lv = await langVars();
+    const prompt = `You are creating immersive learning content for a ${lv.langName} reader who just encountered "${word}" while reading.
 
 TARGET WORD: "${word}"
 
@@ -978,15 +979,15 @@ STEP 3 - CREATE MATCHING CONTENT:
    - Must use "${word}" naturally
 
 STEP 4 - TRANSLATE TO SINHALA:
-- Wrap the Sinhala word for "${word}" in <b> tags EVERY TIME it appears
-- Match the formality level: formal context = formal Sinhala, casual context = casual Sinhala
-- Use vocabulary from the same domain in Sinhala too
+- Wrap the ${lv.langName} word for "${word}" in <b> tags EVERY TIME it appears
+- Match the formality level: formal context = formal ${lv.langName}, casual context = casual ${lv.langName}
+- Use vocabulary from the same domain in ${lv.langName} too
 
 Output ONLY this HTML structure (No markdown):
 <div class="sr-hook-box" style="animation: fadeIn 0.5s;">
     <span class="sr-label">⚡️ Scenario</span>
     <p class="sr-hook-text">[1-2 sentence scenario that takes place in the SAME world/genre as the context above]</p>
-    <p class="sr-sub-text">[Sinhala scenario matching the context's formality, with <b>word</b>]</p>
+    <p class="sr-sub-text">[${lv.langName} scenario matching the context's formality, with <b>word</b>]</p>
 </div>
 
 <div class="sr-section" style="animation: fadeIn 0.5s 0.1s backwards;">
@@ -995,7 +996,7 @@ Output ONLY this HTML structure (No markdown):
         <div class="sr-chat-bubble sr-chat-a"><b>A:</b> [Dialogue line from character that fits this world]</div>
         <div class="sr-chat-bubble sr-chat-b"><b>B:</b> [Response from character B]</div>
     </div>
-    <p class="sr-sub-text">[Sinhala dialogue matching tone, with <b>word</b>]</p>
+    <p class="sr-sub-text">[${lv.langName} dialogue matching tone, with <b>word</b>]</p>
 </div>
 
 <details class="sr-details" style="animation: fadeIn 0.5s 0.2s backwards;">
@@ -1003,7 +1004,7 @@ Output ONLY this HTML structure (No markdown):
     <div class="sr-full-story">
         <p class="sr-text">[3-4 sentence story extending the scenario in the same world]</p>
         <hr class="sr-divider">
-        <p class="sr-sub-text">[Sinhala story with <b>word</b>]</p>
+        <p class="sr-sub-text">[${lv.langName} story with <b>word</b>]</p>
     </div>
 </details>
 `;
@@ -1011,25 +1012,26 @@ Output ONLY this HTML structure (No markdown):
 }
 
 async function lookupGeneral(word) {
+    const lv = await langVars();
     const prompt = `
 Target Word: "${word}"
 
 Task:
 1. Provide a general, dictionary-style definition.
 2. Give 2 OTHER common uses of this word in different contexts.
-3. Translate to Sinhala.
+3. Translate to ${lv.langName}.
 
-CRITICAL: In Sinhala translations, wrap the key Sinhala word in <b> tags.
+CRITICAL: In ${lv.langName} translations, wrap the key ${lv.langName} word in <b> tags.
 
 Output ONLY this HTML (no markdown):
 <div class="sr-general-box">
     <p class="sr-def"><b>General Definition:</b> [Broad, general meaning that covers all uses]</p>
-    <p class="sr-sub-text">[Sinhala general definition with <b>key word</b>]</p>
+    <p class="sr-sub-text">[${lv.langName} general definition with <b>key word</b>]</p>
     <div style="margin-top:12px;">
         <span class="sr-label">Other Common Uses:</span>
         <ul style="margin:0; padding-left:18px; font-size:13px; color:#374151; line-height:1.8;">
-            <li>[Example use in different context 1] - <span class="sr-gen-trans">[Sinhala with <b>word</b>]</span></li>
-            <li>[Example use in different context 2] - <span class="sr-gen-trans">[Sinhala with <b>word</b>]</span></li>
+            <li>[Example use in different context 1] - <span class="sr-gen-trans">[${lv.langName} with <b>word</b>]</span></li>
+            <li>[Example use in different context 2] - <span class="sr-gen-trans">[${lv.langName} with <b>word</b>]</span></li>
         </ul>
     </div>
 </div>
@@ -1038,33 +1040,34 @@ Output ONLY this HTML (no markdown):
 }
 
 async function lookupSimple(word, context) {
-    const prompt = `You are a friendly Sinhala teacher explaining to a 13-year-old student.
+    const lv = await langVars();
+    const prompt = `You are a friendly ${lv.langName} teacher explaining to a 13-year-old student.
 
 The student is reading this: "${context}"
 
 They got stuck on the word: "${word}"
 
 YOUR TASK:
-1. Explain what "${word}" means IN WHAT THEY'RE READING using super simple Sinhala
-2. Start with "ඔයා කියවන දේ අනුව..." (According to what you're reading...) to connect it back
-3. Give ONE simple example sentence in Sinhala that a teenager would say
+1. Explain what "${word}" means IN WHAT THEY'RE READING using super simple ${lv.langName}
+2. Open by connecting it back to the sentence they are reading
+3. Give ONE simple example sentence in ${lv.langName} that a teenager would say
 4. Keep it SHORT - total of 3-4 sentences max
 
 IMPORTANT:
-- Use the SIMPLEST Sinhala words possible (like texting a friend)
-- Don't use formal/literary Sinhala
+- Use the SIMPLEST ${lv.langName} words possible (like texting a friend)
+- Don't use formal/literary ${lv.langName}
 - Help them understand THIS sentence, not give a general definition
 
 Output ONLY this HTML structure (No markdown):
 <div class="sr-simple-box">
     <div style="background:rgba(240,253,244,0.66); border:1px solid rgba(134,239,172,0.45); border-radius:13px; padding:15px; margin-bottom:10px;">
         <div style="font-weight:700; color:#166534; font-size:14px; margin-bottom:5px;">👶 Simple Explanation</div>
-        <p style="font-size:14px; color:#14532d; line-height:1.6; font-family:'Noto Sans Sinhala', sans-serif;">
-            [Start with "ඔයා කියවන දේ අනුව..." then explain in super simple Sinhala what ${word} means in their context]
+        <p style="font-size:14px; color:#14532d; line-height:1.6; font-family:var(--sr-lang-font, sans-serif);">
+            [Explain in super simple ${lv.langName} what ${word} means in their context]
         </p>
         <div style="margin-top:10px; border-top:1px dashed #bbf7d0; padding-top:8px;">
             <span style="font-size:11px; font-weight:700; color:#166534; text-transform:uppercase;">Example:</span>
-            <p style="font-size:13px; color:#15803d; font-style:italic; margin-top:2px;">[One casual Sinhala sentence a 13-year-old would actually say]</p>
+            <p style="font-size:13px; color:#15803d; font-style:italic; margin-top:2px;">[One casual ${lv.langName} sentence a 13-year-old would actually say]</p>
         </div>
     </div>
 </div>
