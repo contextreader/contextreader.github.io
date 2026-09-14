@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ianxavierx.github.io/context-reader/sitemap.xml

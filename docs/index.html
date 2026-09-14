@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Context Reader — the word you're stuck on, explained in your language</title>
+<meta name="description" content="A free, open-source Chrome extension that explains a hard word using the sentence around it, in 13 languages. No server, no tracking, no account. Uses your own Gemini API key.">
+<link rel="canonical" href="https://ianxavierx.github.io/context-reader/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Context Reader">
+<meta property="og:description" content="The word you're stuck on, explained in your language — using the sentence around it. Free, open source, no tracking.">
+<meta property="og:url" content="https://ianxavierx.github.io/context-reader/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Sinhala:wght@400;700&display=swap">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Context Reader",
+  "applicationCategory": "BrowserApplication",
+  "operatingSystem": "Chrome",
+  "description": "A Chrome extension that explains a hard word using the sentence around it, in 13 languages. No server, no tracking. Uses your own Gemini API key.",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "license": "https://opensource.org/licenses/MIT",
+  "isAccessibleForFree": true
+}
+</script>
+<style>
+:root{
+  --bg:#f4f5f7; --card:rgba(255,255,255,0.70); --line:rgba(17,24,39,0.10);
+  --ink:#111827; --ink-soft:#374151; --ink-mute:#5b6472;
+  --amber:#a84e08; --green:#166534;
+  --sp:clamp(1rem,2.5vw,1.6rem);
+  --radius:18px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1216; --card:rgba(255,255,255,0.055); --line:rgba(255,255,255,0.10);
+    --ink:#f3f4f6; --ink-soft:#d3d7de; --ink-mute:#9aa3af;
+    --amber:#fbbf24; --green:#4ade80;
+  }
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:Inter,system-ui,-apple-system,sans-serif;
+  line-height:1.6; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:62rem; margin:0 auto; padding-inline:var(--sp)}
+a{color:var(--amber)}
+h1,h2,h3{line-height:1.15; letter-spacing:-0.02em; margin:0}
+h1{font-size:clamp(2.1rem,6vw,3.7rem); font-weight:800}
+h2{font-size:clamp(1.4rem,3.4vw,2rem); font-weight:700; margin-bottom:.8rem}
+h3{font-size:1rem; font-weight:700; margin-bottom:.3rem}
+p{margin:0 0 1rem}
+.lede{font-size:clamp(1.05rem,2.2vw,1.3rem); color:var(--ink-soft); max-width:34em}
+section{padding-block:clamp(2.6rem,7vw,4.6rem)}
+.card{
+  background:var(--card); border:1px solid var(--line);
+  border-radius:var(--radius); padding:calc(var(--sp)*1.1);
+  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+}
+.grid{display:grid; gap:1rem; grid-template-columns:repeat(auto-fit,minmax(15rem,1fr))}
+.muted{color:var(--ink-mute); font-size:.92rem}
+.tag{
+  display:inline-block; font-size:.68rem; font-weight:700; letter-spacing:.08em;
+  text-transform:uppercase; padding:.15rem .5rem; border-radius:99px;
+  border:1px solid var(--line); color:var(--ink-mute); vertical-align:middle;
+}
+.tag.on{color:var(--green); border-color:currentColor}
+
+/* hero */
+header{padding-block:clamp(3rem,9vw,6rem) clamp(1rem,3vw,2rem)}
+.eyebrow{
+  font-size:.75rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--ink-mute); margin-bottom:1rem;
+}
+.cta{display:flex; gap:.7rem; flex-wrap:wrap; margin-top:1.8rem}
+.btn{
+  display:inline-flex; align-items:center; gap:.45rem;
+  padding:.7rem 1.15rem; border-radius:99px; text-decoration:none;
+  font-weight:600; font-size:.95rem; border:1px solid var(--line);
+  color:var(--ink); background:var(--card);
+}
+.btn.primary{border-color:var(--amber); color:var(--amber); font-weight:700}
+
+/* the demo */
+.demo{margin-top:clamp(2rem,5vw,3rem)}
+.sentence{
+  font-size:clamp(.95rem,2vw,1.1rem); color:var(--ink-mute);
+  border-left:2px solid var(--line); padding-left:1rem; margin-bottom:1.1rem;
+}
+.sentence mark{background:rgba(168,78,8,.16); color:inherit; padding:0 .15em; border-radius:3px}
+.bubble{max-width:30rem}
+.bubble .word{font-size:1.45rem; font-weight:800; letter-spacing:-.02em}
+.bubble .answer{
+  font-family:'Noto Sans Sinhala',Inter,sans-serif;
+  font-size:1.3rem; font-weight:700; color:var(--amber); margin:.15rem 0 .9rem;
+}
+.bubble .label{
+  font-size:.62rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--ink-mute); display:block; margin-bottom:.3rem;
+}
+.bubble .gloss{font-family:'Noto Sans Sinhala',Inter,sans-serif; font-size:.95rem; color:var(--ink-soft)}
+.vs{
+  display:grid; gap:.6rem; grid-template-columns:1fr; margin-top:1rem;
+  font-size:.88rem; color:var(--ink-mute);
+}
+.vs b{color:var(--ink)}
+
+/* steps */
+ol.steps{counter-reset:s; list-style:none; padding:0; margin:0; display:grid; gap:.9rem}
+ol.steps li{
+  counter-increment:s; position:relative; padding-left:2.6rem;
+}
+ol.steps li::before{
+  content:counter(s); position:absolute; left:0; top:-.1rem;
+  width:1.8rem; height:1.8rem; border-radius:99px;
+  display:grid; place-items:center; font-size:.8rem; font-weight:800;
+  color:var(--amber); border:1px solid var(--line); background:var(--card);
+}
+
+/* languages */
+.langs{display:flex; flex-wrap:wrap; gap:.45rem; margin-top:.4rem}
+.lang{
+  border:1px solid var(--line); background:var(--card);
+  border-radius:99px; padding:.3rem .75rem; font-size:.9rem;
+}
+.lang.tuned{border-color:var(--green); color:var(--green); font-weight:600}
+
+table{width:100%; border-collapse:collapse; font-size:.92rem}
+th,td{text-align:left; padding:.5rem .4rem; border-bottom:1px solid var(--line); vertical-align:top}
+th{font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-mute); font-weight:700}
+td code{font-size:.85em}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; background:var(--card); padding:.1em .35em; border-radius:4px}
+
+footer{border-top:1px solid var(--line); padding-block:2rem; color:var(--ink-mute); font-size:.88rem}
+footer a{margin-right:1rem}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header class="wrap">
+  <div class="eyebrow">Free · Open source · No tracking</div>
+  <h1>The word you're stuck&nbsp;on,<br>in your language.</h1>
+  <p class="lede">
+    Context Reader reads the sentence around a word before it answers — so you get the
+    meaning that actually fits, not every meaning it has.
+  </p>
+  <div class="cta">
+    <a class="btn primary" href="https://github.com/IanXavierx/context-reader-sinhala-direct">Get it on GitHub</a>
+    <a class="btn" href="https://aistudio.google.com/apikey">Get a free API key</a>
+  </div>
+</header>
+
+<section class="wrap demo" aria-label="Example">
+  <p class="sentence">The blood <mark>culture</mark> was positive after 36 hours of incubation.</p>
+  <div class="card bubble">
+    <div class="word">culture</div>
+    <div class="answer">රක්ත වගාව</div>
+    <span class="label">Context</span>
+    <div class="gloss">මෙකෙන් කියන්නේ රුධිරයේ බැක්ටීරියා තියෙනවද කියලා බලන්න කරන පරීක්ෂණයක්.</div>
+  </div>
+  <div class="vs">
+    <div>A dictionary would have said <b>සංස්කෘතිය</b> — culture as in art and customs. Correct, and useless here.</div>
+  </div>
+</section>
+
+<section class="wrap">
+  <h2>How it works</h2>
+  <ol class="steps">
+    <li><h3>Select a word</h3><p class="muted">On any page. A small mark appears — click it.</p></li>
+    <li><h3>It reads the sentence</h3><p class="muted">The word and its surrounding context go to Google Gemini, using your own key.</p></li>
+    <li><h3>You get the sense that fits</h3><p class="muted">Plus deeper takes if you want them: a worked scenario, a dictionary entry, or a plain-language version.</p></li>
+  </ol>
+</section>
+
+<section class="wrap">
+  <h2>Already in your language?</h2>
+  <p class="lede">It won't translate a word into itself. Highlight a hard word in the language
+  you already read, and it gives you a simpler one instead.</p>
+</section>
+
+<section class="wrap">
+  <h2>13 languages</h2>
+  <p class="muted">Two are <span class="tag on">tuned</span> — they ship worked examples, checked by a
+  speaker, that teach the model to pick the sense matching the domain. The rest work, but
+  without those examples domain-specific senses are less reliable. The extension says which
+  is which instead of pretending they're equal.</p>
+  <div class="langs">
+    <span class="lang tuned">English</span>
+    <span class="lang tuned">සිංහල Sinhala</span>
+    <span class="lang">தமிழ் Tamil</span>
+    <span class="lang">हिन्दी Hindi</span>
+    <span class="lang">العربية Arabic</span>
+    <span class="lang">简体中文 Chinese</span>
+    <span class="lang">日本語 Japanese</span>
+    <span class="lang">한국어 Korean</span>
+    <span class="lang">Русский Russian</span>
+    <span class="lang">Español</span>
+    <span class="lang">Français</span>
+    <span class="lang">Português</span>
+    <span class="lang">Deutsch</span>
+  </div>
+  <p class="muted" style="margin-top:1rem">Adding examples for your language is a few lines in one
+  file — <a href="https://github.com/IanXavierx/context-reader-sinhala-direct/blob/main/CONTRIBUTING.md">how to do it</a>.</p>
+</section>
+
+<section class="wrap">
+  <h2>Why it asks for your own key</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>There's no server</h3>
+      <p class="muted">Your browser talks to Google directly. Nothing of yours passes through
+      anything belonging to this project, because there is nothing to pass through.</p>
+    </div>
+    <div class="card">
+      <h3>So it stays free</h3>
+      <p class="muted">Nobody is paying per-lookup costs, so there's no plan, no quota, and no
+      reason to ever start charging.</p>
+    </div>
+    <div class="card">
+      <h3>And it's checkable</h3>
+      <p class="muted">The extension may contact exactly one host, listed in its manifest and
+      enforced by Chrome. You don't have to take our word for it.</p>
+    </div>
+  </div>
+  <p class="muted" style="margin-top:1.1rem">The cost is honest: you need a free Gemini key before
+  your first lookup. It takes about a minute.</p>
+</section>
+
+<section class="wrap">
+  <h2>What leaves your machine</h2>
+  <table>
+    <thead><tr><th>What</th><th>Where</th><th>When</th></tr></thead>
+    <tbody>
+      <tr><td>The word and its sentence</td><td>Google Gemini, with your key</td><td>Each lookup</td></tr>
+      <tr><td>An IP address, for fonts</td><td>Google Fonts</td><td>Page load</td></tr>
+      <tr><td>Nothing else</td><td>—</td><td>—</td></tr>
+    </tbody>
+  </table>
+  <p class="muted" style="margin-top:1rem">No analytics. No telemetry. No account. Your key is stored
+  locally, read only by the extension's service worker, and can be encrypted with a passphrase.
+  <a href="https://github.com/IanXavierx/context-reader-sinhala-direct/blob/main/PRIVACY_POLICY.md">Full policy</a>.</p>
+</section>
+
+<footer class="wrap">
+  <a href="https://github.com/IanXavierx/context-reader-sinhala-direct">Source</a>
+  <a href="https://github.com/IanXavierx/context-reader-sinhala-direct/blob/main/PRIVACY_POLICY.md">Privacy</a>
+  <a href="https://github.com/IanXavierx/context-reader-sinhala-direct/blob/main/CONTRIBUTING.md">Contribute</a>
+  <a href="https://github.com/IanXavierx/context-reader-sinhala-direct/blob/main/LICENSE">MIT</a>
+  <p style="margin-top:1rem">Built in Sri Lanka. Context Reader © 2026.</p>
+</footer>
+
+</body>
+</html>

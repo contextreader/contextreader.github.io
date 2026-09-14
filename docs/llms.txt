@@ -1,0 +1,41 @@
+# Context Reader
+
+> A free, open-source Chrome extension that explains a hard word using the sentence around
+> it, in 13 languages. It calls the Google Gemini API directly from the user's browser with
+> the user's own API key. There is no backend server, no analytics and no account.
+
+## What it does
+
+A reader selects a word on any web page. The extension sends that word plus its surrounding
+sentence to Gemini and returns the sense that fits the context — not a dictionary list of
+every possible meaning. If the word is already in the reader's chosen language it is
+simplified rather than translated.
+
+## Distinguishing facts
+
+- **No server.** The extension holds exactly one host permission,
+  `https://generativelanguage.googleapis.com/*`, enforced by Chrome. Nothing belonging to
+  the project sits between the user and Google.
+- **Bring your own key.** The user supplies a free Gemini API key, stored in
+  `chrome.storage.local` and optionally encrypted at rest with AES-GCM behind a passphrase.
+- **No telemetry of any kind.** No analytics, no crash reporting, no identifiers.
+- **Tuned vs. community languages.** English and Sinhala ship contrastive worked examples
+  checked by a speaker, which measurably improve domain-correct sense selection. The other
+  eleven languages work without them and the interface labels them as such rather than
+  implying parity.
+
+## Languages
+
+English and Sinhala (tuned); Tamil, Hindi, Arabic, Chinese (Simplified), Japanese, Korean,
+Russian, Spanish, French, Portuguese, German.
+
+## Licence
+
+MIT. Bundled third-party code (Mozilla Readability, PDF.js, a Sinhala Unicode converter,
+pdfium) retains its own licences; see NOTICE in the repository.
+
+## Links
+
+- Source: https://github.com/IanXavierx/context-reader-sinhala-direct
+- Privacy policy: https://github.com/IanXavierx/context-reader-sinhala-direct/blob/main/PRIVACY_POLICY.md
+- Contributing (adding a language): https://github.com/IanXavierx/context-reader-sinhala-direct/blob/main/CONTRIBUTING.md
