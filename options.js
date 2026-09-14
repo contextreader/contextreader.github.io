@@ -200,22 +200,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // Language
     // ============================================
 
-    // Shared with the popup and welcome page so all three say the same thing.
-    const describeLang = (lang) => CRLangPicker.describe(lang);
-
     async function initLanguage() {
         const sel = $('opt-language');
         if (!sel) return;
         const res = await send({ action: 'getLanguages' });
         if (!res) return;
 
-        // Renders the options and owns the search field; saving stays below.
+        // Renders the options and owns the search field and the tuned/community
+        // note, so all three picker pages say the same thing; saving stays below.
         CRLangPicker.attach({
             select: sel, input: $('opt-language-search'), status: $('opt-language-count'),
-            languages: res.languages, current: res.current,
+            note: $('opt-language-note'), languages: res.languages, current: res.current,
         });
         const cur = res.languages.find((l) => l.code === res.current);
-        setText('opt-language-note', describeLang(cur));
         if (cur) setText('opt-about-language', `${cur.nativeName} — ${cur.name}`);
     }
 
@@ -223,7 +220,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const sel = $('opt-language');
         const res = await send({ action: 'setLanguage', code: sel.value });
         if (res && res.lang) {
-            setText('opt-language-note', describeLang(res.lang));
             setText('opt-about-language', `${res.lang.nativeName} — ${res.lang.name}`);
         }
         // The prompt editor shows the language name inside the locked schema.

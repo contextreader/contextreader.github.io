@@ -64,11 +64,11 @@ const key = (el, k) => { let prevented = false;
 const type = (el, v) => { el.value = v; el.dispatchEvent({ type: 'input' }); };
 
 function setup(current = 'si') {
-    const select = fakeSelect('sel'), input = fakeEl('in'), status = fakeEl('st');
+    const select = fakeSelect('sel'), input = fakeEl('in'), status = fakeEl('st'), note = fakeEl('nt');
     const saved = [];
     select.addEventListener('change', () => saved.push(select.value));   // the page's handler
-    const picker = P.attach({ select, input, status, languages: LANGS, current });
-    return { select, input, status, saved, picker };
+    P.attach({ select, input, status, note, languages: LANGS, current });
+    return { select, input, status, note, saved };
 }
 
 console.log('attach — idle:');
@@ -139,19 +139,50 @@ console.log('attach — click in the list:');
     ok('Escape afterwards returns to the clicked language, not the original', select.value === 'ja', select.value);
 }
 
-console.log('attach — plain dropdown change and setCurrent:');
+console.log('attach — plain dropdown change:');
 {
-    const { select, input, saved, picker } = setup('si');
+    const { select, input, saved } = setup('si');
     select.value = 'fr'; select.dispatchEvent({ type: 'change' });
     type(input, 'ger'); key(input, 'Escape');
     ok('dropdown choice becomes the one Escape returns to', select.value === 'fr', select.value);
-    picker.setCurrent('ko');
-    ok('setCurrent selects when idle', select.value === 'ko', select.value);
-    type(input, 'ger'); picker.setCurrent('ar');
-    ok('setCurrent does not disturb an active search', select.options.map((o) => o.value).join() === 'de');
-    key(input, 'Escape');
-    ok('…but applies once it ends', select.value === 'ar', select.value);
     ok('only the explicit dropdown change was saved', saved.join() === 'fr', saved);
+}
+
+console.log('the note describes the language on screen, never a different one:');
+// The bug this guards, seen in a screenshot: searching "espanol" highlighted
+// Español (community) directly above "Tuned — ships worked examples…",
+// because the note still described the saved Sinhala.
+{
+    const TUNED = /^Tuned/, COMMUNITY = /^Community language/;
+    const { select, input, note } = setup('si');
+    ok('idle: describes the saved tuned language', TUNED.test(note.textContent), note.textContent);
+    type(input, 'espanol');
+    ok('searching: follows the highlighted community language', COMMUNITY.test(note.textContent), note.textContent);
+    type(input, 's');   // Sinhala, Spanish, Chinese — Sinhala highlighted first
+    ok('highlight on a tuned row says tuned', TUNED.test(note.textContent), note.textContent);
+    key(input, 'ArrowDown');
+    ok('arrow onto a community row updates the note', COMMUNITY.test(note.textContent), note.textContent);
+    type(input, 'qqqq');
+    ok('no match: no description at all', note.textContent === '', note.textContent);
+    key(input, 'Escape');
+    ok('Escape: back to the saved language', TUNED.test(note.textContent), note.textContent);
+    type(input, 'hindi'); key(input, 'Enter');
+    ok('after choosing: describes the chosen language', COMMUNITY.test(note.textContent), note.textContent);
+    select.value = 'en'; select.dispatchEvent({ type: 'change' });
+    ok('plain dropdown change updates it too', TUNED.test(note.textContent), note.textContent);
+
+    // Exhaustive: every query prefix of every language name, every highlight.
+    let lies = [];
+    for (const l of LANGS) for (let i = 1; i <= l.name.length; i++) {
+        type(input, l.name.slice(0, i));
+        for (let k = 0; k < select.options.length; k++) {
+            const hl = LANGS.find((x) => x.code === select.options[select.selectedIndex].value);
+            if ((hl.tuned ? TUNED : COMMUNITY).test(note.textContent) === false) lies.push(`${l.name.slice(0, i)}→${hl.code}`);
+            key(input, 'ArrowDown');
+        }
+    }
+    ok('no query and highlight leaves the note describing another language', lies.length === 0, lies.slice(0, 5));
+    key(input, 'Escape');
 }
 
 console.log('every page that picks a language is wired:');

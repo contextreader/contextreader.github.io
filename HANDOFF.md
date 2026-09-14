@@ -5,7 +5,7 @@ Last updated 2026-09-14. Read this before changing anything.
 **Repo** `contextreader/contextreader.github.io` — private. Was public for about an hour on
 14 Sep; assume that window may have been cloned. Nothing sensitive was in it.
 
-**State** 44 commits · `npm test` → 437 assertions · `npm run package` → 136 KB ·
+**State** 45 commits · `npm test` → 443 assertions · `npm run package` → 136 KB ·
 13 languages on 9 typesets · 2 permissions · 1 host.
 
 ---
@@ -92,8 +92,10 @@ Settings.
 2. ~~**Search in the language picker**~~ — done 14 Sep. `lib/lang-picker.js` is the one
    picker for Settings, the popup and the welcome page: a search field in front of the native
    `<select>`, which becomes a visible list while searching. Matches code, then name prefix,
-   then word prefix — deliberately not mid-word. Seen rendering in headless Chrome. Two things
-   still open:
+   then word prefix — deliberately not mid-word. The tuned/community note follows the
+   **highlighted** row while searching, never the saved language — the first version put
+   "Tuned —" under a highlighted community language, caught only in a screenshot. Seen
+   rendering in headless Chrome. Two things still open:
    - Long labels clip in the 300px popup list (`简体中文 — Chinese (Simplified) (comm…`).
      Longer names arrive with item 1. Don't fix it by dropping the community tag — the UI
      must say which languages are tuned.

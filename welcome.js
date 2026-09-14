@@ -16,14 +16,11 @@
         CRLangPicker.attach({
             select, input: document.getElementById('welcome-lang-search'),
             status: document.getElementById('welcome-lang-count'),
-            languages: res.languages, current: res.current,
+            note, languages: res.languages, current: res.current,
         });
-        note.textContent = CRLangPicker.describe(res.languages.find((l) => l.code === res.current));
     });
 
     select.addEventListener('change', () => {
-        chrome.runtime.sendMessage({ action: 'setLanguage', code: select.value }, (res) => {
-            if (res && res.lang) note.textContent = CRLangPicker.describe(res.lang);
-        });
+        chrome.runtime.sendMessage({ action: 'setLanguage', code: select.value });
     });
 })();
