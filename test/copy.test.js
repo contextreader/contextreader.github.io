@@ -47,6 +47,28 @@ for (const f of ['popup.html', 'options.html', 'welcome.html']) {
     ok('content.js paints nothing teal (the --sr-teal-* names resolve to ink)', teal.length === 0, teal);
 }
 
+console.log('fonts do not tell Google which sites someone visits:');
+// Until 15 Sep, content.js @imported Inter in its stylesheet at load, so every page
+// visited sent fonts.googleapis.com a request carrying that page's origin. A
+// recorded page load showed it; these hold the fix in place.
+{
+    const src = read('content.js');
+    const css = src.slice(src.indexOf('const styles = `'), src.indexOf('`;', src.indexOf('const styles = `')));
+    ok('the bubble stylesheet has no @import', !/@import/.test(css));
+    const creates = (src.match(/createElement\(['"]link['"]\)/g) || []).length;
+    const noRef = (src.match(/referrerPolicy = 'no-referrer'/g) || []).length;
+    ok('every font <link> content.js creates is referrer-free', creates === 1 && noRef === 1, { creates, noRef });
+    ok('fonts are enabled only from showBubble', (src.match(/enableFonts\(\)/g) || []).length === 2
+        && /function showBubble\([^)]*\) \{\s*enableFonts\(\);/.test(src));
+    ok('applyLangFont fetches nothing until fonts are on', /if \(!srFontsOn \|\| !lang\.family\) return;/.test(src));
+    const printLinks = src.match(/<link [^>]*fonts\.googleapis\.com/g) || [];
+    ok('markup font links in content.js are referrer-free', printLinks.every((l) => /referrerpolicy="no-referrer"/.test(l)), printLinks);
+    for (const f of ['popup.html', 'options.html', 'welcome.html']) {
+        const links = read(f).match(/<link [^>]*fonts\.googleapis\.com[^>]*>/g) || [];
+        ok(`${f} font links are referrer-free`, links.length > 0 && links.every((l) => /referrerpolicy="no-referrer"/.test(l)), links);
+    }
+}
+
 console.log('the welcome page covers the step people get stuck on:');
 const welcome = read('welcome.html');
 ok('asks for the key', /id="welcome-open-settings"/.test(welcome) && /aistudio\.google\.com\/apikey/.test(welcome));

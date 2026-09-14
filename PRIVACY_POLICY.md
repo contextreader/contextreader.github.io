@@ -28,14 +28,20 @@ Note that the free tier of the Gemini API and the paid tier differ in whether yo
 may be used to improve Google's models. Which applies to you depends on your own key, not
 on this extension. If that matters to you, read the terms above before choosing a plan.
 
-### To Google Fonts, when the interface renders
+### To Google Fonts, when you open a bubble
 
-The extension loads its typefaces from `fonts.googleapis.com` and `fonts.gstatic.com`. Like
-any web font request, this means Google's font servers see your IP address and that a font
-was requested. **No word you look up and no page content is included.**
+The bubble's typefaces come from `fonts.googleapis.com` and `fonts.gstatic.com`. They are
+requested **only when you open a bubble** on a page — never just because a page loaded —
+and **with no referrer**, so Google's font servers see your IP address and that a font was
+requested, but not which page or site you were on. **No word you look up and no page
+content is included.** The extension's own Settings, popup and welcome pages load the same
+typefaces the same way.
 
-This is a genuine third-party request and we would rather it were not there. Self-hosting
-the fonts would remove it, and is an open improvement.
+Before 15 September 2026 this was worse: the fonts were requested on every page load, and
+the request carried the page's origin. That was fixed as soon as it was measured.
+
+This is still a genuine third-party request and we would rather it were not there.
+Bundling the fonts into the extension would remove it, and is an open improvement.
 
 ### Nowhere else
 

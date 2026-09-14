@@ -56,8 +56,9 @@ paying per-lookup costs, there is no subscription, no quota and no reason to eve
 charging.
 
 **No tracking. Verifiably.**
-No analytics. No telemetry. No account. No identifiers. The extension is permitted to
-contact exactly one server — Google's Gemini API — and Chrome enforces that. The entire
+No analytics. No telemetry. No account. No identifiers. The extension holds permission
+for exactly one API — Google's Gemini — and your lookups go nowhere else. (Its typefaces
+come from Google Fonts when a bubble opens, with no page address attached.) The entire
 source is public, so you don't have to take our word for it.
 
 Your API key is stored on your device, read only by the extension's background worker,
@@ -94,8 +95,8 @@ except in the lookup request described below.
 **Host permission — `https://generativelanguage.googleapis.com/*`**
 The extension's single function is answering lookups with Google's Gemini API. The
 selected word and its surrounding sentence are sent to this host, authenticated with the
-user's own API key, and the explanation is returned. This is the only host the extension
-may contact.
+user's own API key, and the explanation is returned. This is the only host permission the
+extension holds, and lookups are sent nowhere else.
 
 **Content script on `<all_urls>`**
 The extension must work on whatever page the user is reading — a news article, a PDF, a

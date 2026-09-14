@@ -79,9 +79,10 @@ sent anywhere but Google. Optionally you can encrypt it at rest with a passphras
 
 There is no analytics, no telemetry, no error reporting, no crash reporting, no server.
 
-Two honest caveats: the interface loads fonts from Google Fonts, so `fonts.googleapis.com`
-sees that you loaded a page; and Google sees your lookups, because it is the one answering
-them. Full detail in [PRIVACY_POLICY.md](PRIVACY_POLICY.md).
+Two honest caveats: when you open a bubble, its typefaces are fetched from Google Fonts —
+with no referrer, so Google sees your IP address but not the page you're on, and nothing is
+fetched on pages where you never open one; and Google sees your lookups, because it is the
+one answering them. Full detail in [PRIVACY_POLICY.md](PRIVACY_POLICY.md).
 
 ## Permissions
 
@@ -89,7 +90,7 @@ them. Full detail in [PRIVACY_POLICY.md](PRIVACY_POLICY.md).
 |---|---|
 | `storage` | Your language, key and settings, on your device |
 | `activeTab` | Read the selected text on the page you're looking at |
-| `generativelanguage.googleapis.com` | The only host it may contact |
+| `generativelanguage.googleapis.com` | The only host permission it holds; lookups go nowhere else |
 
 ## Development
 

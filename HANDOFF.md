@@ -50,6 +50,14 @@ the real `content.js` into pages with Playwright (see below); the three left nee
 | 7 | **Scroll** with the bubble open | Not measured. |
 | 8 | **PubMed** | ✓ **Three bugs, fixed.** The × was in the header's flow on *every* page (a later `position:relative` list overrode it); PubMed's `h2` rule set the word in Merriweather; its `button{padding:10px 20px}` left the Google button a 0px content box, so no icon. |
 
+**Fonts were leaking browsing (found and fixed 15 Sep).** `content.js` runs on every page and
+put an `@import` of Inter in its stylesheet at load, plus a Noto `<link>` for non-Latin
+targets — so `fonts.googleapis.com` got a request carrying the page's origin as Referer on
+**every site visited**, before any lookup. A recorded page load showed it. Fonts now load
+only in `showBubble()` via `enableFonts()`, with `referrerPolicy = 'no-referrer'`; the
+re-recorded load makes 0 font requests. `test/copy.test.js` holds it. Bundling the fonts
+would remove the request entirely and is the open improvement.
+
 **How the bubble was measured.** `playwright-core` from `~/Desktop/interactive app/node_modules`
 (Chromium is in `~/Library/Caches/ms-playwright`). New page → `addScriptTag` a `window.chrome`
 stub, `lib/languages.js`, `content.js` → `setLang(code)` → `showBubble(x, y, buildLookupHTML(word, {t, d}))`

@@ -36,7 +36,6 @@ document.body.appendChild(triggerBtn);
 // (COMPLETELY UNCHANGED)
 // ========================================
 const styles = `
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
     /* ✨ NEW: Golden Ratio Design System */
     :root {
@@ -1185,22 +1184,42 @@ function fallbackNoteHTML(m) {
 
 let srLang = CRLanguages.getLang(CRLanguages.DEFAULT_LANG);
 
-// The script font is loaded on demand rather than baked into the stylesheet:
-// a Sinhala reader should not pay for Devanagari, and vice versa. Languages
-// covered by Inter (Latin, Cyrillic) load nothing extra.
-function applyLangFont(lang) {
-    document.documentElement.style.setProperty('--sr-lang-font', lang.font);
+// Fonts are fetched from Google Fonts only once the reader opens a bubble, and
+// never with a referrer. This script runs on every page; until 15 Sep it put an
+// @import in the stylesheet at load, so fonts.googleapis.com was asked for Inter
+// — with the page's origin as Referer — on every site visited, before anyone
+// looked anything up. Measured with a recorded page load; see HANDOFF.
+// A lookup already sends the word to Google; a font request at that moment,
+// without a referrer, tells Google Fonts nothing new.
+//
+// The script font is still loaded per language rather than baked in: a Sinhala
+// reader should not pay for Devanagari. Inter covers Latin and Cyrillic.
+const SR_INTER_HREF = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap';
+let srFontsOn = false;
 
-    if (!lang.family) return;
-    const href = `https://fonts.googleapis.com/css2?family=${lang.family}&display=swap`;
-    let link = document.getElementById('sr-lang-font');
+function addFontLink(id, href) {
+    let link = document.getElementById(id);
     if (!link) {
         link = document.createElement('link');
-        link.id = 'sr-lang-font';
+        link.id = id;
         link.rel = 'stylesheet';
+        link.referrerPolicy = 'no-referrer';
         document.head.appendChild(link);
     }
     if (link.href !== href) link.href = href;
+}
+
+function enableFonts() {
+    if (srFontsOn) return;
+    srFontsOn = true;
+    addFontLink('sr-inter-font', SR_INTER_HREF);
+    applyLangFont(srLang);
+}
+
+function applyLangFont(lang) {
+    document.documentElement.style.setProperty('--sr-lang-font', lang.font);
+    if (!srFontsOn || !lang.family) return;
+    addFontLink('sr-lang-font', `https://fonts.googleapis.com/css2?family=${lang.family}&display=swap`);
 }
 
 // Direction comes from the pack, not from a hardcoded language check — adding
@@ -1833,6 +1852,7 @@ function closeBubble() {
 
 // UNCHANGED: Smart Positioning
 function showBubble(clientX, clientY, content) {
+    enableFonts();
     bubble.style.display = "flex"; 
     bubble.style.opacity = "0";
     bubble.innerHTML = content;
@@ -2975,7 +2995,7 @@ function generateStudySheetDocNew(data, level, lang) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${title}</title>
-    <link href="https://fonts.googleapis.com/css2?family=${srLang.family || 'Inter:wght@400;600;700;800'}&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link referrerpolicy="no-referrer" href="https://fonts.googleapis.com/css2?family=${srLang.family || 'Inter:wght@400;600;700;800'}&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         @page { size: A4; margin: 12mm 15mm; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
