@@ -1,5 +1,8 @@
 # LANDING — brief for the landing-page session
 
+> **Trigger:** Ian starts this session with **`CR landing`**. The extension session's trigger
+> is `CR handoff`; don't mix them.
+
 Written 2026-09-15 for a fresh session whose only job is to design the website. Read this,
 then `CLAUDE.md`'s first section for the product's four commitments. You do not need the
 rest of `HANDOFF.md` — that is the extension's state, and another session owns it.
@@ -30,7 +33,7 @@ you choose. A dictionary gives every meaning; a model can pick the one *this sen
 means. That is the whole product.
 
 **Objective:** help someone read something they need to read, in a language that isn't
-their first. Built in Sri Lanka, for anyone.
+their first — anyone, anywhere.
 
 **Audience:** people reading in a second language, or in a register they don't use — a
 medical term, a legal phrase, an academic sentence. Students and working people.
@@ -40,9 +43,20 @@ install it — including the one-minute cost of getting a free Gemini API key.
 
 ---
 
+## Ian's direction (15 Sep)
+
+**"This should look like a premium design."** Not a template, not a developer README with
+a gradient. Think of the restraint of a well-made product page: confident type, generous
+space, a few exact details, and one memorable moment — the lit word — instead of many
+competing ones. Premium here should come from precision and calm rather than decoration,
+which is consistent with the yardstick below (legibility first, calm second, decoration
+last). Show him a direction early (a private Artifact preview works on his phone) before
+building every section.
+
 ## Hard rules (these have each gone wrong before)
 
-1. **Not a Sinhala product.** No Sinhala-first framing, examples, glyphs or artwork. Ian
+1. **Not a Sinhala product — and no Sri Lanka framing.** No Sinhala-first framing, examples,
+   glyphs or artwork, and no country of origin. Ian
    removed a Sinhala answer from the demo and asked for Sinhala not to lead the language
    list — both on 15 Sep. Sinhala appears only where it is simply one of the facts: in the
    alphabetical language list, and in "English and Sinhala are tuned". This has had to be
@@ -139,8 +153,8 @@ privacy policy and contributing guide are in the repo. There is no Chrome Web St
 yet — don't link to one or promise a date. Old links (`contextreader.pages.dev`,
 `Context-Reader-Global`, the old store listing) belong to the previous product.
 
-**Open question for Ian:** the footer says "Made in Sri Lanka, for anyone reading in a
-second language." That is origin, not Sinhala framing — but given rule 1, confirm he wants it.
+**No Sri Lanka mention either.** Ian removed "Made in Sri Lanka" from the footer on 15 Sep.
+No country of origin, no flag, no "built in" line anywhere on the site.
 
 ---
 
