@@ -91,4 +91,8 @@ history of this file is public.
 
 ## Contact
 
-Open an issue on the project's GitHub repository.
+Email **contextreader@gmail.com**, or open an issue on the
+[project's GitHub repository](https://github.com/contextreader/contextreader.github.io/issues).
+
+Questions about how Google handles the lookups themselves go to Google — this project
+never receives them.

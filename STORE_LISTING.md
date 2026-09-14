@@ -64,6 +64,7 @@ and can be encrypted with a passphrase.
 **Open source (MIT).** Adding examples for your language is a few lines in one file.
 
 Source and privacy policy: https://github.com/contextreader/contextreader.github.io
+Questions: contextreader@gmail.com
 
 ---
 
@@ -120,6 +121,15 @@ text and clicks.
 - Not being sold to third parties ✅
 - Not being used or transferred for purposes unrelated to the item's single purpose ✅
 - Not being used or transferred to determine creditworthiness or for lending purposes ✅
+
+---
+
+## Support contact
+
+`contextreader@gmail.com`
+
+Also used as the organisation contact on GitHub. The listing's "Support" tab should point
+here; the privacy policy names the same address so the two agree.
 
 ---
 
