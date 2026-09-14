@@ -222,6 +222,27 @@ const mono = fetchLog[0].body.contents[0].parts[0].text;
 ok('monolingual prompt still speaks Sinhala', mono.includes('Sinhala'));
 ok('and still carries its Sinhala section labels', /[\u0D80-\u0DFF]/.test(mono));
 
+say('the one-shot English override changes the lookup, not the setting:');
+reset();
+Object.assign(local, { geminiApiKey: 'AIza-test', targetLanguage: 'si' });
+fetchPlan = [answer('a lab test that grows bacteria', 'explanation')];
+await BG.lookupModeDefault('culture', 'blood culture test', 'http://x', 1, 'en');
+const oSys = fetchLog[0].body.system_instruction.parts[0].text;
+const oUsr = fetchLog[0].body.contents[0].parts[0].text;
+ok('system instruction is English', oSys.includes('English readers'), oSys.slice(0, 80));
+ok('lookup prompt is English', oUsr.includes('English'), oUsr.slice(0, 80));
+ok('no Sinhala anywhere in the request', !/[\u0D80-\u0DFF]/.test(oSys + oUsr));
+ok('English examples came from the pack', oSys.includes('a financial institution'));
+ok('schema names English', JSON.stringify(fetchLog[0].body.generationConfig.responseSchema).includes('English'));
+ok('stored language untouched', local.targetLanguage === 'si', local.targetLanguage);
+
+say('without the override the same call is Sinhala again:');
+reset();
+Object.assign(local, { geminiApiKey: 'AIza-test', targetLanguage: 'si' });
+fetchPlan = [answer('\u0dbb\u0d9a\u0dca\u0dad \u0dc0\u0d9c\u0dcf\u0dc0', 'x')];
+await BG.lookupModeDefault('culture', 'blood culture test', 'http://x', 1);
+ok('back to Sinhala', fetchLog[0].body.system_instruction.parts[0].text.includes('Sinhala readers'));
+
 loud();
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

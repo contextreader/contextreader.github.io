@@ -5,7 +5,6 @@
   "description": "Understands what you are reading and explains it in your language. Free, open source, no server, no tracking.",
   "permissions": [
     "storage",
-    "contextMenus",
     "activeTab"
   ],
   "host_permissions": [

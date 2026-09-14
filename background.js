@@ -161,14 +161,17 @@ const MODEL_PREF_DEFAULTS = {
 };
 
 // The language the reader wants explanations in. Packs live in lib/languages.js.
-async function getTargetLanguage() {
+async function getTargetLanguage(override) {
+    if (override && CRLanguages.LANGUAGES[override]) return CRLanguages.getLang(override);
     const { targetLanguage } = await chrome.storage.local.get('targetLanguage');
     return CRLanguages.getLang(targetLanguage || CRLanguages.DEFAULT_LANG);
 }
 
 // Everything a prompt template needs to know about the target language.
-async function langVars() {
-    const lang = await getTargetLanguage();
+// `override` is the one-shot "explain this in English" button: it changes this
+// lookup only and never touches the stored preference.
+async function langVars(override) {
+    const lang = await getTargetLanguage(override);
     return { langName: lang.name, examples: CRLanguages.examplesBlock(lang.code) };
 }
 
@@ -392,9 +395,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     if (request.action === "lookup") {
         const tabId = sender.tab ? sender.tab.id : null;
-        useMonolingual(request.lang).then((mono) => {
+        // An explicit override means the reader asked for this one lookup in
+        // another language, so the monolingual mode does not apply.
+        const override = request.overrideLang || null;
+        useMonolingual(override ? null : request.lang).then((mono) => {
             const fn = mono ? lookupContextSinhala : lookupContext;
-            fn(request.text, request.context, currentUrl, tabId).then(sendResponse);
+            fn(request.text, request.context, currentUrl, tabId, override).then(sendResponse);
         });
         return true;
     }
@@ -573,14 +579,12 @@ chrome.runtime.onInstalled.addListener((details) => {
         });
         chrome.tabs.create({ url: chrome.runtime.getURL("welcome.html") });
     }
-    // Create context menus (removeAll first to prevent duplicates on update)
-    chrome.contextMenus.removeAll(() => {
-        chrome.contextMenus.create({
-            id: "generate-study-sheet",
-            title: "Generate Study Sheet",
-            contexts: ["page", "selection"]
-        });
-    });
+    // No context menus in 1.0, so the contextMenus permission is gone from the
+    // manifest too — one less thing to justify in review. The Study Sheet was
+    // the only thing that had one and it is not shipping: its prompts are
+    // hardcoded Sinhala in both directions and its CEFR levels exist only as
+    // en/si pairs. This is a new extension id, so there is no older install
+    // with a stale menu to clean up.
 });
 
 // Fetch and cache access info from /access endpoint
@@ -823,12 +827,12 @@ function schemaTD(langName) {
     };
 }
 
-async function lookupContext(word, context, url, tabId) {
+async function lookupContext(word, context, url, tabId, overrideLang) {
     incrementGlobalCounter();
 
     // modes A and B removed: they streamed via the Cloudflare Worker
     if (LOOKUP_MODE === 'C') return lookupModeC(word, context, url, tabId);
-    return lookupModeDefault(word, context, url, tabId);
+    return lookupModeDefault(word, context, url, tabId, overrideLang);
 }
 
 // The lookup response is a JSON string that content.js parses for {t,d}.
@@ -849,8 +853,8 @@ function attachMeta(raw, meta) {
 }
 
 // ── DEFAULT: Single call, wait for full {t, d} ──
-async function lookupModeDefault(word, context, url, tabId) {
-    const lv = await langVars();
+async function lookupModeDefault(word, context, url, tabId, overrideLang) {
+    const lv = await langVars(overrideLang);
     const generationConfig = {
         maxOutputTokens: 1024,
         responseMimeType: "application/json",
@@ -860,7 +864,7 @@ async function lookupModeDefault(word, context, url, tabId) {
     const meta = {};
     const raw = await callGemini(
         renderPrompt(lookupTemplate + LOOKUP_JSON_CONTRACT, Object.assign({ word, context }, lv)),
-        word, context, url, generationConfig, meta);
+        word, context, url, generationConfig, meta, overrideLang);
     return attachMeta(raw, meta);
 }
 
@@ -1597,7 +1601,7 @@ async function generateStudySheetV2(chunks, level, lang, tabId, calibrationWords
 // 🌐 GEMINI API CALL
 // ============================================
 
-async function callGemini(prompt, word = "", context = "", url = "", generationConfig = null, metaOut = null) {
+async function callGemini(prompt, word = "", context = "", url = "", generationConfig = null, metaOut = null, overrideLang = null) {
     const t0 = performance.now();
     try {
         const tSign = 0;   // no HMAC in direct mode
@@ -1634,7 +1638,7 @@ async function callGemini(prompt, word = "", context = "", url = "", generationC
         }
 
         const { system: systemTemplate } = await getPrompts();
-        const systemInstruction = renderPrompt(systemTemplate, await langVars());
+        const systemInstruction = renderPrompt(systemTemplate, await langVars(overrideLang));
 
         const payload = {
             system_instruction: { parts: [{ text: systemInstruction }] },
@@ -1785,12 +1789,3 @@ async function callGemini(prompt, word = "", context = "", url = "", generationC
 
 // Context menus are created in the consolidated onInstalled listener above
 
-// 2. Handle the click
-chrome.contextMenus.onClicked.addListener((info, tab) => {
-    if (info.menuItemId === "generate-study-sheet" && tab?.id) {
-        chrome.tabs.sendMessage(tab.id, {
-            action: "triggerStudySheet",
-            hasSelection: !!info.selectionText
-        });
-    }
-});

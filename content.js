@@ -577,6 +577,26 @@ const styles = `
     } 
     .sr-section:last-child { margin-bottom: 0; }
 
+    /* One-shot "explain this in English". Sits next to Google; hidden when
+       English is already the reader's language. Text, not an icon — an icon for
+       a language is a flag, and a flag is the wrong thing for a language. */
+    .sr-en-btn {
+        all: unset;
+        box-sizing: border-box;
+        display: inline-flex; align-items: center; justify-content: center;
+        height: 26px; padding: 0 var(--space-md);
+        font-family: inherit; font-size: 10px; font-weight: 700;
+        letter-spacing: 0.06em;
+        color: var(--sr-ink-mute); cursor: pointer;
+        border: 1px solid var(--sr-glass-line); border-radius: 100px;
+        background: var(--sr-glass-soft);
+        transition: color var(--timing-fast), border-color var(--timing-fast);
+    }
+    .sr-en-btn:hover { color: var(--sr-ink); border-color: var(--sr-amber-deep); }
+    .sr-en-btn[aria-pressed="true"] {
+        color: var(--sr-amber-deep); border-color: var(--sr-amber-deep);
+    }
+
     /* Right-to-left. The dir attribute is set from the language pack's rtl
        flag, so adding Urdu or Hebrew needs no change here. */
     #smart-reader-bubble[dir="rtl"] .sr-body { direction: rtl; text-align: right; }
@@ -1943,45 +1963,55 @@ triggerBtn.addEventListener('mousedown', function(e) {
         return;
     }
 
-    sendMessageWithRetry({ action: "lookup", text: currentSelection, context: currentContext, lang: detectLanguage(currentSelection) }, response => {
-        if (bubble.style.display === 'none') return;
-        const isEmptyResponse = !response || response.trim() === '' || response.trim() === '<div></div>' || response.replace(/<[^>]*>/g, '').trim().length === 0;
-        if (isEmptyResponse) {
-            response = "<div class='sr-body' style='padding:20px; text-align:center;'><div style='font-size:24px; margin-bottom:8px;'>🤷</div><div style='font-size:13px; color:#6b7280;'>No definition found for this word. Try selecting a different word.</div></div>";
-        }
-        // JSON response from fast lookup — build HTML client-side
-        // Note: response data comes from our own Gemini API via signed HMAC Worker proxy, not user input
-        let finalHTML = response;
-        if (typeof response === 'string' && response.trim().startsWith('{')) {
-            try {
-                finalHTML = buildLookupHTML(currentSelection, response);
-            } catch(e) { /* fall through to raw HTML for backward compat */ }
-        }
-        bubble.innerHTML = finalHTML;
-        forceHighlightWord(bubble.querySelector('.sr-body'));
-        injectControls(currentSelection);
-
-        setupMoreBtn(currentSelection);
-        setupGeneralBtn(currentSelection);
-        setupSimpleBtn(currentSelection);
-
-        // Show warning when approaching daily limit
-        chrome.runtime.sendMessage({ action: "getUsage" }, (usage) => {
-            if (usage && !usage.unlimited && usage.remaining <= 5 && usage.remaining > 0) {
-                const body = bubble.querySelector('.sr-body');
-                if (body) {
-                    const warn = document.createElement('div');
-                    warn.style.cssText = 'text-align:center; font-size:11px; color:#92400e; background:#fffbeb; border:1px solid #fde68a; border-radius:6px; padding:5px 10px; margin-top:8px;';
-                    warn.textContent = `${usage.remaining} lookup${usage.remaining !== 1 ? 's' : ''} remaining today`;
-                    body.appendChild(warn);
-                }
-            }
-        });
-
-        setTimeout(repositionBubble, 50);
-    });
+    lastLookupWasEnglish = false;
+    sendMessageWithRetry({ action: "lookup", text: currentSelection, context: currentContext,
+                           lang: detectLanguage(currentSelection) }, renderLookupResponse);
 });
 
+// Extracted so the "explain in English" button can reuse it — it re-runs the
+// same lookup with an override and re-renders through exactly this path,
+// rather than keeping a second copy of the rendering in sync.
+// True while the bubble is showing the one-shot English view, so the EN button
+// can render as pressed and not fire twice.
+let lastLookupWasEnglish = false;
+
+function renderLookupResponse(response) {
+    if (bubble.style.display === 'none') return;
+    const isEmptyResponse = !response || response.trim() === '' || response.trim() === '<div></div>' || response.replace(/<[^>]*>/g, '').trim().length === 0;
+    if (isEmptyResponse) {
+        response = "<div class='sr-body' style='padding:20px; text-align:center;'><div style='font-size:24px; margin-bottom:8px;'>🤷</div><div style='font-size:13px; color:#6b7280;'>No definition found for this word. Try selecting a different word.</div></div>";
+    }
+    // JSON response from fast lookup — build HTML client-side
+    // Note: response data comes from our own Gemini API via signed HMAC Worker proxy, not user input
+    let finalHTML = response;
+    if (typeof response === 'string' && response.trim().startsWith('{')) {
+        try {
+            finalHTML = buildLookupHTML(currentSelection, response);
+        } catch(e) { /* fall through to raw HTML for backward compat */ }
+    }
+    bubble.innerHTML = finalHTML;
+    forceHighlightWord(bubble.querySelector('.sr-body'));
+    injectControls(currentSelection);
+
+    setupMoreBtn(currentSelection);
+    setupGeneralBtn(currentSelection);
+    setupSimpleBtn(currentSelection);
+
+    // Show warning when approaching daily limit
+    chrome.runtime.sendMessage({ action: "getUsage" }, (usage) => {
+        if (usage && !usage.unlimited && usage.remaining <= 5 && usage.remaining > 0) {
+            const body = bubble.querySelector('.sr-body');
+            if (body) {
+                const warn = document.createElement('div');
+                warn.style.cssText = 'text-align:center; font-size:11px; color:#92400e; background:#fffbeb; border:1px solid #fde68a; border-radius:6px; padding:5px 10px; margin-top:8px;';
+                warn.textContent = `${usage.remaining} lookup${usage.remaining !== 1 ? 's' : ''} remaining today`;
+                body.appendChild(warn);
+            }
+        }
+    });
+
+    setTimeout(repositionBubble, 50);
+}
 // UNCHANGED
 const SAVED_WORDS_LIMIT = 500;
 
@@ -2196,6 +2226,29 @@ function injectControls(word) {
     gWrap.appendChild(googleBtn);
     gWrap.appendChild(gMenu);
     iconContainer.appendChild(gWrap);
+
+    // One-shot English. Re-runs this lookup with an override and re-renders
+    // through renderLookupResponse — the stored language is untouched, so the
+    // next word comes back in the reader's own language again.
+    if (srLang.code !== 'en') {
+        const enBtn = document.createElement('button');
+        enBtn.id = 'sr-en-btn';
+        enBtn.className = 'sr-en-btn';
+        enBtn.textContent = 'EN';
+        enBtn.title = 'Explain this in English (just this once)';
+        enBtn.setAttribute('aria-pressed', String(lastLookupWasEnglish));
+        enBtn.addEventListener('click', () => {
+            if (lastLookupWasEnglish) return;
+            lastLookupWasEnglish = true;
+            const body = bubble.querySelector('.sr-body');
+            if (body) body.style.opacity = '0.45';
+            sendMessageWithRetry({
+                action: "lookup", text: currentSelection, context: currentContext,
+                lang: detectLanguage(currentSelection), overrideLang: 'en'
+            }, renderLookupResponse);
+        });
+        iconContainer.appendChild(enBtn);
+    }
     const headerTop = bubble.querySelector('.sr-header-top'); if(headerTop) headerTop.appendChild(iconContainer);
 
     chrome.storage.local.get(['savedWords'], (result) => {

@@ -40,6 +40,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Language switcher. Writes the same targetLanguage key Settings and the
+    // welcome page use; content.js listens on storage.onChanged, so open tabs
+    // follow without a reload.
+    const langSelect = document.getElementById('popup-language');
+    if (langSelect) {
+        chrome.runtime.sendMessage({ action: 'getLanguages' }, (res) => {
+            if (!res || !res.languages) return;
+            langSelect.innerHTML = res.languages.map((l) =>
+                `<option value="${l.code}">${l.nativeName}${l.nativeName === l.name ? '' : ' — ' + l.name}`
+                + `${l.tuned ? '' : '  (community)'}</option>`).join('');
+            langSelect.value = res.current;
+        });
+        langSelect.addEventListener('change', () => {
+            chrome.runtime.sendMessage({ action: 'setLanguage', code: langSelect.value });
+        });
+    }
+
     // Dynamic version from manifest
     const versionLabel = document.getElementById('version-label');
     if (versionLabel) {
