@@ -59,19 +59,19 @@ bubble — `content.js` needs a real page and a real selection.
 
 ---
 
-## Open decisions
+## Decided
 
-**The palette.** Two candidates, unresolved, and it blocks the site, the logo and the brand
-guide rewrite:
+**The palette (15 Sep).** Amber, one family at two strengths. Ian's brand is "orange"; both
+earlier builds used the amber ramp, and the shipping `#a84e08` is the same hue made
+text-safe, so the two "candidates" were never two brands.
 
-- *Recommended* — the retuned tokens the extension ships today: amber `#a84e08`, green
-  `#166534`, red `#b91c1c` on a milky neutral. These were corrected precisely because the
-  brighter originals failed AA at the sizes they are used at.
-- The original brand colours (`#fbbf24`, teal `#0891b2`) are livelier on a website but then
-  the site and the installed extension disagree.
+- `#a84e08` — text, UI state, primary actions (5.12:1 on `#f4f5f7`).
+- `#fbbf24` — display only: logo fill, hero shapes. 1.53:1 on the light ground, so never
+  text and never a lone shape on light; put dark ink on it (10.63:1) or use it on dark.
+- Teal is retired everywhere, the site included. `test/copy.test.js` fails if a page paints
+  with a `--teal*` token.
 
-Whichever wins becomes the single system of record across the site, bubble, popup and
-Settings.
+Full tokens in `~/.claude/commands/brand-guide.md`.
 
 ---
 
@@ -105,10 +105,13 @@ Settings.
 3. **New logo.** `icon128.png` is puzzle pieces around a **Sinhala glyph**, and mush at the
    32px it mostly lives at. Generate several directions for review first.
    *Blocked:* `MCP_DOCKER` has not connected — no image tooling.
-4. ~~**Rewrite `~/.claude/commands/brand-guide.md`**~~ — done 14 Sep (its header says so).
-   **Still drifting:** `welcome.html` shows a 🇱🇰 flag as step 5's visual and as the
-   "Simplify" feature icon (`&#x1F1F1;&#x1F1F0;`). That is the Sinhala-default drift the
-   fourth commitment forbids; replace both.
+4. ~~**Rewrite `~/.claude/commands/brand-guide.md`**~~ — done 14 Sep; palette added 15 Sep.
+   ~~**Welcome page drift**~~ — rewritten 15 Sep. It promised "30 free lookups per day",
+   audio, video clips, saved words and an `Alt+Shift+S` shortcut — none of which this build
+   has — showed a 🇱🇰 flag twice, and **never asked for the API key**, so a new user's first
+   lookup was a "key needed" card. It now goes language → key (with why) → pin → highlight →
+   the two-sentence `culture` demo, lists only what the bubble really has, and shows whether
+   a key is set. `test/copy.test.js` holds all of it.
 5. **Landing page.** `docs/index.html` is the old page and reads as Sinhala-first. A redesign
    exists as a preview but was not committed; it needs the 100+ language treatment and the
    brand colours before it lands.

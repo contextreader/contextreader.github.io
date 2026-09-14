@@ -24,3 +24,25 @@
         chrome.runtime.sendMessage({ action: 'setLanguage', code: select.value });
     });
 })();
+
+// Step 2, the key. Without one, the first lookup is a "key needed" card — so
+// say plainly whether this step is done, and notice when Settings finishes it.
+(() => {
+    const btn = document.getElementById('welcome-open-settings');
+    const status = document.getElementById('welcome-key-status');
+    if (!btn || !status) return;
+
+    btn.addEventListener('click', () => chrome.runtime.openOptionsPage());
+
+    function refresh() {
+        chrome.runtime.sendMessage({ action: 'getKeyState' }, (ks) => {
+            const done = !!(ks && ks.hasKey);
+            status.textContent = done ? '✓ Key added. You’re set.' : 'No key yet — lookups will ask for one.';
+            status.classList.toggle('ok', done);
+        });
+    }
+    refresh();
+    chrome.storage.onChanged.addListener((changes, area) => {
+        if (area === 'local' && (changes.geminiApiKey || changes.geminiApiKeyEnc)) refresh();
+    });
+})();

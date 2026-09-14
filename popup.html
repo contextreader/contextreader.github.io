@@ -202,8 +202,10 @@
             font-size: 12px; font-weight: 700; margin-bottom: var(--space-sm);
         }
         #restricted-page-msg {
-            background: rgba(240,249,255,0.75); border: 1px solid rgba(186,230,253,0.9);
-            color: var(--teal-deep); text-align: center; margin-top: var(--space-lg);
+            /* Neutral: teal was retired (palette decision, 15 Sep), and this is
+               information, not a warning that earns amber. */
+            background: var(--glass-soft); border: 1px solid var(--glass-line);
+            color: var(--ink-soft); text-align: center; margin-top: var(--space-lg);
         }
         /* ── footer ──────────────────────────────────────────────────── */
         .foot {

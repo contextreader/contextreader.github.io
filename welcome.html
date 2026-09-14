@@ -194,6 +194,36 @@
             text-align: center;
             box-shadow: var(--spec-sm);
         }
+        .key-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-md) var(--space-lg); margin-top: var(--space-lg); }
+        .key-link { font-size: 13.5px; font-weight: 600; color: var(--amber-deep); text-underline-offset: 3px; }
+        .key-btn {
+            padding: var(--space-md) var(--space-lg);
+            background: var(--glass-soft);
+            border: 1px solid rgba(180,83,9,0.28); border-radius: 100px;
+            font-family: inherit; font-size: 13px; font-weight: 600; color: var(--ink);
+            cursor: pointer; box-shadow: var(--spec-sm);
+        }
+        .key-btn:focus-visible { outline: 2px solid var(--amber-deep); outline-offset: 3px; }
+        .key-status { margin-top: var(--space-md); font-size: 13px; min-height: 20px; }
+        .key-status.ok { color: #166534; font-weight: 600; }
+
+        .demo { margin-top: var(--space-lg); display: grid; gap: var(--space-md); }
+        .demo-row {
+            background: var(--glass-soft);
+            border: 1px solid var(--glass-line);
+            border-radius: var(--space-lg);
+            padding: var(--space-md) var(--space-lg);
+            box-shadow: var(--spec-sm);
+        }
+        .step-content .demo-src { font-size: 14px; color: var(--ink-soft); }
+        .demo-src mark { background: none; color: var(--ink); font-weight: 700; text-decoration: underline; text-decoration-color: rgba(180,83,9,0.45); text-underline-offset: 3px; }
+        .step-content .demo-out { font-size: 14px; color: var(--amber-deep); font-weight: 600; margin-top: 2px; }
+        .step-content h3 em { font-style: italic; }
+
+        .feature-item .ico { height: 22px; margin-bottom: var(--space-sm); color: var(--ink-soft); display: flex; align-items: center; justify-content: center; }
+        .feature-item .ico-text { font-size: 12px; font-weight: 800; letter-spacing: 0.04em; }
+        .features-foot { margin-top: var(--space-lg); font-size: 12.5px; color: var(--ink-mute); }
+        .kbd { display: inline-block; padding: 1px 7px; border: 1px solid var(--glass-line); border-radius: 6px; background: var(--glass-soft); font-size: 11.5px; font-weight: 600; color: var(--ink-soft); }
         .feature-item .emoji { font-size: 22px; margin-bottom: var(--space-sm); line-height: 1; }
         .feature-item .name { font-size: 13px; font-weight: 600; color: var(--ink); }
         .feature-item .desc { font-size: 11.5px; color: var(--ink-mute); margin-top: 2px; line-height: 1.5; }
@@ -290,107 +320,100 @@
             </div>
         </div>
 
-        <!-- Step 2: Pin -->
+        <!-- Step 2: Key -->
         <div class="step-card">
             <div class="step-num">2</div>
             <div class="step-content">
-                <h3>Pin the extension</h3>
-                <p>Click the <strong>puzzle piece icon</strong> in your Chrome toolbar (top-right), find <strong>Context Reader</strong>, and click the <strong>pin icon</strong> next to it. This keeps it visible for quick access.</p>
-                <div class="step-visual">&#x1F9E9; &#x1F4CC;</div>
+                <h3>Add your free Gemini key</h3>
+                <p>Context Reader has no server. Your browser asks Google&rsquo;s Gemini directly, using a
+                   key that belongs to you &mdash; which is why it can be free permanently and has nothing
+                   to track you with. Getting a key takes about a minute and needs no card.</p>
+                <div class="key-row">
+                    <a class="key-link" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Get a key at Google AI Studio &#x2197;</a>
+                    <button class="key-btn" id="welcome-open-settings" type="button">Paste it in Settings</button>
+                </div>
+                <p class="key-status" id="welcome-key-status"></p>
             </div>
         </div>
 
-        <!-- Step 2 -->
+        <!-- Step 3: Pin -->
         <div class="step-card">
             <div class="step-num">3</div>
             <div class="step-content">
-                <h3>Highlight any word</h3>
-                <p>Select a word on any webpage by clicking and dragging over it.</p>
-                <div class="step-visual">&#x1F446; &#x1F4DD;</div>
+                <h3>Pin the extension</h3>
+                <p>Click the <strong>puzzle piece icon</strong> in your Chrome toolbar (top-right), find <strong>Context Reader</strong>, and click the <strong>pin icon</strong> next to it. That puts the language switch one click away.</p>
             </div>
         </div>
 
-        <!-- Step 3 -->
+        <!-- Step 4: Highlight -->
         <div class="step-card">
             <div class="step-num">4</div>
             <div class="step-content">
-                <h3>Click the lightning bolt</h3>
-                <p>A small icon appears near your selection. Click it to get the definition.</p>
-                <div class="step-visual">&#x26A1;</div>
+                <h3>Highlight a word you&rsquo;re stuck on</h3>
+                <p>Select it on any page. A small button appears next to your selection &mdash; click it.</p>
             </div>
         </div>
 
-        <!-- Step 4 -->
+        <!-- Step 5: The point -->
         <div class="step-card">
             <div class="step-num">5</div>
             <div class="step-content">
-                <h3>Get a context-aware definition</h3>
-                <p>Unlike a dictionary, Context Reader gives you the meaning that fits <strong>what you're reading</strong> &mdash; in the language you chose.</p>
-                <div class="step-visual">&#x1F4A1; &#x1F1F1;&#x1F1F0;</div>
+                <h3>Get the meaning <em>this sentence</em> needs</h3>
+                <p>A dictionary gives every meaning of a word. Context Reader reads the sentence around it
+                   and gives you the one that fits &mdash; in the language you chose.</p>
+                <div class="demo">
+                    <div class="demo-row">
+                        <p class="demo-src">The blood <mark>culture</mark> came back negative.</p>
+                        <p class="demo-out">a sample grown in a lab to find bacteria</p>
+                    </div>
+                    <div class="demo-row">
+                        <p class="demo-src">The company <mark>culture</mark> rewards long hours.</p>
+                        <p class="demo-out">the shared habits and values of a group</p>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Features -->
+        <!-- In the bubble -->
         <div class="features">
-            <h2>What you can do</h2>
+            <h2>In the bubble</h2>
             <div class="feature-grid">
                 <div class="feature-item">
-                    <div class="emoji">&#x1F50A;</div>
-                    <div class="name">Audio</div>
-                    <div class="desc">Hear pronunciation</div>
+                    <div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4.5 13.5H11l-1 8.5 8.5-11.5H12l1-8.5Z"/></svg></div>
+                    <div class="name">More</div>
+                    <div class="desc">A fuller explanation, still tied to your sentence</div>
                 </div>
                 <div class="feature-item">
-                    <div class="emoji">&#x1F3AC;</div>
-                    <div class="name">Video Clips</div>
-                    <div class="desc">See it used in movies</div>
+                    <div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M2.5 12h19"/><path d="M12 2.5a15 15 0 0 1 0 19a15 15 0 0 1 0-19Z"/></svg></div>
+                    <div class="name">General</div>
+                    <div class="desc">The word&rsquo;s other meanings, outside this sentence</div>
                 </div>
                 <div class="feature-item">
-                    <div class="emoji">&#x2764;&#xFE0F;</div>
-                    <div class="name">Save Words</div>
-                    <div class="desc">Build your vocab list</div>
+                    <div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 13.9 9 19.5 11l-5.6 2L12 18.5 10.1 13 4.5 11l5.6-2L12 3.5Z"/><path d="M18.5 3.5v3M20 5h-3"/></svg></div>
+                    <div class="name">Simple</div>
+                    <div class="desc">The same meaning in plainer words</div>
                 </div>
                 <div class="feature-item">
-                    <div class="emoji">&#x1F1F1;&#x1F1F0;</div>
-                    <div class="name">Simplify</div>
-                    <div class="desc">Hard words made plain</div>
+                    <div class="ico ico-text">EN</div>
+                    <div class="name">English</div>
+                    <div class="desc">This one answer in English; your language stays set</div>
                 </div>
                 <div class="feature-item">
-                    <div class="emoji">&#x1F476;</div>
-                    <div class="name">Simple Mode</div>
-                    <div class="desc">Kid-friendly explanations</div>
+                    <div class="ico ico-text">G</div>
+                    <div class="name">Search</div>
+                    <div class="desc">Pronounce it, or look it up on Google</div>
                 </div>
             </div>
+            <p class="features-foot"><span class="kbd">Esc</span> closes the bubble.</p>
         </div>
 
-        <!-- Shortcuts -->
-        <div class="shortcut-card">
-            <h2>Keyboard Shortcuts</h2>
-            <div class="shortcut-row">
-                <span class="shortcut-label">Activate extension</span>
-                <span class="shortcut-key">Alt+Shift+S</span>
-            </div>
-            <div class="shortcut-row">
-                <span class="shortcut-label">Close definition bubble</span>
-                <span class="shortcut-key">Esc</span>
-            </div>
-        </div>
-
-        <!-- Daily limit note -->
-        <div class="privacy-note" style="background:#fffbeb; border-color:#fde68a;">
-            <h3 style="color:#92400e;">&#x1F4CA; 30 free lookups per day</h3>
-            <p style="color:#a16207;">That's plenty for most reading sessions. Your count resets every day at midnight.</p>
-        </div>
-
-        <!-- Pin reminder -->
-        <div class="privacy-note" style="background:#f0f9ff; border-color:#bae6fd;">
-            <h3 style="color:#0369a1;">&#x1F4CC; Don't forget to pin!</h3>
-            <p style="color:#0369a1;">Click the puzzle piece icon in your toolbar and pin Context Reader for one-click access.</p>
-        </div>
-
-        <!-- Privacy -->
+        <!-- Commitments -->
         <div class="privacy-note">
-            <h3>&#x1F512; Your privacy matters</h3>
-            <p>No account needed. No browsing history collected.<br>Words you look up are never sent to analytics.</p>
+            <h3>Free permanently. No tracking.</h3>
+            <p>No account, no plan, no daily limit &mdash; there is no server of ours to pay for.
+               The word you look up and the sentence around it go from your browser to Google&rsquo;s
+               Gemini with your key, and nowhere else. No analytics of any kind. The code is open
+               source, so you can check.</p>
         </div>
 
         <!-- CTA -->
