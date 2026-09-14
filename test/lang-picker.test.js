@@ -29,9 +29,9 @@ ok('exact code outranks a name prefix ("de" → German before anything else)', c
 ok('non-Latin combining marks are kept', P.fold('සි') !== P.fold('ස'));
 
 console.log('labels and description:');
-ok('native and English name', P.label(L.getLang('hi')) === 'हिन्दी — Hindi  (community)', P.label(L.getLang('hi')));
+ok('native and English name', P.label(L.getLang('hi')) === 'हिन्दी \u2014 Hindi', P.label(L.getLang('hi')));
 ok('no "English — English"', P.label(L.getLang('en')) === 'English', P.label(L.getLang('en')));
-ok('tuned has no community tag', !/community/.test(P.label(L.getLang('si'))));
+ok('no per-row status suffix', !/community|tuned/i.test(LANGS.map(P.label).join()));
 ok('tuned description', /worked examples/.test(P.describe(L.getLang('si'))));
 ok('community description', /Community language/.test(P.describe(L.getLang('ta'))));
 ok('no language, no description', P.describe(undefined) === '');
@@ -71,6 +71,24 @@ function setup(current = 'si') {
     return { select, input, status, note, saved };
 }
 
+console.log('grouping says tuned or not:');
+{
+    const sel = fakeSelect('g'); const inp = fakeEl('gi');
+    P.attach({ select: sel, input: inp, languages: LANGS, current: 'si' });
+    const html = sel.innerHTML;
+    const tunedBlock = (html.match(/<optgroup label="Tuned">(.*?)<\/optgroup>/) || [])[1] || '';
+    const commBlock = (html.match(/<optgroup label="Community">(.*?)<\/optgroup>/) || [])[1] || '';
+    const inBlock = (b) => [...b.matchAll(/value="([^"]+)"/g)].map((m) => m[1]).sort().join();
+    ok('Tuned group holds exactly the tuned languages', inBlock(tunedBlock) === LANGS.filter((l) => l.tuned).map((l) => l.code).sort().join(), inBlock(tunedBlock));
+    ok('Community group holds exactly the rest', inBlock(commBlock) === LANGS.filter((l) => !l.tuned).map((l) => l.code).sort().join(), inBlock(commBlock));
+    type(inp, 'zzzz-no'); type(inp, 'hindi');
+    ok('a search with no tuned match renders no empty Tuned group', !/label="Tuned"/.test(sel.innerHTML), sel.innerHTML);
+    // Option order must equal the order the note indexes by, or the note lies.
+    type(inp, 's');
+    const order = sel.options.map((o) => o.value).join();
+    ok('search rows are grouped tuned-first', order === 'si,es,zh', order);
+}
+
 console.log('attach — idle:');
 {
     const { select, input, status, saved } = setup('si');
@@ -88,7 +106,7 @@ console.log('attach — search and choose with Enter:');
 {
     const { select, input, status, saved } = setup('si');
     type(input, 'hin');
-    ok('becomes a list', select.attrs.size === '2', select.attrs.size);
+    ok('becomes a list: one match + its heading', select.attrs.size === '2', select.attrs.size);
     ok('only the match', select.options.map((o) => o.value).join() === 'hi', select.options.map((o) => o.value));
     ok('first match highlighted', select.value === 'hi');
     ok('status counts', status.textContent === `1 of ${LANGS.length} · Enter to choose`, status.textContent);
@@ -107,7 +125,7 @@ console.log('attach — arrows, Escape, no match:');
     type(input, 's');    // Sinhala, Spanish, Chinese (Simplified)
     const n = select.options.length;
     ok('several matches listed', n > 2, n);
-    ok('list height capped', Number(select.attrs.size) <= 6, select.attrs.size);
+    ok('list fits every match plus headings (3 + Tuned + Community)', select.attrs.size === '5', select.attrs.size);
     key(input, 'ArrowDown');
     ok('ArrowDown moves the highlight', select.selectedIndex === 1, select.selectedIndex);
     key(input, 'ArrowUp'); key(input, 'ArrowUp');
@@ -146,6 +164,23 @@ console.log('attach — plain dropdown change:');
     type(input, 'ger'); key(input, 'Escape');
     ok('dropdown choice becomes the one Escape returns to', select.value === 'fr', select.value);
     ok('only the explicit dropdown change was saved', saved.join() === 'fr', saved);
+}
+
+console.log('following a change made elsewhere:');
+{
+    const sel = fakeSelect('f'), inp = fakeEl('fi'), note = fakeEl('fn');
+    const saved = []; sel.addEventListener('change', () => saved.push(sel.value));
+    const picker = P.attach({ select: sel, input: inp, note, languages: LANGS, current: 'si' });
+    picker.setCurrent('ta');
+    ok('idle: selects the new language', sel.value === 'ta', sel.value);
+    ok('idle: note follows', /^Community language/.test(note.textContent), note.textContent);
+    type(inp, 'ger'); picker.setCurrent('en');
+    ok('during a search: the list is left alone', sel.options.map((o) => o.value).join() === 'de');
+    key(inp, 'Escape');
+    ok('…and applies when it ends', sel.value === 'en', sel.value);
+    picker.setCurrent('xx');
+    ok('unknown code ignored', sel.value === 'en', sel.value);
+    ok('following never saves', saved.length === 0, saved);
 }
 
 console.log('the note describes the language on screen, never a different one:');

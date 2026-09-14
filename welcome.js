@@ -13,10 +13,14 @@
 
     chrome.runtime.sendMessage({ action: 'getLanguages' }, (res) => {
         if (!res || !res.languages) return;
-        CRLangPicker.attach({
+        const picker = CRLangPicker.attach({
             select, input: document.getElementById('welcome-lang-search'),
             status: document.getElementById('welcome-lang-count'),
             note, languages: res.languages, current: res.current,
+        });
+        // Settings or the popup may change it while this tab is open.
+        chrome.storage.onChanged.addListener((changes, area) => {
+            if (area === 'local' && changes.targetLanguage) picker.setCurrent(changes.targetLanguage.newValue);
         });
     });
 

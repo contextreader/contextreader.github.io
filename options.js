@@ -200,6 +200,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // Language
     // ============================================
 
+    let langPicker = null;
+    let langList = [];
+
+    // Settings stays open in a tab; the popup can change the language meanwhile.
+    if (chrome.storage.onChanged) chrome.storage.onChanged.addListener((changes, area) => {
+        const ch = area === 'local' && changes.targetLanguage;
+        if (!ch || !langPicker) return;
+        // Our own save lands here too; the change handler already did the rest.
+        if (ch.newValue === $('opt-language').value) return;
+        langPicker.setCurrent(ch.newValue);
+        const lang = langList.find((l) => l.code === ch.newValue);
+        if (lang) setText('opt-about-language', `${lang.nativeName} — ${lang.name}`);
+        loadPrompts();
+    });
+
     async function initLanguage() {
         const sel = $('opt-language');
         if (!sel) return;
@@ -208,7 +223,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Renders the options and owns the search field and the tuned/community
         // note, so all three picker pages say the same thing; saving stays below.
-        CRLangPicker.attach({
+        langList = res.languages;
+        langPicker = CRLangPicker.attach({
             select: sel, input: $('opt-language-search'), status: $('opt-language-count'),
             note: $('opt-language-note'), languages: res.languages, current: res.current,
         });

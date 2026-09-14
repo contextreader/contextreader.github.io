@@ -95,13 +95,12 @@ Full tokens in `~/.claude/commands/brand-guide.md`.
    then word prefix — deliberately not mid-word. The tuned/community note follows the
    **highlighted** row while searching, never the saved language — the first version put
    "Tuned —" under a highlighted community language, caught only in a screenshot. Seen
-   rendering in headless Chrome. Two things still open:
-   - Long labels clip in the 300px popup list (`简体中文 — Chinese (Simplified) (comm…`).
-     Longer names arrive with item 1. Don't fix it by dropping the community tag — the UI
-     must say which languages are tuned.
-   - The welcome page's step 1 was an **empty `<select>` from 13 to 14 Sep** — nothing
-     populated it. Fixed; `test/lang-picker.test.js` now checks each page loads and attaches
-     the picker. Treat any other markup-only change to `welcome.html` with suspicion.
+   rendering in headless Chrome. The list is grouped under **Tuned** and **Community**
+   headings rather than a "(community)" suffix per row — the suffix was what clipped in the
+   300px popup, and would repeat ninety-odd times at 100 languages. Settings and the welcome
+   page follow a language changed elsewhere (`setCurrent`, via `storage.onChanged`).
+   The welcome page's step 1 was an **empty `<select>` from 13 to 14 Sep** — nothing
+   populated it. `test/lang-picker.test.js` checks each page loads and attaches the picker.
 3. **New logo.** `icon128.png` is puzzle pieces around a **Sinhala glyph**, and mush at the
    32px it mostly lives at. Generate several directions for review first.
    *Blocked:* `MCP_DOCKER` has not connected — no image tooling.

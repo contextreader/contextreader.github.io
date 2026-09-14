@@ -52,6 +52,7 @@ globalThis.document = {
 globalThis.self = globalThis;
 
 let store = {};
+const storageListeners = [];
 let sess = {};
 let responder = () => undefined;
 globalThis.chrome = {
@@ -60,7 +61,7 @@ globalThis.chrome = {
     id: 'testextensionid',
     sendMessage: (msg, cb) => { const r = responder(msg); if (cb) cb(r); },
   },
-  storage: { session: {
+  storage: { onChanged: { addListener: (f) => storageListeners.push(f) }, session: {
     get: (k, cb) => { let o; if (typeof k === 'string') o = { [k]: sess[k] };
       else if (Array.isArray(k)) { o={}; for (const n of k) o[n]=sess[n]; }
       else { o={}; for (const [n,d] of Object.entries(k)) o[n]=sess[n]??d; }
@@ -86,7 +87,8 @@ module.exports = {
   els, store, sess,
   setStore: (s) => { store = s; },
   setResponder: (f) => { responder = f; },
-  run: () => { for (const el of Object.values(els)) el.listeners = {};
+  fireStorageChange: (changes) => storageListeners.forEach((f) => f(changes, 'local')),
+  run: () => { for (const el of Object.values(els)) el.listeners = {}; storageListeners.length = 0;
                delete require.cache[require.resolve(path.join(DIR, 'options.js'))];
                require(path.join(DIR, 'options.js')); return domReady(); },
   flush: () => new Promise(r => setImmediate(r)),

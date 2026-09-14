@@ -97,9 +97,8 @@ S.setResponder((msg) => {
   const lsel = S.els['opt-language'];
   ok('populated from the real packs', lsel.innerHTML.includes('සිංහල') && lsel.innerHTML.includes('Sinhala'),
      lsel.innerHTML.slice(0, 120));
-  ok('tuned language is not labelled community',
-     !/සිංහල[^<]*community/.test(lsel.innerHTML));
-  ok('untuned languages are labelled', /community/.test(lsel.innerHTML));
+  ok('tuned languages grouped under Tuned', /<optgroup label="Tuned">[^]*?සිංහල[^]*?<\/optgroup>/.test(lsel.innerHTML));
+  ok('untuned languages grouped under Community', /<optgroup label="Community">[^]*?Tamil[^]*?<\/optgroup>/.test(lsel.innerHTML));
   ok('current selection applied', lsel.value === 'si', lsel.value);
   ok('note explains what tuned means', /worked examples/.test(S.els['opt-language-note'].textContent),
      S.els['opt-language-note'].textContent);
@@ -120,6 +119,13 @@ S.setResponder((msg) => {
   ok('switching language updates the note',
      /Community language/.test(S.els['opt-language-note'].textContent),
      S.els['opt-language-note'].textContent);
+
+  console.log('Settings follows a language changed in the popup:');
+  // hi (community) -> en (tuned), so a note that did not move would fail.
+  S.fireStorageChange({ targetLanguage: { oldValue: 'hi', newValue: 'en' } });
+  ok('select follows', lsel.value === 'en', lsel.value);
+  ok('About row follows', /English/.test(S.els['opt-about-language'].textContent), S.els['opt-about-language'].textContent);
+  ok('note follows, community to tuned', /^Tuned/.test(S.els['opt-language-note'].textContent), S.els['opt-language-note'].textContent);
 
   console.log(`\n${pass} passed, ${fail} failed`);
   process.exit(fail ? 1 : 0);
