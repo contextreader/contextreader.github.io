@@ -1,189 +1,127 @@
-# HANDOFF — UX pass: direction settled, browser check still outstanding
+# HANDOFF
 
-The first Liquid Glass pass (tag `ux-wip-2026-09-12`) was **rejected on sight**: it was
-chromatic and loud where the reference is monochrome and calm. It has been retuned.
+Last updated 2026-09-14. Read this before changing anything.
 
-**What changed, 2026-09-12 (second pass):**
+**Repo** `contextreader/contextreader.github.io` — private. Was public for about an hour on
+14 Sep; assume that window may have been cloned. Nothing sensitive was in it.
 
-| | First pass | Now |
+**State** 41 commits · `npm test` → 358 assertions · `npm run package` → 132 KB ·
+13 languages · 2 permissions · 1 host.
+
+---
+
+## The objective, because the work drifted from it once
+
+**Help someone read something they need to read, in a language that isn't their first.**
+Sri Lanka first — people doing work in English — then anyone.
+
+A dictionary gives every meaning of a word. Until recently nothing could tell you *which one
+this sentence means*. A model can. That is the whole product.
+
+Four commitments that constrain everything else:
+
+- **Free permanently** — no plan, no quota. Possible because there is no server: the user
+  brings their own Gemini key.
+- **No tracking** — none, not "minimal". Verifiable: one host permission.
+- **Open source, MIT** — so the privacy claim can be checked rather than believed.
+- **Not a Sinhala product.** Sinhala is one language it happens to be good at.
+
+---
+
+## The gap that matters
+
+**Almost none of this has been seen in a browser.** Only the Settings page and one lookup.
+Everything else is logic tested against a stubbed `chrome` and a DOM shim that renders
+nothing at all. `npm test` passing means the logic holds; it says nothing about whether the
+thing looks right or is readable.
+
+Check these in a real browser, worst-first:
+
+| # | Check | Why it is the risk |
 |---|---|---|
-| Ambient light | `0 0 55px` amber bloom on bubble, popup, Settings | none — no coloured light in any scene |
-| Edge | `--sr-rim`, 5-stop amber↔teal iridescent | neutral, directional: bright white top-left → faint dark bottom-right |
-| Refraction | `--sr-fx-lens: blur(4px) brightness(1.32) saturate(1.75)` | `--sr-fx-lens: none` — lens band retired everywhere |
-| Body filter | `saturate(170%) brightness(1.10) contrast(0.94)` | `saturate(105%) brightness(1.06) contrast(0.97)` |
-| Surface | `0.38 / 0.26 / 0.30` — near-transparent | `0.66 / 0.54 / 0.58` — milky |
-| Depth | six insets, all white | dual-tone: light top-left **and a dark bottom-right** |
-| Trigger | clear glass, ink rods | the most opaque surface in the extension (0.80/0.68/0.72) |
-| Accent | amber fills, glows and gradients throughout | amber only where it carries meaning |
-
-The direction was chosen from a rendered preview rather than written blind:
-<https://claude.ai/code/artifact/3a28358e-9a63-41b1-b466-e642eb1a00cf> — variant A
-(neutral glass, amber on the word), at surface 0.66/0.54/0.58, blur 20px, lens off.
-
-**Where amber survives, deliberately:** the Sinhala translation line (`.sr-translation`),
-the trigger's lit rod, the usage bar (quantity), step numbers on welcome (a real
-sequence), and primary actions — which are now primary *by weight and hue, not by fill*.
-**The accent palette, and how it was got wrong twice.** Final values are
-`--sr-amber-deep #a84e08`, `--green #166534`, `--red #b91c1c`.
-
-The first two attempts measured contrast against `#ffffff`. **The surface is never white.**
-It is translucent white over a grey page gradient, so the ground is `#f4f5f7` typically and
-`#eff0f3` at the card's most transparent stop. Measured properly:
-
-| | `#f4f5f7` typical | `#eff0f3` worst |
-|---|---|---|
-| `--amber-deep` `#b45309` | 4.60 pass | 4.41 **fail** |
-| `--green` `#15803d` | 4.60 pass | 4.40 **fail** |
-| `--red` `#dc2626` | 4.43 **fail** | 4.24 **fail** |
-
-So the accurate statement is *not* "all three were failing" — that overstates it, and
-`8ef6ee7`'s commit message says so wrongly by quoting the worst-stop column against the
-typical ground. Two passed by 0.10 and one failed outright. **A 0.10 margin that goes
-negative further down the card's ramp is the real argument for darkening all three**, not
-outright failure.
-
-This matters most on `.sr-translation`: 17px at weight 600 is not "large text" under WCAG,
-so it needs the full 4.5:1, and it is the one element the extension exists to produce.
-
-**Not touched, deliberately:** the three-panel colour coding (contextual / General teal /
-Simple green) is carrying information — it tells you which of the three explanations you
-are reading — so it stays.
-
-Read `CLAUDE.md` first for how the build works.
+| 1 | A lookup on a **dark page** | The answer line measures ~2:1 contrast against the composited scrim. That line is the product. This is the one that can invalidate work rather than merely look wrong. |
+| 2 | Target **Hindi**, then **More**, **General**, **Simple** | These three were hardcoded Sinhala until 14 Sep while the first bubble was correct. Fixed and covered by tests, but never watched running. |
+| 3 | Target **English**, look up a hard English word | The same-language path: it must simplify, not echo the word back. |
+| 4 | Target **Sinhala**, `blood culture` | Must give `රුධිර වගාව`, not `වගාව`. The prompt has changed twice; this is the only check standing under it. |
+| 5 | A lookup on a **photo-heavy page** | The retune's main claim. Surface is 66/54/58%. If text is hard to read, raise `--sr-glass-top/mid/bot` in `content.js` `:root`. |
+| 6 | The **trigger** over busy text | Was the predicted failure of the first glass pass; the fix (most opaque surface rather than least) is untested. |
+| 7 | **Scroll** with the bubble open | Repaint cost unmeasured. The lens band was retired, which should have helped. |
+| 8 | **PubMed** | CSS-aggressive, and there is no shadow DOM protecting the bubble. |
 
 ---
 
-## Still unverified — this is the gap
+## Open decisions
 
-The retune was checked structurally — `node --check` passes, the set of `sr-*` names is
-byte-identical to `HEAD`'s (nothing lost, nothing invented), braces balance, all three
-`@keyframes` survive, and the `@import` is still the first statement in the literal — and
-the direction was judged against a rendered preview. But the **extension itself has still
-not been loaded in a browser.** The preview could only answer checks #1 and part of #2; its "dark
-page" is an authored panel, not the PDF reader, and its triggers sit over authored text.
+**The palette.** Two candidates, unresolved, and it blocks the site, the logo and the brand
+guide rewrite:
 
-Load unpacked (`chrome://extensions` → Developer mode → `sinhala-direct/`), add a Gemini
-key in Settings, then look at a lookup on each of these.
+- *Recommended* — the retuned tokens the extension ships today: amber `#a84e08`, green
+  `#166534`, red `#b91c1c` on a milky neutral. These were corrected precisely because the
+  brighter originals failed AA at the sizes they are used at.
+- The original brand colours (`#fbbf24`, teal `#0891b2`) are livelier on a website but then
+  the site and the installed extension disagree.
 
-| # | Check | Why it's the risk |
-|---|---|---|
-| 1 | A lookup on a **white article** (Wikipedia) | Baseline. The refractive edge should be visible as a bright halo at the bubble border. If the border looks like a flat white line, `mask-composite` didn't apply and the lens is dead. |
-| 2 | A lookup on a **photo-heavy page** | The retune's main claim. Tint is now 66/54/58%. If Sinhala is still hard to read, raise `--sr-glass-top/mid/bot` (`content.js`, `:root`). One place, three numbers. |
-| 3 | A lookup on a **dark page** / the extension's PDF reader | `brightness(1.14) contrast(0.88)` is meant to normalise a dark backdrop upward. Unverified. |
-| 4 | **Scroll** while the bubble is open | Two nested `backdrop-filter`s per surface (body + lens). Repaint cost is unmeasured. If it janks, drop `saturate()` from `--sr-fx-body` first. |
-| 5 | The **trigger** over text | Was the predicted failure, and was addressed: it is now the most opaque surface in the extension rather than the least. Confirm it actually holds on a busy background. |
-| 6 | Click **More**, then **General**, then **Simple** | Gemini generates this markup. The panels got CSS for the first time; the prompts were edited in lockstep. Mismatch here means the two drifted. |
-| 7 | Sinhala → Sinhala lookup | Confirms the `@import` still loads Noto Sans Sinhala. Note: **the toolbar is hidden entirely for Sinhala words** (the Google chip is inside `if (!isSinhala)`). Intentional or not is undecided. |
-| 8 | **PubMed** | CSS-aggressive, and this build has no shadow DOM to protect it. |
+Whichever wins becomes the single system of record across the site, bubble, popup and
+Settings.
 
 ---
 
-## Known-incomplete, by area
+## Next session's work
 
-### Visual
-- **The extension has not been seen rendered.** All of the above.
-- The `artifact-design` pass produced a trigger-mark study at
-  `https://claude.ai/code/artifact/29ccb8bd-7250-49c7-9e1d-aaa7337432a9` —
-  **Focus Brackets** is the chosen alternate if Lit Line reads as a text-formatting
-  control once it's been used for a while.
-- `welcome.html` and `pdf-reader.html` are now on the shared tokens. welcome's stylesheet
-  was replaced wholesale (every class name preserved). pdf-reader is a *reading* surface,
-  so its page stays flat and white and only the toolbar — which genuinely floats over the
-  document — takes frost; its palette moved into the same neutral family.
-- The printable study sheet (`content.js`, standalone stylesheet near the end) keeps white
-  paper, since it exists to be printed; only its surround and the Save button moved.
-
-### Code hygiene
-- **`--space-xs` … `--space-2xl` are not namespaced** and are injected into the host
-  page's `:root`. On a site that defines its own `--space-*`, ours win and can visibly
-  break their layout. Pre-existing, widened by one token this session. Prefix them `--sr-`.
-- `escapeHTML` is declared twice in `content.js`. Harmless (hoisting makes the second
-  win) but it should be one.
-- `GA_API_SECRET` is still hardcoded in `background.js`. It ships in the published
-  extension too, so it is not a new exposure — but analytics is probably not wanted in
-  a 10-person test build. Deleting that line is the whole fix.
-- Five icon buttons (audio, video, save, list, study) are still *constructed* in
-  `injectControls()` but never appended. Other code holds references to them
-  (`saveWord()` reads `#sr-save-btn`), so they cannot simply be deleted.
-
-### Security — not done, raised repeatedly
-- **Rotate `AIzaSyAL_rAV…`** — the live Global Worker key, committed to
-  `Context-Reader-Global` history across 4 files including `cloudfareworker-global.js`.
-  Repo is private, so not an active leak, but history is permanent.
-  Then: `wrangler secret put GOOGLE_API_KEY`, read `env.GOOGLE_API_KEY`, and add
-  `cloudfareworker-global.js` to that repo's `.gitignore` (the Sinhala worker is
-  already ignored there — the pattern didn't carry over when it was forked).
-- **Rotate the `AQ.…` key** that was pasted into the session transcript.
+1. **Languages past 100.** Split script from language in `lib/languages.js`: ~20 scripts each
+   defined once with a Noto family and a detection range, languages referencing them. Today
+   every pack carries its own font and regex, which makes each new language a font hunt.
+   Keep `tuned`/`examples` — at that scale the honesty matters more, not less, and only
+   English and Sinhala have checked examples. **Do not machine-translate examples.**
+2. **Search in the language picker** — Settings and popup. Match native name, English name
+   and code. Not the bubble: it is `overflow:hidden` with no shadow DOM.
+3. **New logo.** `icon128.png` is puzzle pieces around a **Sinhala glyph**, and mush at the
+   32px it mostly lives at. Generate several directions for review first.
+   *Blocked:* `MCP_DOCKER` has not connected — no image tooling.
+4. **Rewrite `~/.claude/commands/brand-guide.md`** — user-level, not in this repo, and
+   actively misleading. Details in that file's own header once rewritten.
+5. **Landing page.** `docs/index.html` is the old page and reads as Sinhala-first. A redesign
+   exists as a preview but was not committed; it needs the 100+ language treatment and the
+   brand colours before it lands.
+6. **Then publish** — public repo, Pages from `main` `/docs`, store submission. Screenshots
+   (1280×800 plus a 440×280 tile) are the hard blocker; `STORE_LISTING.md` lists the four
+   worth taking.
 
 ---
 
-## Open product questions, unresolved
+## Traps that have already cost time
 
-**Latency vs. correctness.** The lookup is one call returning `{t,d}` together, because
-splitting it (the published extension's MODE C) makes the model give the dictionary sense
-instead of the contextual one — `culture` in a blood-culture context returned
-`සංස්කෘතිය` when asked for the translation alone, `රක්ත වගාව` when asked for translation
-plus explanation. The cost is MODE C's ~1s first paint; total is now 1.4–4.3s.
-
-The fix is **not** to re-split. It is to stream the single call and render `t` the moment
-it parses. `lookupModeA` had exactly that machinery and was deleted this session because
-it streamed through the Worker — recover it from git history and point it at the direct
-endpoint. This is the highest-value remaining change.
-
-**The published extension has a real bug.** `gemini-2.5-flash-lite` returns `තියුණු`
-("sharp") for clinical *acute*, in both the medical and geometry contexts — no
-discrimination at all. Reproduced in four configurations. It affects the live Chrome Web
-Store extension and is unfixed there.
-
-Switching production to 3.1 **without also** moving to the single-call + `SCHEMA_TD`
-shape makes things worse: under production's `t`-alone config, 3.1 overruns
-`maxOutputTokens` writing paragraphs into the headline slot and truncates into invalid
-JSON. Model and call shape have to change together.
-
-**The 2.5 baseline is n=8, not n=24.** Its daily free-tier quota ran out mid-run. The
-`acute` failure reproduced in both runs so that finding is solid; everything else about
-2.5 is undersampled.
-
----
-
-## Things that will bite whoever edits this next
-
-1. **Gemini writes some of the HTML.** Prompt templates in `background.js` hardcode
-   `sr-*` class names — the model emits `.sr-hook-box`, `.sr-chat`, `.sr-def-label`, and a
-   second copy of the action-pill row. **Never rename an `sr-*` class**, and never delete
-   `@keyframes fadeIn`. `normalizeActionPills()` in `content.js` exists because the model
-   cannot reliably reproduce inline SVG.
-
-2. **All bubble CSS is one template literal** (`const styles` in `content.js`).
-   `node --check` passes on a badly damaged stylesheet, because broken CSS is still a
-   valid JS string. It happened once this session: a `s.index('url("data:image/svg+xml…')`
-   matched the bubble's grain texture instead of the trigger's mark and ~116 brace pairs
-   were overwritten. **The selector-set diff is the primary guard** — run it before and
-   after, the set of names must be identical:
-
-   ```sh
-   git show HEAD:content.js | grep -o 'sr-[a-zA-Z0-9_-]*' | sort -u > /tmp/before.txt
+1. **`node --check` passes badly broken CSS.** All of `content.js`'s styles are one template
+   literal, so broken CSS is still a valid JS string. After any scripted edit take a **fresh**
+   selector-set diff and brace count:
+   ```
+   grep -o 'sr-[a-zA-Z0-9_-]*' content.js | sort -u > /tmp/before.txt
+   # edit
    grep -o 'sr-[a-zA-Z0-9_-]*' content.js | sort -u | diff /tmp/before.txt -
    ```
+   Take the number fresh. `170/170`, `100/100`, `174/174` and `178/178` have each gone stale.
+2. **Never rename an `sr-*` class.** Prompts in `background.js` name them, Gemini emits them
+   as literal HTML, and a saved prompt override is a third place a stale name can hide —
+   the one place neither grep nor this repo can see.
+3. **Test the feature, not the diff.** 327 assertions missed three panels left hardcoded
+   Sinhala, because not one of them called a panel function.
+4. **`test/extract.mjs` finds code by comment banner.** Renaming a banner makes it throw
+   rather than silently skip a test. Deliberate — fix the marker.
+5. **Measure contrast against the composited ground, not white.** Two sessions got this wrong
+   in opposite directions. The surface is translucent white over a grey page.
+6. **`saveWord()` reads `.sr-section:nth-of-type(2)`**, and `:nth-of-type` counts by tag, not
+   class. A `div` added inside `.sr-body` silently changes what gets saved.
+7. **Another Claude session may be in this repo.** One was, for most of 12–13 Sep. Check
+   `git status` before `git add -A` — an earlier one swept its uncommitted work into an
+   unrelated commit.
 
-   Not line-anchored on purpose: a `^\s*[.#]` pattern misses `#smart-reader-bubble::before`,
-   `> *` descendant rules and multi-selector lines — exactly what a mass overwrite destroys.
+---
 
-   Brace counting is the weaker check and has now produced two false baselines. Take your
-   own before editing, never a number written down here, and **scope it to the block you
-   are editing, not the whole file**:
-   - `content.js` was 170/170 when this file was written, 172/172 after the retune,
-     174/174 once `.sr-fallback-note` landed. It moves whenever a rule is added.
-   - `options.html` counted whole-file reads 100/100 but the style block is 96/96 — the
-     four extra are `{{word}}` and `{{context}}` in the prompt-editor help text. A
-     whole-file count on that file now moves whenever the placeholder docs change.
+## Still true, still not done
 
-3. **The `@import` must stay the first statement** in that literal. Prepend anything and
-   Noto Sans Sinhala silently stops loading.
-
-4. **`saveWord()` uses `.sr-section:nth-of-type(2)`.** Wrapping, reordering or nesting
-   `.sr-section` silently saves the wrong text.
-
-5. **No shadow DOM.** Styles go to `document.head` and the bubble is `overflow: hidden`,
-   so absolutely-positioned children get clipped at its edges — that is why the Google
-   dropdown is right-anchored.
+- `sinhala/` and `global/` stay private forever. `global/` has a **live Gemini key in
+  committed history**, plus a Supabase anon key and an HMAC secret. Rotate all three
+  regardless.
+- The PDF reader is in the repo and out of the build. `npm run package` fails loudly if a
+  `pdf*` file ever reaches the zip.
+- Study Sheet is out of 1.0 — hardcoded Sinhala both ways, CEFR levels only as en/si pairs.

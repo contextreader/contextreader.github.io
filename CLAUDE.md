@@ -1,17 +1,29 @@
-# Context Reader (Direct) — Sinhala
+# Context Reader
 
-> **⚠️ UX pass: direction settled, browser check outstanding — see [HANDOFF.md](HANDOFF.md).**
-> The first Liquid Glass pass was rejected for being chromatic and loud. It has been
-> retuned to a calm monochrome frost with amber kept only where it carries meaning, chosen
-> from a rendered preview. The **extension itself still has not been loaded in a browser** —
-> verify before building on top. Never rename an `sr-*` class: `background.js` prompt
-> templates hardcode them and Gemini emits them as literal HTML.
+> **Read [HANDOFF.md](HANDOFF.md) first.** It carries the current state, the open decisions,
+> the browser checks nobody has run, and the traps that have already cost time.
 
-Experiment build. Forked from the published `sinhala/` v2.1.0 extension to answer one
-question: **is a newer Gemini model plus a user-supplied API key better than the
-Worker-proxied setup?**
+**This is the product, not an experiment.** It began as a fork of the published `sinhala/`
+build to test whether a newer model plus a user-supplied key beat the Worker-proxied setup.
+It did, and this became the thing that ships: one extension, many languages, free, open
+source, no server, no tracking.
 
-Not for the Chrome Web Store. For ~10 testers, each using their own free Gemini key.
+**Help someone read something they need to read, in a language that isn't their first.**
+Sri Lanka first, then anyone. A dictionary gives every meaning of a word; until recently
+nothing could tell you which one *this sentence* means. That is the entire product.
+
+Four commitments that constrain every change:
+
+- **Free permanently.** No plan, no quota. Possible only because there is no server — the
+  user brings their own Gemini key.
+- **No tracking.** None, not "minimal". One host permission, and it must stay that way.
+- **Open source, MIT**, so the privacy claim is checkable.
+- **Not a Sinhala product.** Sinhala is one language it happens to be good at. Do not let
+  the code, the copy or the artwork drift back toward treating it as the default.
+
+Never rename an `sr-*` class: `background.js` prompt templates hardcode them, Gemini emits
+them as literal HTML, and a user's saved prompt override is a third place a stale name can
+hide.
 
 ## What is different from the published extension
 
@@ -21,13 +33,16 @@ Not for the Chrome Web Store. For ~10 testers, each using their own free Gemini 
 | Model | `gemini-2.5-flash-lite` | **user-selectable**, default `gemini-3.1-flash-lite` |
 | Auth | HMAC-SHA256 shared secret with the Worker | user's own API key |
 | Key storage | Worker env var | `chrome.storage.local`, optionally AES-GCM encrypted |
-| Rate limit | 50/day, server-enforced via KV | Google free tier (20 RPM per model) |
+| Rate limit | 50/day, server-enforced via KV | Google free tier, with automatic fallback down a chain of free models |
 | Response cache | Supabase `cache` table | none — every lookup hits Gemini |
 | Global counter | Worker KV | local count in `chrome.storage.local` |
-| Bubble toolbar | audio, Google, video, save, list, study sheet | **Google only** (with a search dropdown) |
+| Bubble toolbar | audio, Google, video, save, list, study sheet | Google (with a search dropdown) + a one-shot **EN** button |
+| Languages | Sinhala only | **13 packs**, English and Sinhala tuned; same-language input is simplified rather than translated |
+| Analytics | GA4 on every lookup | none |
 
-There is **no Worker, no Supabase, and no HMAC secret in this repo.** `signRequest()` is a
-stub that throws. Lookup modes A and B were deleted — they streamed through the Worker.
+There is **no Worker, no Supabase, and no HMAC secret in this repo**, and no longer any
+stub pretending otherwise — `signRequest`, `PROXY_URL` and the dead study-sheet V3 path were
+all removed. Lookup modes A and B were deleted; they streamed through the Worker.
 
 ## Architecture
 
