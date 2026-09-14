@@ -72,5 +72,17 @@ ok('every pack has a font and a native name',
    L.listLangs().every((l) => l.font && l.nativeName && typeof l.rtl === 'boolean'));
 ok('arabic is the rtl one', L.getLang('ar').rtl === true && L.getLang('si').rtl === false);
 
+console.log('script detection decides whether the language font applies:');
+// The bug this guards: --sr-lang-font is the TARGET font, and it used to be
+// applied whenever the SOURCE looked Sinhala. A Hindi reader highlighting
+// Sinhala text got Sinhala painted in Devanagari.
+ok('English word is English script', L.isScript('constrained', 'en'));
+ok('Sinhala word is not English script', !L.isScript('\u0db4\u0dbb\u0dd2\u0dc3\u0dbb\u0dba', 'en'));
+ok('Sinhala word is Sinhala script', L.isScript('\u0db4\u0dbb\u0dd2\u0dc3\u0dbb\u0dba', 'si'));
+ok('Sinhala word is NOT Hindi script', !L.isScript('\u0db4\u0dbb\u0dd2\u0dc3\u0dbb\u0dba', 'hi'));
+ok('Hindi word is Hindi script', L.isScript('\u092a\u0930\u094d\u092f\u093e\u0935\u0930\u0923', 'hi'));
+ok('empty and numeric text match nothing', !L.isScript('', 'si') && !L.isScript('123', 'en'));
+ok('every pack has a script test', L.listLangs().every((l) => l.script instanceof RegExp));
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

@@ -1871,17 +1871,23 @@ function forceHighlightWord(container) {
     });
 }
 
-// Typewriter animation — uses Intl.Segmenter for proper Sinhala grapheme clusters
+// Typewriter animation. Segmenting by grapheme keeps combining marks attached
+// to their base character — essential for Sinhala and Devanagari, harmless for
+// Latin. No locale: the word being animated is whatever the reader highlighted,
+// which need not be in their chosen language.
 function generateTypewriterHtml(word) {
     let chars;
     if (typeof Intl !== 'undefined' && Intl.Segmenter) {
-        const segmenter = new Intl.Segmenter('si', { granularity: 'grapheme' });
+        const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
         chars = [...segmenter.segment(word)].map(s => s.segment);
     } else {
         chars = Array.from(word);
     }
-    const isSinhala = detectLanguage(word) === 'si';
-    const fontStyle = isSinhala ? "font-family:var(--sr-lang-font, sans-serif); text-transform:none; letter-spacing:1px;" : "";
+    // --sr-lang-font is the TARGET language's font. The highlighted word is
+    // source text, so it only applies when the two share a script — otherwise
+    // we would paint, say, Sinhala text in Devanagari.
+    const sameScript = CRLanguages.isScript(word, srLang.code);
+    const fontStyle = sameScript ? "font-family:var(--sr-lang-font, sans-serif); text-transform:none; letter-spacing:1px;" : "";
     return chars.map((char, i) => {
         const displayChar = char === ' ' ? '&nbsp;' : char;
         return `<span class="sr-char" style="animation-delay: ${i * 0.05}s; ${fontStyle}">${displayChar}</span>`;
@@ -1899,8 +1905,7 @@ triggerBtn.addEventListener('mousedown', function(e) {
     if (displayWord.length > 18) {
         displayWord = displayWord.substring(0, 18) + "...";
     }
-    const isSinhalaWord = detectLanguage(currentSelection) === 'si';
-    const imprintStyle = isSinhalaWord
+    const imprintStyle = CRLanguages.isScript(currentSelection, srLang.code)
         ? "font-family:var(--sr-lang-font, sans-serif); text-transform:none; letter-spacing:1px; font-size:20px;"
         : "";
     showBubble(x, y, `
@@ -2182,22 +2187,20 @@ function injectControls(word) {
         });
     };
 
-    const isSinhala = detectLanguage(word) === 'si';
-    // Experiment build: Google is the only control shown. Audio, video (Yarn),
-    // save, my-words and study sheet are still constructed — other code holds
-    // references to saveBtn / #sr-save-btn — they are simply not attached.
-    if (!isSinhala) {
-        gWrap.appendChild(googleBtn);
-        gWrap.appendChild(gMenu);
-        iconContainer.appendChild(gWrap);
-    }
+    // Google is the only control shown. Audio, video, save, my-words and study
+    // sheet are still constructed — other code holds references to saveBtn /
+    // #sr-save-btn — they are simply not attached.
+    // It used to be hidden whenever the source looked Sinhala, which made no
+    // sense once there are thirteen languages: searching the web for the word
+    // you just highlighted is useful whatever script it is in.
+    gWrap.appendChild(googleBtn);
+    gWrap.appendChild(gMenu);
+    iconContainer.appendChild(gWrap);
     const headerTop = bubble.querySelector('.sr-header-top'); if(headerTop) headerTop.appendChild(iconContainer);
 
-    if (!isSinhala) {
-        chrome.storage.local.get(['savedWords'], (result) => {
-            if (result.savedWords && result.savedWords.some(w => w.word === word)) { saveBtn.classList.add('sr-saved'); }
-        });
-    }
+    chrome.storage.local.get(['savedWords'], (result) => {
+        if (result.savedWords && result.savedWords.some(w => w.word === word)) { saveBtn.classList.add('sr-saved'); }
+    });
 }
 
 // UNCHANGED: Setup More Button
