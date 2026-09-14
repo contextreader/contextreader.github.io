@@ -9,6 +9,8 @@ fits.
 
 **Free. Open source. No server. No tracking. No account.**
 
+[contextreader site](https://ianxavierx.github.io/contextreader/) · [Privacy](PRIVACY_POLICY.md) · [Contributing](CONTRIBUTING.md)
+
 ---
 
 ## Why it works this way

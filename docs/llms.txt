@@ -36,6 +36,6 @@ pdfium) retains its own licences; see NOTICE in the repository.
 
 ## Links
 
-- Source: https://github.com/IanXavierx/context-reader-sinhala-direct
-- Privacy policy: https://github.com/IanXavierx/context-reader-sinhala-direct/blob/main/PRIVACY_POLICY.md
-- Contributing (adding a language): https://github.com/IanXavierx/context-reader-sinhala-direct/blob/main/CONTRIBUTING.md
+- Source: https://github.com/IanXavierx/contextreader
+- Privacy policy: https://github.com/IanXavierx/contextreader/blob/main/PRIVACY_POLICY.md
+- Contributing (adding a language): https://github.com/IanXavierx/contextreader/blob/main/CONTRIBUTING.md

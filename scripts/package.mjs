@@ -38,7 +38,7 @@ if (missing.length) {
 }
 
 const outDir = join(ROOT, 'dist');
-const out = join(outDir, `context-reader-${manifest.version}.zip`);
+const out = join(outDir, `contextreader-${manifest.version}.zip`);
 mkdirSync(outDir, { recursive: true });
 rmSync(out, { force: true });
 
