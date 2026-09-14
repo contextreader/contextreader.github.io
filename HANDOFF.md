@@ -5,8 +5,8 @@ Last updated 2026-09-14. Read this before changing anything.
 **Repo** `contextreader/contextreader.github.io` — private. Was public for about an hour on
 14 Sep; assume that window may have been cloned. Nothing sensitive was in it.
 
-**State** 41 commits · `npm test` → 358 assertions · `npm run package` → 132 KB ·
-13 languages · 2 permissions · 1 host.
+**State** 43 commits · `npm test` → 360 assertions · `npm run package` → 132 KB ·
+13 languages on 9 typesets · 2 permissions · 1 host.
 
 ---
 
@@ -68,13 +68,21 @@ Settings.
 
 ## Next session's work
 
-1. **Languages past 100.** Split script from language in `lib/languages.js`: ~20 scripts each
-   defined once with a Noto family and a detection range, languages referencing them. Today
-   every pack carries its own font and regex, which makes each new language a font hunt.
-   Keep `tuned`/`examples` — at that scale the honesty matters more, not less, and only
-   English and Sinhala have checked examples. **Do not machine-translate examples.**
+1. **Languages past 100.** The restructure is done (14 Sep): `TYPESETS` holds font, Google
+   Fonts family, detection regex and direction once; `LANGUAGES` entries name one. A language
+   on an existing typeset is now one line. `getLang()` still returns the old flat shape, so
+   no consumer changed — keep it that way. What's left is the data: add the languages, and a
+   `TYPESETS` entry per new script. Check as you go:
+   - **Every new `family` URL must return 200.** The css2 API rejects a request that asks for
+     a weight the family doesn't have, and every entry today asks for `400;600;800` — don't
+     assume a new Noto family has all three. `curl -sI` each one.
+   - Keep `tuned`/`examples` honest — at that scale it matters more, not less, and only
+     English and Sinhala have checked examples. **Do not machine-translate examples.**
+   - `sc` and `jp` overlap in Han on purpose. Typesets are render bundles, not Unicode
+     scripts; don't merge entries because their ranges overlap.
 2. **Search in the language picker** — Settings and popup. Match native name, English name
-   and code. Not the bubble: it is `overflow:hidden` with no shadow DOM.
+   and code. Not the bubble: it is `overflow:hidden` with no shadow DOM. At 100 entries a
+   plain `<select>` stops being usable, so this lands with or before item 1's data.
 3. **New logo.** `icon128.png` is puzzle pieces around a **Sinhala glyph**, and mush at the
    32px it mostly lives at. Generate several directions for review first.
    *Blocked:* `MCP_DOCKER` has not connected — no image tooling.

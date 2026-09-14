@@ -84,5 +84,17 @@ ok('Hindi word is Hindi script', L.isScript('\u092a\u0930\u094d\u092f\u093e\u093
 ok('empty and numeric text match nothing', !L.isScript('', 'si') && !L.isScript('123', 'en'));
 ok('every pack has a script test', L.listLangs().every((l) => l.script instanceof RegExp));
 
+console.log('languages resolve through typesets:');
+// A mistyped typeset name would otherwise surface as a lookup that silently
+// loads no font — nothing throws until a reader sees tofu.
+const unresolved = Object.entries(L.LANGUAGES).filter(([, p]) => !L.TYPESETS[p.typeset]).map(([c]) => c);
+ok('every language names a defined typeset', unresolved.length === 0, unresolved.join());
+// The fallback used to spread the raw table entry; after the split that would
+// hand back a typeset name and no font.
+const fb = L.getLang('xx');
+ok('unknown code falls back to a fully resolved English',
+   fb.code === 'en' && fb.font === 'inherit' && fb.script instanceof RegExp && !('typeset' in fb),
+   JSON.stringify(fb));
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
