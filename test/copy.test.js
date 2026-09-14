@@ -75,5 +75,17 @@ ok('asks for the key', /id="welcome-open-settings"/.test(welcome) && /aistudio\.
 ok('says why it needs one', /no server/i.test(welcome));
 ok('key status is wired', /welcome-key-status/.test(read('welcome.js')) && /getKeyState/.test(read('welcome.js')));
 
+console.log('the site lists exactly the languages the extension offers:');
+{
+    const L = require('../lib/languages.js');
+    const site = read('docs/index.html');
+    const block = site.slice(site.indexOf('<!-- languages:start'), site.indexOf('<!-- languages:end'));
+    const missing = L.listLangs().filter((l) => !block.includes(`lang="${l.code}"`)).map((l) => l.code);
+    const listed = (block.match(/<li[ >]/g) || []).length;
+    ok('every language is on the site, and nothing extra', missing.length === 0 && listed === L.listLangs().length, { missing, listed });
+    ok('the site names the right count', site.includes(`>${L.listLangs().length}<`) && !/\b13 languages\b/.test(site));
+    ok('the site makes no third-party font request', !/fonts\.googleapis\.com|fonts\.gstatic\.com/.test(site));
+}
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

@@ -136,9 +136,13 @@ Full tokens in `~/.claude/commands/brand-guide.md`.
    lookup was a "key needed" card. It now goes language → key (with why) → pin → highlight →
    the two-sentence `culture` demo, lists only what the bubble really has, and shows whether
    a key is set. `test/copy.test.js` holds all of it.
-5. **Landing page.** `docs/index.html` is the old page and reads as Sinhala-first. A redesign
-   exists as a preview but was not committed; it needs the 100+ language treatment and the
-   brand colours before it lands.
+5. ~~**Landing page.**~~ — rebuilt 15 Sep in `docs/index.html`. Leads with English: the
+   `culture` pair (lab report vs job review), with the measured Sinhala answer as one
+   example among 110, not the headline. The 110-name list is generated from
+   `lib/languages.js` between `languages:start/end` markers, and `test/copy.test.js` fails if
+   the two drift. **The site makes no third-party requests**: Inter is self-hosted in
+   `docs/fonts/` (OFL). The logo's lit-word device is the one bold element. Not yet seen by
+   a human in a browser; Pages is still off.
 6. **Then publish** — public repo, Pages from `main` `/docs`, store submission. Screenshots
    (1280×800 plus a 440×280 tile) are the hard blocker; `STORE_LISTING.md` lists the four
    worth taking.
