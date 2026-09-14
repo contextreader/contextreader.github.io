@@ -41,6 +41,12 @@ for (const f of ['popup.html', 'options.html', 'welcome.html']) {
     ok(`${f} paints nothing with a teal token`, uses.length === 0, uses);
 }
 
+{
+    const src = read('content.js');
+    const teal = src.match(/#0891b2|#0e7490|rgba\(8,\s*145,\s*178/gi) || [];
+    ok('content.js paints nothing teal (the --sr-teal-* names resolve to ink)', teal.length === 0, teal);
+}
+
 console.log('the welcome page covers the step people get stuck on:');
 const welcome = read('welcome.html');
 ok('asks for the key', /id="welcome-open-settings"/.test(welcome) && /aistudio\.google\.com\/apikey/.test(welcome));

@@ -98,10 +98,12 @@ const styles = `
       --sr-glass-mid: rgba(255,255,255,0.54);
       --sr-glass-bot: rgba(255,255,255,0.58);
       /* accent glass, by role — see the panel comments below */
-      --sr-teal-deep: #0e7490;
-      --sr-teal-veil: rgba(8,145,178,0.09);
-      --sr-teal-line: rgba(8,145,178,0.26);
-      --sr-teal-glow: rgba(8,145,178,0.28);
+      /* Teal is retired (palette decision, 15 Sep): these names stay because
+         rules reference them, but they resolve to neutral ink. */
+      --sr-teal-deep: #374151;
+      --sr-teal-veil: rgba(17,24,39,0.04);
+      --sr-teal-line: rgba(17,24,39,0.12);
+      --sr-teal-glow: rgba(17,24,39,0.14);
       --sr-green: #047857;
       --sr-green-line: rgba(16,185,129,0.28);
       /* Neutral directional rim: one light source, top-left. Bright white where
@@ -244,11 +246,11 @@ const styles = `
         display: flex; justify-content: space-between; align-items: center; 
         margin-bottom: var(--space-lg); 
         padding-bottom: var(--space-md);
-        border-bottom: 2px solid #ecfeff; 
+        border-bottom: 2px solid rgba(17,24,39,0.08); 
     }
     
     .sr-general-title { 
-        font-size: 16px; font-weight: 700; color: #0891b2; 
+        font-size: 16px; font-weight: 700; color: var(--sr-ink); 
         display: flex; align-items: center; 
         gap: var(--space-md); 
     }
@@ -271,7 +273,7 @@ const styles = `
     }
     
     .sr-general-sinhala { 
-        color: #0891b2; font-weight: 700; 
+        color: var(--sr-ink); font-weight: 700; 
         font-family: var(--sr-lang-font, sans-serif); 
         margin-top: var(--space-md); 
         font-size: 13px; 
@@ -284,7 +286,7 @@ const styles = `
     }
     
     .sr-general-uses-title { 
-        font-size: 13px; font-weight: 700; color: #0e7490; 
+        font-size: 13px; font-weight: 700; color: var(--sr-ink-soft); 
         margin-bottom: var(--space-md); 
     }
     
@@ -298,7 +300,7 @@ const styles = `
     }
     
     .sr-gen-trans { 
-        color: #0891b2; font-weight: 700; 
+        color: var(--sr-ink); font-weight: 700; 
         font-family: var(--sr-lang-font, sans-serif); 
     }
     
@@ -382,9 +384,13 @@ const styles = `
         transform: translateY(-1px);
     }
     
+    /* The answer line lives here, so this band is near-opaque milk rather than
+       glass. Measured from pixels (15 Sep), the translucent version gave the
+       amber answer 2.67:1 over a dark page and 3.86:1 over a busy photo; this
+       gives 4.91 and 5.21, and 5.49 on white. Raise it before lowering it. */
     .sr-header {
         padding: var(--space-lg) var(--space-xl);
-        background: linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0));
+        background: linear-gradient(180deg, rgba(255,255,255,0.86), rgba(255,255,255,0.80));
         border-bottom: 1px solid rgba(255,255,255,0.35);
         cursor: move; user-select: none; flex-shrink: 0; position: relative;
     }
@@ -394,8 +400,11 @@ const styles = `
         padding-right: 30px; 
     }
     
+    /* font-family and line-height are explicit because this is an <h2>, and
+       sites style h2 directly — PubMed set it in Merriweather. */
     .sr-word {
         margin:0; font-size: 22px; font-weight: 800;
+        font-family: inherit; line-height: 1.25;
         color: var(--sr-ink); letter-spacing: -0.5px;
         text-shadow: 0 1px 0 rgba(255,255,255,0.55);
     }
@@ -410,9 +419,12 @@ const styles = `
         line-height: 1.5;
     }
     
+    /* padding / box-sizing / min-width: host pages style bare <button>.
+       PubMed's padding:10px 20px left a 40px icon button a 0px content box. */
     .sr-close-btn {
         position: absolute; top: 12px; right: 12px;
         width: 26px; height: 26px; border-radius: 50%;
+        padding: 0; margin: 0; box-sizing: border-box; min-width: 0; line-height: 1;
         background: var(--sr-glass-soft);
         -webkit-backdrop-filter: blur(var(--space-lg));
         backdrop-filter: blur(var(--space-lg));
@@ -490,7 +502,10 @@ const styles = `
        Chips and pills carry no body text, so they take Liquid Glass neat:
        almost no tint, and the edge doing all the work. position:relative is
        required — the ::before is absolutely positioned against it. */
-    .sr-icon-btn, .sr-secondary-btn, .sr-close-btn, .sr-cancel-btn,
+    /* .sr-close-btn is NOT in this list: it is position:absolute (declared
+       above), which anchors its ::before just as well, and listing it here
+       overrode that and dropped the × into the header's flow on every page. */
+    .sr-icon-btn, .sr-secondary-btn, .sr-cancel-btn,
     .sr-view-btn, .sr-delete-btn, .sr-nav-btn { position: relative; }
     .sr-icon-btn::before, .sr-secondary-btn::before, .sr-close-btn::before,
     .sr-cancel-btn::before, .sr-view-btn::before, .sr-delete-btn::before,
@@ -509,6 +524,7 @@ const styles = `
 
     .sr-icon-btn {
         width: var(--space-xxl); height: var(--space-xxl);   /* 34px, Fibonacci */
+        padding: 0; margin: 0; box-sizing: border-box; min-width: 0;   /* see .sr-close-btn */
         border-radius: 50%;
         background: rgba(255,255,255,0.16);
         -webkit-backdrop-filter: var(--sr-fx-sm);
@@ -710,16 +726,16 @@ const styles = `
         animation: fadeIn var(--timing-normal) both;
     }
     .sr-general-box {
-        background: linear-gradient(180deg, rgba(236,254,255,0.78) 0%, rgba(236,254,255,0.52) 100%);
+        background: linear-gradient(180deg, rgba(255,255,255,0.78) 0%, rgba(255,255,255,0.52) 100%);
         border: 1px solid var(--sr-teal-line);
     }
     .sr-general-box .sr-label { color: var(--sr-teal-deep); }
     .sr-general-box .sr-sub-text {
-        background: rgba(8,145,178,0.08);
+        background: rgba(17,24,39,0.04);
         border-color: var(--sr-teal-line);
-        color: #0b4f5e;
+        color: var(--sr-ink-soft);
     }
-    .sr-general-box .sr-sub-text b { color: var(--sr-teal-deep); background: rgba(8,145,178,0.14); }
+    .sr-general-box .sr-sub-text b { color: var(--sr-teal-deep); background: rgba(17,24,39,0.07); }
 
     .sr-simple-box {
         background: linear-gradient(180deg, rgba(240,253,244,0.80) 0%, rgba(240,253,244,0.54) 100%);
@@ -2074,7 +2090,7 @@ function showSavedList() {
             body.innerHTML = `<div style="padding:40px 20px; text-align:center; color:#6b7280;"><div style="font-size:30px; margin-bottom:10px;">🔭</div>No words saved yet.<br>Click the ❤️ to start building your library!</div><div style="text-align:center; padding-bottom:10px;"><button id="sr-back-list" class="sr-secondary-btn">⬅ Back</button></div>`;
         } else {
             let html = `<div style="padding:10px;"><h3 style="margin:0 0 15px 5px; font-size:16px; color:#111827; display:flex; justify-content:space-between; align-items:center;">My Library <span style="font-size:12px; font-weight:400; color:#6b7280; background:#f3f4f6; padding:2px 8px; border-radius:10px;">${list.length} / ${SAVED_WORDS_LIMIT}</span></h3>
-            <div style="text-align:right; margin-bottom:10px;"><button id="sr-export-csv" style="font-size:11px; color:#0369a1; background:none; border:none; cursor:pointer; text-decoration:underline;">📥 Export CSV</button></div>`;
+            <div style="text-align:right; margin-bottom:10px;"><button id="sr-export-csv" style="font-size:11px; color:#374151; background:none; border:none; cursor:pointer; text-decoration:underline;">📥 Export CSV</button></div>`;
             list.forEach(item => {
                 html += `<div class="sr-list-item"><div><div class="sr-list-word">${item.word}</div><div class="sr-list-trans">${item.trans}</div></div><div class="sr-action-group"><button class="sr-view-btn" title="View Details" data-word="${item.word}">👁️</button><button class="sr-delete-btn" title="Delete" data-word="${item.word}">×</button></div></div>`;
             });

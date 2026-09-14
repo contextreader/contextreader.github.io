@@ -36,18 +36,26 @@ Everything else is logic tested against a stubbed `chrome` and a DOM shim that r
 nothing at all. `npm test` passing means the logic holds; it says nothing about whether the
 thing looks right or is readable.
 
-Check these in a real browser, worst-first:
+Check these in a real browser, worst-first. **Five of eight were run on 15 Sep** by injecting
+the real `content.js` into pages with Playwright (see below); the three left need a real key.
 
-| # | Check | Why it is the risk |
+| # | Check | Result |
 |---|---|---|
-| 1 | A lookup on a **dark page** | The answer line measures ~2:1 contrast against the composited scrim. That line is the product. This is the one that can invalidate work rather than merely look wrong. |
-| 2 | Target **Hindi**, then **More**, **General**, **Simple** | These three were hardcoded Sinhala until 14 Sep while the first bubble was correct. Fixed and covered by tests, but never watched running. |
-| 3 | Target **English**, look up a hard English word | The same-language path: it must simplify, not echo the word back. |
-| 4 | Target **Sinhala**, `blood culture` | Must give `රුධිර වගාව`, not `වගාව`. The prompt has changed twice; this is the only check standing under it. |
-| 5 | A lookup on a **photo-heavy page** | The retune's main claim. Surface is 66/54/58%. If text is hard to read, raise `--sr-glass-top/mid/bot` in `content.js` `:root`. |
-| 6 | The **trigger** over busy text | Was the predicted failure of the first glass pass; the fix (most opaque surface rather than least) is untested. |
-| 7 | **Scroll** with the bubble open | Repaint cost unmeasured. The lens band was retired, which should have helped. |
-| 8 | **PubMed** | CSS-aggressive, and there is no shadow DOM protecting the bubble. |
+| 1 | A lookup on a **dark page** | ✓ **Was failing: 2.67:1**, measured from pixels. `.sr-header` is now near-opaque milk (0.86→0.80): **4.91:1**. |
+| 2 | Target **Hindi**, then **More**, **General**, **Simple** | Needs a real key. Hardcoded-Sinhala fix is covered by tests, never watched running. |
+| 3 | Target **English**, look up a hard English word | Needs a real key. Must simplify, not echo the word back. |
+| 4 | Target **Sinhala**, `blood culture` | Needs a real key. Must give `රුධිර වගාව`, not `වගාව`. |
+| 5 | A lookup on a **photo-heavy page** | ✓ **Was 3.86:1** over a worst-case striped ground; **5.21:1** with the same header fix. White page 5.49:1. |
+| 6 | The **trigger** over busy text | ✓ Findable on dark and photo. Weakest on white (white disc, shadow only) — revisit with the new logo, whose mark it should share. |
+| 7 | **Scroll** with the bubble open | Not measured. |
+| 8 | **PubMed** | ✓ **Three bugs, fixed.** The × was in the header's flow on *every* page (a later `position:relative` list overrode it); PubMed's `h2` rule set the word in Merriweather; its `button{padding:10px 20px}` left the Google button a 0px content box, so no icon. |
+
+**How the bubble was measured.** `playwright-core` from `~/Desktop/interactive app/node_modules`
+(Chromium is in `~/Library/Caches/ms-playwright`). New page → `addScriptTag` a `window.chrome`
+stub, `lib/languages.js`, `content.js` → `setLang(code)` → `showBubble(x, y, buildLookupHTML(word, {t, d}))`
+→ screenshot at DPR 2. Contrast: ink = darker half of amber pixels (`r−b > 70`) in
+`.sr-translation`'s box, ground = median of the neutral pixels there. For live sites use
+`newContext({ bypassCSP: true })` — a content script bypasses page CSP, an injected tag does not.
 
 **Extension pages can be screenshotted without loading the extension.** Read the real
 `popup.html`/`welcome.html`/`options.html`, rewrite relative `src`/`href` to absolute
