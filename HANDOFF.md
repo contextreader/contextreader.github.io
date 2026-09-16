@@ -44,7 +44,7 @@ the real `content.js` into pages with Playwright (see below); the three left nee
 | 1 | A lookup on a **dark page** | ✓ **Was failing: 2.67:1**, measured from pixels. `.sr-header` is now near-opaque milk (0.86→0.80): **4.91:1**. |
 | 2 | Target **Hindi**, then **More**, **General**, **Simple** | Needs a real key. Hardcoded-Sinhala fix is covered by tests, never watched running. |
 | 3 | Target **English**, look up a hard English word | Needs a real key. Must simplify, not echo the word back. |
-| 4 | Target **Sinhala**, a domain term | Needs a real key **and Ian's judgement**. The old target `රුධිර වගාව` is wrong — he rejected it and `රෝග කාරක වගාව` on 15–16 Sep. What still needs checking: the answer commits to the domain sense rather than returning the bare dictionary word. **Ask Ian for a term he accepts, then re-pin this row.** |
+| 4 | Target **Sinhala**, `bank` in a finance sentence | Needs a real key. Must give **බැංකුව**, not ඉවුර (the river sense) — that pair already ships as a tuned example in `lib/languages.js`, so it is checkable today without waiting on new judgement. **Not** blood culture: `රුධිර වගාව` and `රෝග කාරක වගාව` were both rejected by Ian, and a medical example is deferred (see below). |
 | 5 | A lookup on a **photo-heavy page** | ✓ **Was 3.86:1** over a worst-case striped ground; **5.21:1** with the same header fix. White page 5.49:1. |
 | 6 | The **trigger** over busy text | ✓ Now the logo on an amber disc; clearly findable on white, dark and photo. (The white disc before it was weakest on white.) |
 | 7 | **Scroll** with the bubble open | Not measured. |
@@ -184,7 +184,12 @@ been steering every language, not sitting inert. Their before/after sets are
 
 Still open from that run:
 
-- **Sinhala blood culture** — see check 4 above. Ask Ian for a term he accepts.
+- **A medical Sinhala example — deferred, not blocking (17 Sep).** Ian chose to ship with what is
+  there and add one later. Nothing claims a medical Sinhala answer now: the blood-culture target is
+  marked disputed wherever it appears, and check 4 uses the finance pair instead. When it is picked
+  up: capture a term whose everyday and clinical senses differ (`acute` is half-measured already —
+  CLAUDE.md records 3.1 getting it right where 2.5-flash-lite does not), get Ian's yes on the
+  Sinhala, then pin it as check 4 and, if he vouches for the pair, add it to the `si` examples.
 - **Swahili**: "riverbank" came back as `ubao wa mto` ("plank of the river") twice, where
   `ukingo` is the usual word. A good first example pair if Swahili is ever tuned.
 - The four Sinhala example pairs in `lib/languages.js` carry the same "checked by a speaker"
