@@ -108,7 +108,32 @@ console.log('the site tells the truth about languages, however it presents them:
         // Regenerate with scripts/site-languages.mjs if a list comes back.
         ok('no printed list, so nothing can drift from lib/languages.js', true);
     }
-    ok('the site makes no third-party font request', !/fonts\.googleapis\.com|fonts\.gstatic\.com/.test(site));
+    // The rule is that the page LOADS nothing from anywhere else — not that it
+    // never says the words. Naming the hosts is what makes the privacy claim
+    // checkable: "a font request goes to fonts.googleapis.com, with no referrer"
+    // is worth more to a reader than hiding it. So this looks at subresources
+    // only: <link href>, src/srcset, CSS url(), @import. <a href> is a link a
+    // person clicks, not a request the page makes.
+    const external = [];
+    const scan = (re, what) => {
+        for (const m of site.matchAll(re)) {
+            const url = (m[1] || '').trim();
+            if (/^(https?:)?\/\//i.test(url)) external.push(`${what}: ${url.slice(0, 60)}`);
+        }
+    };
+    // rel=canonical and rel=alternate name a URL, they don't fetch one;
+    // preconnect and dns-prefetch DO open a connection, so they count.
+    for (const m of site.matchAll(/<link\b([^>]*)>/gi)) {
+        const tag = m[1];
+        const rel = (tag.match(/\brel\s*=\s*["']([^"']+)/i) || [, ''])[1].toLowerCase();
+        if (/canonical|alternate/.test(rel)) continue;
+        const href = (tag.match(/\bhref\s*=\s*["']([^"']+)/i) || [, ''])[1].trim();
+        if (/^(https?:)?\/\//i.test(href)) external.push(`link rel=${rel || '?'}: ${href.slice(0, 60)}`);
+    }
+    scan(/\b(?:src|srcset)\s*=\s*["']([^"',]+)/gi, 'src');
+    scan(/url\(\s*["']?([^"')]+)/gi, 'css url()');
+    scan(/@import\s+(?:url\()?\s*["']?([^"');]+)/gi, '@import');
+    ok('the site loads nothing from a third party', external.length === 0, external);
 }
 
 console.log(`\n${pass} passed, ${fail} failed`);
