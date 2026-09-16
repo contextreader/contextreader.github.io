@@ -176,6 +176,12 @@ Fixed here on 16 Sep, each with a test that fails without the fix:
 - `isScript()` said Turkish `kıyı`, `Işık` and Polish `Łódź` were not Latin: the typeset used
   `[A-Za-z]`. It is `\p{Script=Latin}` now.
 
+**Confirmed against the real model after the fix (16 Sep).** The landing session re-captured
+25 languages through a build of `23cb579`: Urdu Simple came back in Urdu script first try, no
+retries, and **all 25 More answers changed** — the hardcoded "translate to Sinhala" step had
+been steering every language, not sitting inert. Their before/after sets are
+`modes-ext-oldprompt.json` and the current one in that session's scratchpad.
+
 Still open from that run:
 
 - **Sinhala blood culture** — see check 4 above. Ask Ian for a term he accepts.
