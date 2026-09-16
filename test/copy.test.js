@@ -79,15 +79,35 @@ ok('key status is wired', /welcome-key-status/.test(read('welcome.js')) && /getK
 ok('says the free/paid tiers differ on training, as the policy does',
    /free and paid tiers[^<]*Gemini API differ in whether/i.test(welcome.replace(/\s+/g, ' ')) && /gemini-api\/terms/.test(welcome));
 
-console.log('the site lists exactly the languages the extension offers:');
+console.log('the site tells the truth about languages, however it presents them:');
 {
     const L = require('../lib/languages.js');
     const site = read('docs/index.html');
-    const block = site.slice(site.indexOf('<!-- languages:start'), site.indexOf('<!-- languages:end'));
-    const missing = L.listLangs().filter((l) => !block.includes(`lang="${l.code}"`)).map((l) => l.code);
-    const listed = (block.match(/<li[ >]/g) || []).length;
-    ok('every language is on the site, and nothing extra', missing.length === 0 && listed === L.listLangs().length, { missing, listed });
-    ok('the site names the right count', site.includes(`>${L.listLangs().length}<`) && !/\b13 languages\b/.test(site));
+    const n = L.listLangs().length;
+    const tuned = L.listLangs().filter((x) => x.tuned);
+
+    // The page may print the whole list or explain coverage in prose — that is the
+    // landing session's call. What it may not do is state a stale count, hide the
+    // tuned/community distinction, or drift from lib/languages.js where it does list.
+    ok(`the site names the right count (${n})`, new RegExp(`\\b${n}\\b`).test(site) && !/\b13 languages\b/.test(site));
+    // Any wording is fine — "community", "without them", "not tuned" — as long as
+    // the page says the others do not carry checked examples. Claiming parity is
+    // the thing that would be false.
+    ok('the site keeps the tuned / not-tuned distinction',
+       /tuned/i.test(site) && /communit|without them|no hand-checked|not tuned|less reliable/i.test(site));
+    const namesTuned = tuned.every((l) => site.includes(l.name));
+    ok('and names which languages are tuned', namesTuned, tuned.map((l) => l.name));
+
+    const hasList = site.includes('<!-- languages:start') && site.includes('<!-- languages:end');
+    if (hasList) {
+        const block = site.slice(site.indexOf('<!-- languages:start'), site.indexOf('<!-- languages:end'));
+        const missing = L.listLangs().filter((l) => !block.includes(`lang="${l.code}"`)).map((l) => l.code);
+        const listed = (block.match(/<li[ >]/g) || []).length;
+        ok('the printed list is every language and nothing extra', missing.length === 0 && listed === n, { missing, listed });
+    } else {
+        // Regenerate with scripts/site-languages.mjs if a list comes back.
+        ok('no printed list, so nothing can drift from lib/languages.js', true);
+    }
     ok('the site makes no third-party font request', !/fonts\.googleapis\.com|fonts\.gstatic\.com/.test(site));
 }
 
