@@ -689,7 +689,8 @@ Output ONLY this JSON: {"t": "<the {{langName}} answer for THIS context — a tr
 //
 // Why history exists. The Worker-era measurement recorded in CLAUDE.md is that
 // weakening SYSTEM_INSTRUCTION degrades output — without its domain-matching
-// rules the model returned වගාව instead of රුධිර වගාව for "blood culture". An
+// rules the model returned වගාව instead of the full domain term for "blood culture"
+// (the Sinhala target first used there is disputed — see CLAUDE.md). An
 // editable prompt with no way back would put that regression one keystroke
 // away, so every save snapshots both prompts and any snapshot can be restored.
 //
@@ -1001,7 +1002,7 @@ STEP 3 - CREATE MATCHING CONTENT:
    - Should feel like "bonus content" from the same article/book/text
    - Must use "${word}" naturally
 
-STEP 4 - TRANSLATE TO SINHALA:
+STEP 4 - TRANSLATE TO ${lv.langName}:
 - Wrap the ${lv.langName} word for "${word}" in <b> tags EVERY TIME it appears
 - Match the formality level: formal context = formal ${lv.langName}, casual context = casual ${lv.langName}
 - Use vocabulary from the same domain in ${lv.langName} too
@@ -1079,6 +1080,9 @@ YOUR TASK:
 IMPORTANT:
 - Use the SIMPLEST ${lv.langName} words possible (like texting a friend)
 - Don't use formal/literary ${lv.langName}
+- Write ${lv.langName} in its own script. Never romanise or transliterate it into
+  the Latin alphabet, even though the register is casual — the reader chose to
+  read ${lv.langName}, and the bubble sets its text direction for that script.
 - Help them understand THIS sentence, not give a general definition
 
 Output ONLY this HTML structure (No markdown):

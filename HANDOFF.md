@@ -44,7 +44,7 @@ the real `content.js` into pages with Playwright (see below); the three left nee
 | 1 | A lookup on a **dark page** | ✓ **Was failing: 2.67:1**, measured from pixels. `.sr-header` is now near-opaque milk (0.86→0.80): **4.91:1**. |
 | 2 | Target **Hindi**, then **More**, **General**, **Simple** | Needs a real key. Hardcoded-Sinhala fix is covered by tests, never watched running. |
 | 3 | Target **English**, look up a hard English word | Needs a real key. Must simplify, not echo the word back. |
-| 4 | Target **Sinhala**, `blood culture` | Needs a real key. Must give `රුධිර වගාව`, not `වගාව`. |
+| 4 | Target **Sinhala**, a domain term | Needs a real key **and Ian's judgement**. The old target `රුධිර වගාව` is wrong — he rejected it and `රෝග කාරක වගාව` on 15–16 Sep. What still needs checking: the answer commits to the domain sense rather than returning the bare dictionary word. **Ask Ian for a term he accepts, then re-pin this row.** |
 | 5 | A lookup on a **photo-heavy page** | ✓ **Was 3.86:1** over a worst-case striped ground; **5.21:1** with the same header fix. White page 5.49:1. |
 | 6 | The **trigger** over busy text | ✓ Now the logo on an amber disc; clearly findable on white, dark and photo. (The white disc before it was weakest on white.) |
 | 7 | **Scroll** with the bubble open | Not measured. |
@@ -155,6 +155,34 @@ Full tokens in `~/.claude/commands/brand-guide.md`.
    `scripts/store-assets.cjs`. Still to capture, from the real extension with a real key:
    the bubble over a real article (the one that sells it) and the model speed table. Do not
    stage those with invented answers or timings.
+
+---
+
+## From the landing session's capture run (15–16 Sep)
+
+It loaded an unpacked build in Playwright, set a real key and target language in
+`chrome.storage`, clicked the trigger and read answers out of the real bubble — roughly 700
+lookups across 25 languages on `gemini-3.1-flash-lite`. Raw captures with Google responseIds
+are in that session's scratchpad (`answers-ext2.json`, `modes-ext.json`).
+
+Fixed here on 16 Sep, each with a test that fails without the fix:
+
+- `lookupDetails` (**More**) told every language "STEP 4 — TRANSLATE TO SINHALA" while the
+  rest of its template interpolated `{{langName}}`. Output stayed in the right language, so
+  this was one model revision away from mattering.
+- `lookupSimple` (**Simple**) answered Urdu in **Roman Urdu** — Latin script — while General
+  answered in Urdu script in the same bubble. Its "like texting a friend" register read as
+  romanised. The prompt now forbids romanising and names the script.
+- `isScript()` said Turkish `kıyı`, `Işık` and Polish `Łódź` were not Latin: the typeset used
+  `[A-Za-z]`. It is `\p{Script=Latin}` now.
+
+Still open from that run:
+
+- **Sinhala blood culture** — see check 4 above. Ask Ian for a term he accepts.
+- **Swahili**: "riverbank" came back as `ubao wa mto` ("plank of the river") twice, where
+  `ukingo` is the usual word. A good first example pair if Swahili is ever tuned.
+- The four Sinhala example pairs in `lib/languages.js` carry the same "checked by a speaker"
+  assumption the disputed target did. Worth having Ian read those four while he is at it.
 
 ---
 

@@ -59,7 +59,9 @@ English · සිංහල Sinhala · Afrikaans · Shqip Albanian · አማር�
 **English and Sinhala are tuned.** A tuned language ships worked examples — contrastive
 pairs like *"bank" in finance is a financial institution, not the edge of a river* — that
 teach the model to pick the sense that matches the domain. Sinhala's are the measured set:
-without them the model returned වගාව instead of රුධිර වගාව for *blood culture*.
+without them the model returned වගාව instead of the full domain term for *blood culture*.
+(The Sinhala wording first used as that target is disputed by a native speaker; the effect
+of the examples is not.)
 
 The other 108 work, but have no hand-checked examples yet, so domain-specific senses may
 be less accurate. The interface says so rather than pretending otherwise.

@@ -8,6 +8,37 @@ let pass = 0, fail = 0;
 const eq = (l, g, w) => { const ok = JSON.stringify(g) === JSON.stringify(w); ok?pass++:fail++;
   console.log(`  ${ok?'PASS':'FAIL'}  ${l}${ok?'':`\n         got  ${JSON.stringify(g)?.slice(0,200)}\n         want ${JSON.stringify(w)?.slice(0,200)}`}`); };
 
+console.log('no panel hardcodes Sinhala outside the Sinhala-only functions:');
+// lookupDetails told EVERY language "STEP 4 - TRANSLATE TO SINHALA" while the rest of
+// its template interpolated ${lv.langName}. Found 16 Sep by the session capturing real
+// answers through the unpacked extension. The Sinhala-to-Sinhala functions below that
+// banner are allowed to say Sinhala — that is their whole job.
+{
+  const { readFileSync } = await import('node:fs');
+  const bg = readFileSync(new URL('../background.js', import.meta.url), 'utf8');
+  // Each shared lookup's own body — not comments, and not the lookup*Sinhala
+  // routing names, which are how the monolingual mode is reached.
+  const body = (name) => {
+    const a = bg.indexOf(`async function ${name}(`);
+    if (a < 0) throw new Error(`prompts test: ${name} is gone — rename the test with it`);
+    return bg.slice(a, bg.indexOf('\n}', a)).replace(/^\s*\/\/.*$/gm, '');
+  };
+  for (const fn of ['lookupContext', 'lookupDetails', 'lookupGeneral', 'lookupSimple'])
+    eq(`${fn} names no language of its own`, (body(fn).match(/Sinhala/gi) || []), []);
+  eq('the Sinhala-only section still exists', bg.includes('SINHALA-TO-SINHALA'), true);
+}
+
+console.log('Simple mode must answer in the reader\'s own script:');
+// For Urdu, Simple returned Roman Urdu ("Yahan significant ka matlab hai…") while General
+// returned proper Urdu script — the "like texting a friend" register reads as romanised.
+{
+  const { readFileSync } = await import('node:fs');
+  const bg = readFileSync(new URL('../background.js', import.meta.url), 'utf8');
+  const simple = bg.slice(bg.indexOf('async function lookupSimple('), bg.indexOf('async function lookupSimple(') + 2000);
+  eq('lookupSimple forbids romanising', /[Nn]ever romanise|[Nn]ever romanize/.test(simple), true);
+  eq('…and says to use the language\'s own script', /own script/.test(simple), true);
+}
+
 console.log('default template derivation:');
 const d = M.promptDefaults();
 eq('lookup default has {{word}}', d.lookup.includes('{{word}}'), true);

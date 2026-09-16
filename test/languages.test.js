@@ -54,6 +54,14 @@ ok('scripts using \\p{} carry the u flag', Object.values(L.TYPESETS).every((t) =
 ok('isScript works with a \\p{} typeset', L.isScript('ελληνικά', 'el') && !L.isScript('ελληνικά', 'ru'));
 ok('Traditional characters count as the tc typeset', L.isScript('繁體中文', 'zh-TW'));
 
+console.log('Latin script detection covers Latin, not just ASCII:');
+// [A-Za-z] said Turkish kıyı and Polish Łódź were not Latin script. Found 16 Sep
+// against the real extension.
+for (const [text, code] of [['kıyı', 'tr'], ['Işık', 'tr'], ['Łódź', 'pl'], ['café', 'fr'],
+                            ['Tiếng Việt', 'vi'], ['Yorùbá', 'yo'], ['Gàidhlig', 'gd'], ['constrained', 'en']])
+    ok(`${text} is Latin script`, L.isScript(text, code), L.isScript(text, code));
+ok('other scripts are still not Latin', !['පරිසරය', '日本語', 'Привет', 'العربية'].some((t) => L.isScript(t, 'en')));
+
 console.log('browser locale → language:');
 for (const [ui, want] of [
     ['zh-TW', 'zh-TW'], ['zh-HK', 'zh-TW'], ['zh-CN', 'zh'], ['zh', 'zh'],

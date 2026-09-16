@@ -62,6 +62,11 @@ highlight word → content.js captures word + surrounding context
 1. **`SYSTEM_INSTRUCTION`** — verbatim from the old Worker. 1,004 chars of domain-matching
    rules (`"bank" in finance = බැංකුව, NOT ඉවුර`). Removing it measurably degrades output:
    without it the model returned `වගාව` instead of `රුධිර වගාව` for blood culture.
+   **The target in that measurement is disputed (16 Sep).** Ian, a native speaker, says
+   `රුධිර වගාව` is *not* correct for blood culture, and rejected `රෝග කාරක වගාව` too. What the
+   measurement shows — with the domain rules the model commits to a domain sense, without
+   them it falls back to the bare dictionary word — is unaffected; the example it was scored
+   against is. Don't cite blood culture as a Sinhala success until Ian supplies the term.
    **Now the editable default, not a constant** — see Editable prompts below.
 2. **`LOOKUP_PROMPT_FULL` + `LOOKUP_JSON_CONTRACT`** — the production prompt plus an
    explicit `{t,d}` contract. The prompt is also editable; the contract is not.
@@ -127,7 +132,7 @@ Measured, same model, same prompt:
 
 | | `t` alone (MODE C) | `t`+`d` together |
 |---|---|---|
-| `culture` (blood culture) | `සංස්කෘතිය (Culture)` ✗ | `රක්ත වගාව` ✓ |
+| `culture` (blood culture) | `සංස්කෘතිය (Culture)` ✗ | `රක්ත වගාව` — domain-shaped, but **the Sinhala is disputed**; see above |
 
 Cost of the single call: ~1.4–4.3s to full result, versus MODE C painting the word at ~1s.
 The fix is **not** to re-split — it is to stream the single call and render `t` as soon as
