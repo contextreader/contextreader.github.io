@@ -262,6 +262,8 @@
         }
         .privacy-note h3 { font-size: 14px; font-weight: 700; color: #166534; margin-bottom: var(--space-sm); }
         .privacy-note p { font-size: 12.5px; color: #166534; line-height: 1.6; }
+        /* Inherit the note's green — a default-blue link is off-palette. */
+        .privacy-note a { color: inherit; text-decoration: underline; text-underline-offset: 3px; font-weight: 600; }
 
         /* ── the one action ─────────────────────────────────────────── */
         .cta { text-align: center; margin-top: var(--space-lg); }
@@ -416,6 +418,13 @@
                The word you look up and the sentence around it go from your browser to Google&rsquo;s
                Gemini with your key, and nowhere else. No analytics of any kind. The code is open
                source, so you can check.</p>
+            <p style="margin-top:var(--space-md)">One thing that is Google&rsquo;s side, not ours: the
+               free and paid tiers of the Gemini API differ in whether your prompts may be used to
+               improve Google&rsquo;s models. Which applies depends on the key you bring. The
+               <a href="https://ai.google.dev/gemini-api/terms" target="_blank" rel="noopener">Gemini API terms</a>
+               say which, and our
+               <a href="https://github.com/contextreader/contextreader.github.io/blob/main/PRIVACY_POLICY.md" target="_blank" rel="noopener">privacy policy</a>
+               says the same.</p>
         </div>
 
         <!-- CTA -->

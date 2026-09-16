@@ -74,6 +74,10 @@ const welcome = read('welcome.html');
 ok('asks for the key', /id="welcome-open-settings"/.test(welcome) && /aistudio\.google\.com\/apikey/.test(welcome));
 ok('says why it needs one', /no server/i.test(welcome));
 ok('key status is wired', /welcome-key-status/.test(read('welcome.js')) && /getKeyState/.test(read('welcome.js')));
+// The privacy policy has always said the free and paid Gemini tiers differ in whether
+// prompts may train Google's models; the page a new user actually reads did not.
+ok('says the free/paid tiers differ on training, as the policy does',
+   /free and paid tiers[^<]*Gemini API differ in whether/i.test(welcome.replace(/\s+/g, ' ')) && /gemini-api\/terms/.test(welcome));
 
 console.log('the site lists exactly the languages the extension offers:');
 {
