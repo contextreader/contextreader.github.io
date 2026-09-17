@@ -175,7 +175,28 @@ console.log('the site tells the truth about languages, however it presents them:
     scan(/\b(?:src|srcset)\s*=\s*["']([^"',]+)/gi, 'src');
     scan(/url\(\s*["']?([^"')]+)/gi, 'css url()');
     scan(/@import\s+(?:url\()?\s*["']?([^"');]+)/gi, '@import');
-    ok('the site loads nothing from a third party', external.length === 0, external);
+    // Two analytics hosts are allowed, both cookieless, because Ian wants visit
+    // numbers for the site. Nothing else may load — and an allowed host still has
+    // to be named in the privacy section, or the page would be counting people
+    // while telling them it doesn't. The extension takes neither: its "no
+    // tracking" claim is absolute and stays that way.
+    const ANALYTICS = { 'static.cloudflareinsights.com': 'Cloudflare Web Analytics', 'gc.zgo.at': 'GoatCounter' };
+    const allowed = Object.keys(ANALYTICS);
+    const host = (u) => (u.match(/^(?:https?:)?\/\/([^/]+)/i) || [, ''])[1].toLowerCase();
+    const strangers = external.filter((e) => !allowed.includes(host(e.split(': ')[1] || '')));
+    ok('the site loads nothing from a third party, bar analytics', strangers.length === 0, strangers);
+
+    // Look in the prose, not the markup: the <script> tag itself contains the
+    // host, so searching the whole file would count the beacon as its own
+    // disclosure — which it is not.
+    const prose = site.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<[^>]+>/g, ' ');
+    const undisclosed = external
+        .map((e) => host(e.split(': ')[1] || ''))
+        .filter((h) => allowed.includes(h))
+        .filter((h) => !new RegExp(ANALYTICS[h].split(' ')[0], 'i').test(prose));
+    ok('any analytics the site loads is named in the page itself', undisclosed.length === 0, undisclosed);
+    const extension = read('content.js') + read('background.js') + read('popup.html') + read('options.html') + read('welcome.html');
+    ok('and none of it is in the extension', !allowed.some((h) => extension.includes(h)));
 }
 
 console.log(`\n${pass} passed, ${fail} failed`);
