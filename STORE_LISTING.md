@@ -143,16 +143,14 @@ here; the privacy policy names the same address so the two agree.
   1. `1-english-significant.png` — the lead. The bubble over an article, English: "significant"
      in "the difference was not significant", answered "statistically meaningful".
   2. `2-hindi-significant.png` — the same word and sentence, Hindi.
-  3. `3-sinhala-significant.png` — the same, Sinhala, in the bundled Noto face.
+  3. `5-simple-panel.png` — the Simple panel open in Sinhala, in the bundled Noto face: the
+     panel treatment and a third script in one frame.
   4. `4-more-panel.png` — the More panel open, Hindi: English scenario above, Hindi below.
   5. `screenshot-language.png` — Settings, the language picker mid-search, Tuned and Community.
 
-  1–4 were captured through the unpacked extension with a real key, on a plain article written
-  for the purpose — real model output, nothing staged or edited.
-
-  Also in `store/`: `5-simple-panel.png`, the Simple panel in Sinhala. It proves the scrim fix
-  but was shot before the panel card was widened on 17 Sep, so it shows the old narrow column.
-  Re-shoot it before swapping it in for #3 or #4.
+  All four bubble shots were captured through the unpacked extension with a real key, on a
+  plain article written for the purpose — real model output, nothing staged or edited.
+  `3-sinhala-significant.png` is the alternate: the same word in Sinhala without a panel open.
 
 - [x] Small promo tile, 440×280 — `store/promo-440x280.png`
 

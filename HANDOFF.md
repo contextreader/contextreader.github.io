@@ -79,6 +79,12 @@ path, first 32 hex digits mapped 0-f → a-p), and the css2 API serves **one var
 every weight**, so saving per weight tripled `fonts/` to 5.3 MB before it was noticed.
 CJK stays remote: those families are megabytes each and every OS ships good ones.
 
+**A capture harness must reject error cards.** The landing session's rig waited for the panel
+to hold more than 30 characters, and a "Gemini error — UNAVAILABLE" card clears that easily —
+it reported success on a screenshot of a failure. It now rejects error, UNAVAILABLE, rate-limit
+and failed-to-load text and wants 60 characters. Worth knowing for any future capture: an exit
+code is not evidence, the frame is. (That 503 also says the free tier is thin.)
+
 **Two bugs the store screenshots found (17 Sep).** Shooting real captures is a check of its
 own: (1) the General/Simple panel opened on `rgba(0,0,0,0.5)` with a blur, so a panel *inside*
 the bubble darkened the milky surface behind it and read as a rendering fault — it is a light
@@ -86,7 +92,7 @@ veil now, and the card is opaque like the search menu; (2) **More and General pr
 everything twice for an English reader** — the templates ask for a block and then "the
 ${langName} version" of it, which is the same text when langName is English. `langVars()` now
 returns `bilingual`, and the second block and the translate step are dropped when it is false.
-Covered by integration assertions in both directions.
+Covered by integration assertions in both directions. A third followed from the re-shoot: the panel card was capped at 400/φ ≈ 247px, so a Sinhala explanation wrapped three words to a line inside a 400px bubble; it takes the bubble's width now.
 
 **How the bubble was measured.** `playwright-core` from `~/Desktop/interactive app/node_modules`
 (Chromium is in `~/Library/Caches/ms-playwright`). New page → `addScriptTag` a `window.chrome`
