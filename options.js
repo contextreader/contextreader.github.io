@@ -601,6 +601,92 @@ document.addEventListener('DOMContentLoaded', () => {
         await loadPrompts();
     });
 
+    // ── hand the prompt to an assistant ──────────────────────────────
+    //
+    // Editing a system instruction by hand is the kind of thing people paste
+    // into ChatGPT or Claude. What an assistant cannot guess is the part that
+    // breaks silently: {{langName}} has to survive, sr- class names are matched
+    // by the bubble's CSS, and the JSON contract below decides whether the
+    // answer parses at all. Both buttons carry that context; the second one also
+    // states the rules and the reply format, so what comes back can go straight
+    // back into the box.
+
+    function promptBundle() {
+        const sys = $('opt-prompt-system');
+        const holders = (promptState && promptState.placeholders && promptState.placeholders.system) || ['langName'];
+        const contract = (promptState && promptState.locked && promptState.locked.jsonContract || '').trim();
+        const schema = JSON.stringify(promptState && promptState.locked && promptState.locked.schema, null, 2);
+        return [
+            '# Context Reader — the system instruction',
+            '',
+            'Context Reader is a Chrome extension. Someone highlights a word they are stuck on',
+            'while reading, and it explains that word using the sentence around it, in the',
+            'language they chose. The text below is the system instruction it sends to Google\'s',
+            'Gemini on EVERY call: word lookups and the More, General and Simple panels alike.',
+            '',
+            'Constraints that are not style preferences:',
+            holders.map((h) => `- \`{{${h}}}\` must appear literally. It is substituted before sending; losing it breaks every lookup.`).join('\n'),
+            '- Leave any `sr-` class names alone. The bubble\'s CSS matches on them, and the model is asked to emit them as HTML.',
+            '- Domain matching is what this instruction is for: the model must pick the sense the sentence\'s field uses, not the first dictionary sense. Weakening that measurably degrades answers.',
+            '',
+            '## Current system instruction',
+            '',
+            '```',
+            (sys && sys.value) || '',
+            '```',
+            '',
+            '## Locked, for context — not yours to change',
+            '',
+            'The answer must parse as this JSON, or the bubble shows nothing:',
+            '',
+            '```',
+            contract,
+            '```',
+            '',
+            '```json',
+            schema,
+            '```',
+        ].join('\n');
+    }
+
+    const COPY_BRIEF = [
+        'You are helping me rewrite the system instruction for a Chrome extension. Read',
+        'everything below before answering.',
+        '',
+        'Rules:',
+        '1. Keep every {{placeholder}} exactly as written, in the same spelling.',
+        '2. Keep the domain-matching behaviour. It is the point of the instruction.',
+        '3. Do not rename or invent `sr-` class names.',
+        '4. Do not restate the JSON contract or schema in the instruction. They are sent separately.',
+        '5. Write it as an instruction to the model, not as an explanation to me.',
+        '',
+        'How to reply:',
+        '- If what I am asking for is unclear or looks like it would make answers worse, ask me',
+        '  your questions first and stop there.',
+        '- Otherwise reply with the finished instruction in ONE fenced code block and nothing',
+        '  else, so I can paste it straight back into the extension.',
+        '',
+        '---',
+        '',
+    ].join('\n');
+
+    async function copyPrompt(text, label) {
+        const out = $('opt-prompt-copy-out');
+        try {
+            await navigator.clipboard.writeText(text);
+            status('opt-prompt-copy-status', `${label} copied — paste it into your assistant.`, 'ok');
+            if (out) out.hidden = true;
+        } catch (e) {
+            // Clipboard permission can be refused; show the text rather than fail silently.
+            if (out) { out.value = text; out.hidden = false; out.focus(); out.select(); }
+            status('opt-prompt-copy-status', 'Could not reach the clipboard — copy it from the box below.', 'bad');
+        }
+    }
+
+    on('opt-prompt-copy', 'click', () => copyPrompt(promptBundle(), 'Prompt and context'));
+    on('opt-prompt-copy-brief', 'click', () =>
+        copyPrompt(COPY_BRIEF + promptBundle() + '\n\n## What I want changed\n\n(say it here)\n', 'Prompt, context and instructions'));
+
     on('opt-prompt-reset', 'click', async () => {
         const res = await send({ action: 'resetPrompts' });
         if (!res || !res.ok) {

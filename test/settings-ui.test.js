@@ -31,7 +31,7 @@ S.setResponder((msg) => {
     }, retentionDays: 30 };
     case 'getPrompts': return { prompts:{...defaults, customized:{system:false,lookup:false}},
       defaults, locked:{ jsonContract:'\nOutput ONLY this JSON: {...}', schema:{type:'OBJECT'} },
-      history: hist, placeholders:{lookup:['word','context'],system:[]} };
+      history: hist, placeholders:{lookup:['word','context','langName'],system:['langName']} };
     default: return { ok:true };
   }
 });
@@ -126,6 +126,36 @@ S.setResponder((msg) => {
   ok('select follows', lsel.value === 'en', lsel.value);
   ok('About row follows', /English/.test(S.els['opt-about-language'].textContent), S.els['opt-about-language'].textContent);
   ok('note follows, community to tuned', /^Tuned/.test(S.els['opt-language-note'].textContent), S.els['opt-language-note'].textContent);
+
+  console.log('handing the prompt to an assistant:');
+  S.els['opt-prompt-copy'].click(); await S.flush();
+  const bundle = S.clipboard[S.clipboard.length - 1] || '';
+  ok('copies the instruction itself', bundle.includes(defaults.system), bundle.slice(0, 80));
+  ok('says the placeholder must survive', /\{\{langName\}\}` must appear literally/.test(bundle));
+  ok('warns off the sr- class names', /sr-` class names alone/.test(bundle));
+  ok('carries the locked contract and schema', bundle.includes('Output ONLY this JSON') && bundle.includes('"type": "OBJECT"'));
+  ok('says where it is sent', /EVERY call/.test(bundle));
+  ok('copying is not saving', S.store.promptOverrides === undefined, S.store.promptOverrides);
+
+  S.els['opt-prompt-copy-brief'].click(); await S.flush();
+  const brief = S.clipboard[S.clipboard.length - 1] || '';
+  ok('the brief leads with the rules', brief.startsWith('You are helping me rewrite'));
+  ok('asks for one pasteable block back', /ONE fenced code block/.test(brief));
+  ok('tells it to ask questions when unclear', /ask me\n  your questions first/.test(brief));
+  ok('still carries the whole bundle', brief.includes(defaults.system) && brief.includes('Output ONLY this JSON'));
+  ok('leaves room for the goal', /## What I want changed/.test(brief));
+  ok('the plain copy has no instructions in it', !bundle.includes('You are helping me rewrite'));
+
+  // A browser that refuses the clipboard must not swallow the text.
+  S.setClipboardFails(true);
+  const before = S.clipboard.length;
+  S.els['opt-prompt-copy'].click(); await S.flush();
+  ok('refused clipboard reveals the text instead', S.els['opt-prompt-copy-out'].hidden === false
+     && S.els['opt-prompt-copy-out'].value.includes(defaults.system));
+  ok('and says so', /Could not reach the clipboard/.test(S.els['opt-prompt-copy-status'].textContent),
+     S.els['opt-prompt-copy-status'].textContent);
+  ok('nothing was copied', S.clipboard.length === before);
+  S.setClipboardFails(false);
 
   console.log(`\n${pass} passed, ${fail} failed`);
   process.exit(fail ? 1 : 0);

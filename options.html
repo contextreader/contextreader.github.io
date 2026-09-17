@@ -285,6 +285,8 @@
 
         /* The pill radius of .field is built for one line. A prompt is not one
            line, so this is the rounded-rect variant. */
+        /* the attribute must win over display:block below */
+        [hidden]{display:none !important}
         .textarea{
             width:100%; display:block; padding:var(--space-lg);
             background:var(--glass-soft);
@@ -570,6 +572,23 @@
                     <button id="opt-prompt-save" class="btn btn-primary">Save</button>
                     <button id="opt-prompt-reset" class="btn btn-sm">Reset to default</button>
                     <span id="opt-prompt-status" class="hint" style="margin-top:0"></span>
+                </div>
+                <div>
+                    <div class="field-label">Rewrite it with an assistant</div>
+                    <div class="row row-wrap">
+                        <button id="opt-prompt-copy" class="btn btn-sm">Copy for an LLM</button>
+                        <button id="opt-prompt-copy-brief" class="btn btn-sm">Copy with instructions</button>
+                        <span id="opt-prompt-copy-status" class="hint" style="margin-top:0"></span>
+                    </div>
+                    <div class="hint">
+                        Both copy the instruction along with what it is for, the placeholders it
+                        must keep and the locked output shape. <b>With instructions</b> adds the
+                        rules an assistant has to follow and asks it to reply with one finished
+                        instruction you can paste straight back into the box — or with questions,
+                        if what you want isn't clear yet. Say what you want changed at the end.
+                    </div>
+                    <textarea id="opt-prompt-copy-out" class="textarea" readonly hidden
+                              style="min-height:110px; margin-top:var(--space-md)"></textarea>
                 </div>
             </div>
             <div class="spread" style="margin-top:var(--space-xl)">

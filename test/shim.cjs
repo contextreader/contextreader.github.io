@@ -27,6 +27,7 @@ function makeEl(id, tag) {
       return out;
     },
     focus() { this._focused = true; },
+    select() { this._selected = true; },
     blur() { this._focused = false; },
     click() { (this.listeners.click || []).forEach(f => f({ stopPropagation(){} })); },
     change() { (this.listeners.change || []).forEach(f => f({})); },
@@ -80,6 +81,18 @@ globalThis.chrome = {
   } },
 };
 
+// Clipboard: options.js writes to it, and falls back to a textarea when the
+// browser refuses. `clipboardFails` drives that second path.
+const clipboard = [];
+let clipboardFails = false;
+// defineProperty, not assignment: Node ships its own read-only `navigator`, so
+// `globalThis.navigator = …` is dropped on the floor and options.js would see a
+// clipboard-less one.
+Object.defineProperty(globalThis, 'navigator', {
+  configurable: true,
+  value: { clipboard: { writeText: async (t) => { if (clipboardFails) throw new Error('denied'); clipboard.push(t); } } },
+});
+
 globalThis.CRDiff = require(path.join(DIR, 'lib/diff.js'));
 globalThis.CRLangPicker = require(path.join(DIR, 'lib/lang-picker.js'));
 
@@ -87,6 +100,8 @@ module.exports = {
   els, store, sess,
   setStore: (s) => { store = s; },
   setResponder: (f) => { responder = f; },
+  clipboard,
+  setClipboardFails: (v) => { clipboardFails = v; },
   fireStorageChange: (changes) => storageListeners.forEach((f) => f(changes, 'local')),
   run: () => { for (const el of Object.values(els)) el.listeners = {}; storageListeners.length = 0;
                delete require.cache[require.resolve(path.join(DIR, 'options.js'))];
