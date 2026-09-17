@@ -241,9 +241,9 @@ Still open from that run:
 
 ## Still true, still not done
 
-- `sinhala/` and `global/` stay private forever. `global/` has a **live Gemini key in
-  committed history**, plus a Supabase anon key and an HMAC secret. Rotate all three
-  regardless.
+- The two retired builds stay private forever. Credentials were committed to one of them
+  during development; rotate anything that was ever used there. Details stay out of this
+  file now that this repo is public — see the private notes.
 - The PDF reader is in the repo and out of the build. `npm run package` fails loudly if a
   `pdf*` file ever reaches the zip.
 - Study Sheet is out of 1.0 — hardcoded Sinhala both ways, CEFR levels only as en/si pairs.
