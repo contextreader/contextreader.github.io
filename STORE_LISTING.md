@@ -139,16 +139,21 @@ here; the privacy policy names the same address so the two agree.
 
 ## Assets still required
 
-- [x] Screenshots, 1280×800 — five, all in `store/`:
-  1. `1-english-significant.png` — the bubble over an article, English. The lead image:
-     "significant" in "the difference was not significant", answered "statistically meaningful".
+- [x] Screenshots, 1280×800 — the store takes five. Upload in this order, all from `store/`:
+  1. `1-english-significant.png` — the lead. The bubble over an article, English: "significant"
+     in "the difference was not significant", answered "statistically meaningful".
   2. `2-hindi-significant.png` — the same word and sentence, Hindi.
   3. `3-sinhala-significant.png` — the same, Sinhala, in the bundled Noto face.
-  4. `4-more-panel.png` — the More panel open, Hindi: the English scenario above, Hindi below.
+  4. `4-more-panel.png` — the More panel open, Hindi: English scenario above, Hindi below.
   5. `screenshot-language.png` — Settings, the language picker mid-search, Tuned and Community.
 
-  1–4 were captured through the unpacked extension with a real key on a plain article written
-  for the purpose — real model output, nothing staged or edited. Upload them in that order.
+  1–4 were captured through the unpacked extension with a real key, on a plain article written
+  for the purpose — real model output, nothing staged or edited.
+
+  Also in `store/`: `5-simple-panel.png`, the Simple panel in Sinhala. It proves the scrim fix
+  but was shot before the panel card was widened on 17 Sep, so it shows the old narrow column.
+  Re-shoot it before swapping it in for #3 or #4.
+
 - [x] Small promo tile, 440×280 — `store/promo-440x280.png`
 
 `node scripts/store-assets.cjs` re-renders both (needs `PLAYWRIGHT_CORE`, see its header).

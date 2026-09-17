@@ -257,8 +257,11 @@ const styles = SR_BUNDLED_FACES + `
         border: 1px solid rgba(17,24,39,0.08);
         border-radius: var(--space-xl);
         padding: var(--space-xl);
-        max-width: calc(400px / var(--phi));
-        margin: var(--space-xl);
+        /* 400/φ = 247px left a Sinhala explanation wrapping into a thin column
+           inside a 400px bubble. The bubble's own padding is the only margin
+           this card needs. */
+        max-width: calc(100% - var(--space-md));
+        margin: var(--space-md);
         box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         animation: slideUp var(--timing-normal) cubic-bezier(0.16, 1, 0.3, 1);
     }
