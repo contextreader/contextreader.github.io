@@ -186,7 +186,15 @@ async function getTargetLanguage(override) {
 // lookup only and never touches the stored preference.
 async function langVars(override) {
     const lang = await getTargetLanguage(override);
-    return { langName: lang.name, examples: CRLanguages.examplesBlock(lang.code) };
+    // The panels print an English block and then the same thing in the reader's
+    // language. With English selected those are one and the same, and the model
+    // dutifully printed every scenario, dialogue and definition twice. `bilingual`
+    // is what turns the second block off.
+    return {
+        langName: lang.name,
+        examples: CRLanguages.examplesBlock(lang.code),
+        bilingual: lang.code !== 'en',
+    };
 }
 
 async function getModelConfig() {
@@ -1002,16 +1010,17 @@ STEP 3 - CREATE MATCHING CONTENT:
    - Should feel like "bonus content" from the same article/book/text
    - Must use "${word}" naturally
 
-STEP 4 - TRANSLATE TO ${lv.langName}:
+${lv.bilingual ? `STEP 4 - TRANSLATE TO ${lv.langName}:
 - Wrap the ${lv.langName} word for "${word}" in <b> tags EVERY TIME it appears
 - Match the formality level: formal context = formal ${lv.langName}, casual context = casual ${lv.langName}
-- Use vocabulary from the same domain in ${lv.langName} too
+- Use vocabulary from the same domain in ${lv.langName} too` : `STEP 4 - ONE LANGUAGE ONLY:
+- The reader reads English, so write each part ONCE, in English. Do not repeat or restate it.`}
 
 Output ONLY this HTML structure (No markdown):
 <div class="sr-hook-box" style="animation: fadeIn 0.5s;">
     <span class="sr-label">⚡️ Scenario</span>
     <p class="sr-hook-text">[1-2 sentence scenario that takes place in the SAME world/genre as the context above]</p>
-    <p class="sr-sub-text">[${lv.langName} scenario matching the context's formality, with <b>word</b>]</p>
+    ${lv.bilingual ? `<p class="sr-sub-text">[${lv.langName} scenario matching the context's formality, with <b>word</b>]</p>` : ''}
 </div>
 
 <div class="sr-section" style="animation: fadeIn 0.5s 0.1s backwards;">
@@ -1020,15 +1029,15 @@ Output ONLY this HTML structure (No markdown):
         <div class="sr-chat-bubble sr-chat-a"><b>A:</b> [Dialogue line from character that fits this world]</div>
         <div class="sr-chat-bubble sr-chat-b"><b>B:</b> [Response from character B]</div>
     </div>
-    <p class="sr-sub-text">[${lv.langName} dialogue matching tone, with <b>word</b>]</p>
+    ${lv.bilingual ? `<p class="sr-sub-text">[${lv.langName} dialogue matching tone, with <b>word</b>]</p>` : ''}
 </div>
 
 <details class="sr-details" style="animation: fadeIn 0.5s 0.2s backwards;">
     <summary>📖 Full Story...</summary>
     <div class="sr-full-story">
         <p class="sr-text">[3-4 sentence story extending the scenario in the same world]</p>
-        <hr class="sr-divider">
-        <p class="sr-sub-text">[${lv.langName} story with <b>word</b>]</p>
+        ${lv.bilingual ? `<hr class="sr-divider">
+        <p class="sr-sub-text">[${lv.langName} story with <b>word</b>]</p>` : ''}
     </div>
 </details>
 `;
@@ -1043,19 +1052,20 @@ Target Word: "${word}"
 Task:
 1. Provide a general, dictionary-style definition.
 2. Give 2 OTHER common uses of this word in different contexts.
-3. Translate to ${lv.langName}.
+${lv.bilingual ? `3. Translate to ${lv.langName}.
 
-CRITICAL: In ${lv.langName} translations, wrap the key ${lv.langName} word in <b> tags.
+CRITICAL: In ${lv.langName} translations, wrap the key ${lv.langName} word in <b> tags.`
+: `3. The reader reads English: write each part ONCE, in English, and do not restate it.`}
 
 Output ONLY this HTML (no markdown):
 <div class="sr-general-box">
     <p class="sr-def"><b>General Definition:</b> [Broad, general meaning that covers all uses]</p>
-    <p class="sr-sub-text">[${lv.langName} general definition with <b>key word</b>]</p>
+    ${lv.bilingual ? `<p class="sr-sub-text">[${lv.langName} general definition with <b>key word</b>]</p>` : ''}
     <div style="margin-top:12px;">
         <span class="sr-label">Other Common Uses:</span>
         <ul style="margin:0; padding-left:18px; font-size:13px; color:#374151; line-height:1.8;">
-            <li>[Example use in different context 1] - <span class="sr-gen-trans">[${lv.langName} with <b>word</b>]</span></li>
-            <li>[Example use in different context 2] - <span class="sr-gen-trans">[${lv.langName} with <b>word</b>]</span></li>
+            <li>[Example use in different context 1]${lv.bilingual ? ` - <span class="sr-gen-trans">[${lv.langName} with <b>word</b>]</span>` : ''}</li>
+            <li>[Example use in different context 2]${lv.bilingual ? ` - <span class="sr-gen-trans">[${lv.langName} with <b>word</b>]</span>` : ''}</li>
         </ul>
     </div>
 </div>

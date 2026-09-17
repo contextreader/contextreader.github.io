@@ -235,20 +235,26 @@ const styles = SR_BUNDLED_FACES + `
         z-index: 2;
     }
     
+    /* A panel opening INSIDE the bubble, not a dialog over a page: a black
+       scrim darkened the milky surface behind it and read as a rendering
+       fault in a screenshot, with the answer text losing contrast underneath.
+       A light veil separates the card without turning the bubble grey. */
     #sr-general-modal {
         position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px);
+        background: rgba(255, 255, 255, 0.55);
+        -webkit-backdrop-filter: blur(3px);
+        backdrop-filter: blur(3px);
         display: none; align-items: center; justify-content: center;
         z-index: 10; 
         animation: fadeIn var(--timing-fast);
     }
     #sr-general-modal.active { display: flex; }
     
+    /* Opaque, like the search menu: this card covers the answer, and at 58-66%
+       white the text underneath read through it. */
     .sr-general-card {
-        background: linear-gradient(180deg, var(--sr-glass-top) 0%, var(--sr-glass-bot) 100%);
-        -webkit-backdrop-filter: var(--sr-fx-body);
-        backdrop-filter: var(--sr-fx-body);
-        border: 1px solid var(--sr-glass-line);
+        background: linear-gradient(180deg, #ffffff 0%, #f7f8fa 100%);
+        border: 1px solid rgba(17,24,39,0.08);
         border-radius: var(--space-xl);
         padding: var(--space-xl);
         max-width: calc(400px / var(--phi));

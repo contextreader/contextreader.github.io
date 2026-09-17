@@ -213,6 +213,31 @@ for (const [label, call] of [
     ok(`${label}: agrees with its system instruction`, sys.includes('Hindi') && !sys.includes('Sinhala'));
 }
 
+// An English reader was told to write each block and then "the English version"
+// of it, so More printed every scenario, dialogue and story twice, and General
+// repeated its definition. Caught in a store screenshot, 17 Sep.
+console.log('an English reader is not asked for the same text twice:');
+for (const [label, call, twice] of [
+    ['More',    () => BG.lookupDetails('significant', 'the difference was not significant', 'http://x'), 'sr-sub-text'],
+    ['General', () => BG.lookupGeneral('significant'), 'sr-sub-text'],
+]) {
+    reset();
+    Object.assign(local, { geminiApiKey: 'AIza-test', targetLanguage: 'en' });
+    fetchPlan = [{ status: 200, body: { candidates: [{ content: { parts: [{ text: '<div>ok</div>' }] } }] } }];
+    await call();
+    const sent = fetchLog[0].body.contents[0].parts[0].text;
+    ok(`${label}: asks for no second, translated block`, !sent.includes(twice),
+       (sent.match(new RegExp(`.{0,60}${twice}.{0,40}`)) || [''])[0]);
+    ok(`${label}: says to write it once`, /ONE LANGUAGE ONLY|write each part ONCE/.test(sent));
+
+    reset();
+    Object.assign(local, { geminiApiKey: 'AIza-test', targetLanguage: 'hi' });
+    fetchPlan = [{ status: 200, body: { candidates: [{ content: { parts: [{ text: '<div>ok</div>' }] } }] } }];
+    await call();
+    const hindi = fetchLog[0].body.contents[0].parts[0].text;
+    ok(`${label}: a Hindi reader still gets both blocks`, hindi.includes(twice) && /Hindi/.test(hindi));
+}
+
 say('the Sinhala monolingual family is untouched and still Sinhala:');
 reset();
 Object.assign(local, { geminiApiKey: 'AIza-test', targetLanguage: 'si' });

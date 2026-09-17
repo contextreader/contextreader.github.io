@@ -79,6 +79,15 @@ path, first 32 hex digits mapped 0-f → a-p), and the css2 API serves **one var
 every weight**, so saving per weight tripled `fonts/` to 5.3 MB before it was noticed.
 CJK stays remote: those families are megabytes each and every OS ships good ones.
 
+**Two bugs the store screenshots found (17 Sep).** Shooting real captures is a check of its
+own: (1) the General/Simple panel opened on `rgba(0,0,0,0.5)` with a blur, so a panel *inside*
+the bubble darkened the milky surface behind it and read as a rendering fault — it is a light
+veil now, and the card is opaque like the search menu; (2) **More and General printed
+everything twice for an English reader** — the templates ask for a block and then "the
+${langName} version" of it, which is the same text when langName is English. `langVars()` now
+returns `bilingual`, and the second block and the translate step are dropped when it is false.
+Covered by integration assertions in both directions.
+
 **How the bubble was measured.** `playwright-core` from `~/Desktop/interactive app/node_modules`
 (Chromium is in `~/Library/Caches/ms-playwright`). New page → `addScriptTag` a `window.chrome`
 stub, `lib/languages.js`, `content.js` → `setLang(code)` → `showBubble(x, y, buildLookupHTML(word, {t, d}))`
