@@ -217,6 +217,10 @@ const styles = SR_BUNDLED_FACES + `
     }
     /* content rides above the lens */
     #smart-reader-bubble > * { position: relative; z-index: 2; }
+    /* The header is a stacking context of its own, so the search menu's z-index
+       cannot lift it out: the body, later in the DOM at the same z-index, was
+       painting over the open menu. Raise the header, not the menu. */
+    #smart-reader-bubble > .sr-header { z-index: 3; }
 
     /* the bright line right at the glass edge, over the lens */
     #smart-reader-bubble::after {
@@ -470,11 +474,12 @@ const styles = SR_BUNDLED_FACES + `
            gets clipped. Opening leftward keeps it inside the 400px bubble. */
         position: absolute; top: calc(var(--space-xxl) + var(--space-sm)); right: 0; left: auto;
         width: 208px; max-width: 208px;
-        background:
-          linear-gradient(180deg, var(--sr-glass-top) 0%, var(--sr-glass-bot) 100%);
-        -webkit-backdrop-filter: var(--sr-fx-body);
-        backdrop-filter: var(--sr-fx-body);
-        border: none;
+        /* Opaque, unlike every other surface here. This one opens ON TOP of the
+           answer and the explanation, and at 58-66% white the text underneath
+           read straight through it — the menu and the answer fighting for the
+           same pixels. A dropdown is the one place the glass has to stop. */
+        background: linear-gradient(180deg, #ffffff 0%, #f7f8fa 100%);
+        border: 1px solid rgba(17,24,39,0.08);
         border-radius: var(--space-xl);
         box-shadow:
           0 var(--space-lg) var(--space-xxl) -8px rgba(17,24,39,0.24),

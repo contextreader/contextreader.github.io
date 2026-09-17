@@ -96,6 +96,21 @@ console.log('fonts do not tell Google which sites someone visits:');
     }
 }
 
+console.log('the search menu is readable where it overlaps the answer:');
+// Seen in a screenshot on 17 Sep: the menu opens on top of the answer and the
+// explanation, and it was built from the same 58-66% white glass as everything
+// else, so the text underneath read straight through it. Worse, the header is
+// its own stacking context, so the menu's z-index could not lift it above the
+// body — the explanation painted over the menu.
+{
+    const css = read('content.js');
+    const menu = css.slice(css.indexOf('.sr-g-menu {'), css.indexOf('}', css.indexOf('.sr-g-menu {')));
+    ok('the menu surface is opaque', /background: linear-gradient\(180deg, #ffffff/.test(menu) && !/--sr-glass/.test(menu), menu.slice(0, 120));
+    ok('the menu does not blur what it covers', !/backdrop-filter/.test(menu));
+    ok('the header outranks the body, so the open menu is on top',
+       /#smart-reader-bubble > \.sr-header \{ z-index: 3; \}/.test(css));
+}
+
 console.log('the welcome page covers the step people get stuck on:');
 const welcome = read('welcome.html');
 ok('asks for the key', /id="welcome-open-settings"/.test(welcome) && /aistudio\.google\.com\/apikey/.test(welcome));
