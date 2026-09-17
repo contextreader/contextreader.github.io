@@ -35,22 +35,24 @@ document.body.appendChild(triggerBtn);
 // ✨ GOLDEN RATIO STYLES ✨
 // (COMPLETELY UNCHANGED)
 // ========================================
-const SR_INTER_WEIGHTS = [400, 500, 600, 700, 800];
-
-// Inter ships inside the extension (fonts/), so the interface needs no network
-// at all: nothing to ask Google for, nothing for a page's CSP to refuse, and
-// nothing to wait for. The per-language Noto face is still fetched on demand —
-// bundling every script would cost megabytes for CJK alone.
-const SR_INTER_FACES = SR_INTER_WEIGHTS.map((w) => `
+// Every typeface the extension ships — Inter in three subsets, and a Noto face
+// for each bundled script — declared from lib/fonts.js and served out of the
+// extension. So the interface needs no network, nothing for a page's CSP to
+// refuse, and no wait. CJK is the exception and is still fetched on demand:
+// those families are megabytes each and every OS ships good ones.
+// The unicode-range is Google's own for that subset; without it a Cyrillic
+// reader would get the Latin file and fall back to a system face.
+const SR_BUNDLED_FACES = CRFonts.FACES.map((f) => `
     @font-face {
-        font-family: 'Inter';
+        font-family: '${f.family}';
         font-style: normal;
-        font-weight: ${w};
+        font-weight: ${f.weight};
         font-display: swap;
-        src: url('${chrome.runtime.getURL(`fonts/inter-${w}.woff2`)}') format('woff2');
+        src: url('${chrome.runtime.getURL(`fonts/${f.file}`)}') format('woff2');
+        unicode-range: ${f.range};
     }`).join('');
 
-const styles = SR_INTER_FACES + `
+const styles = SR_BUNDLED_FACES + `
 
     /* ✨ NEW: Golden Ratio Design System */
     :root {
@@ -1234,7 +1236,8 @@ function enableFonts() {
 
 function applyLangFont(lang) {
     document.documentElement.style.setProperty('--sr-lang-font', lang.font);
-    if (!srFontsOn || !lang.family) return;
+    // A bundled script is already declared above; only CJK is left to fetch.
+    if (!srFontsOn || !lang.family || lang.bundled) return;
     addFontLink('sr-lang-font', `https://fonts.googleapis.com/css2?family=${lang.family}&display=swap`);
 }
 

@@ -28,21 +28,21 @@ Note that the free tier of the Gemini API and the paid tier differ in whether yo
 may be used to improve Google's models. Which applies to you depends on your own key, not
 on this extension. If that matters to you, read the terms above before choosing a plan.
 
-### To Google Fonts, only for some languages, only when you open a bubble
+### To Google Fonts — only for Chinese, Japanese and Korean
 
-The interface typeface (Inter) ships **inside the extension** as of 17 September 2026, so
-nothing is fetched for it, ever.
+Every typeface the bubble uses ships **inside the extension** as of 17 September 2026:
+Inter for the interface, in Latin, Cyrillic and Greek, and a Noto face for each of the 21
+other scripts. Nothing is fetched for them, ever, on any site.
 
-What is left is the typeface for a language whose script Inter does not cover — Sinhala,
-Devanagari, Arabic, Thai and so on. That one file is requested from `fonts.googleapis.com`
-and `fonts.gstatic.com`, **only when you open a bubble** on a page, and **with no referrer**,
-so Google's font servers see your IP address and that a font was requested, but not which
-page or site you were on. **No word you look up and no page content is included.** If you
-read in a Latin or Cyrillic language, the extension makes no font request at all.
+The exception is Chinese, Japanese and Korean. Those families are megabytes each, so they
+are still requested from `fonts.googleapis.com` and `fonts.gstatic.com` — **only when you
+open a bubble** on a page, and **with no referrer**, so Google's font servers see your IP
+address and that a font was requested, but not which page or site you were on. **No word
+you look up and no page content is included.** Every other language fetches nothing.
 
-Before 15 September 2026 this was worse: fonts were requested on every page load, and the
-request carried the page's origin. That was fixed as soon as it was measured, and bundling
-Inter removed most of what remained.
+Before 15 September 2026 this was worse: fonts were requested on every page load, with the
+page's origin attached. That was fixed as soon as it was measured, and bundling removed the
+rest.
 
 ### Nowhere else
 

@@ -61,17 +61,33 @@ console.log('fonts do not tell Google which sites someone visits:');
     // Inter ships in the extension: no request for it, and nothing for a page's
     // CSP to refuse. Verified 17 Sep with the unpacked extension on github.com,
     // which refuses Google Fonts but serves chrome-extension:// fonts fine.
-    ok('Inter is bundled, not fetched', /@font-face/.test(src) && /chrome\.runtime\.getURL\(`fonts\/inter-/.test(src)
-        && !/googleapis[^`'"]*Inter/.test(src));
+    ok('faces are declared from lib/fonts.js and served by the extension',
+       /@font-face/.test(src) && /CRFonts\.FACES\.map/.test(src)
+       && /chrome\.runtime\.getURL\(`fonts\/\$\{f\.file\}`\)/.test(src)
+       && !/googleapis[^`'"]*Inter/.test(src));
     const manifest = JSON.parse(read('manifest.json'));
     const war = (manifest.web_accessible_resources || []).flatMap((r) => r.resources || []);
-    const weights = [400, 500, 600, 700, 800];
-    ok('every bundled weight exists and is web-accessible',
-       weights.every((w) => war.includes(`fonts/inter-${w}.woff2`) && fs.existsSync(path.join(ROOT, `fonts/inter-${w}.woff2`))),
-       war.filter((r) => r.startsWith('fonts/')));
+    const F = require('../lib/fonts.js');
+    const L2 = require('../lib/languages.js');
+    ok('fonts are web-accessible, or the page cannot use them', war.includes('fonts/*.woff2'));
+    ok('lib/fonts.js loads before content.js',
+       manifest.content_scripts[0].js.indexOf('lib/fonts.js') < manifest.content_scripts[0].js.indexOf('content.js'));
+    const absent = F.FACES.filter((f) => !fs.existsSync(path.join(ROOT, 'fonts', f.file))).map((f) => f.file);
+    ok(`every declared face ships (${F.FACES.length})`, absent.length === 0, absent);
+    ok('every face states a unicode-range, so subsets do not shadow each other',
+       F.FACES.every((f) => /^U\+/.test(f.range)));
+    // Inter covers Latin, Cyrillic and Greek; a reader of those makes no font request.
+    const interSubsets = F.FACES.filter((f) => f.family === 'Inter').length;
+    ok('Inter ships its three subsets', interSubsets === 3, interSubsets);
+    const bundledSets = Object.entries(L2.TYPESETS).filter(([, t]) => t.bundled).map(([k]) => k);
+    const missingFace = bundledSets.filter((k) => !F.FACES.some((f) => f.file === `noto-${k}.woff2` || f.file.startsWith(`noto-${k}-`)));
+    ok(`every bundled typeset has a face (${bundledSets.length})`, missingFace.length === 0, missingFace);
+    // CJK is deliberately not bundled: megabytes each, and every OS ships one.
+    ok('CJK stays remote', ['sc', 'tc', 'jp', 'kr'].every((k) => !L2.TYPESETS[k].bundled));
     ok('fonts are enabled only from showBubble', (src.match(/enableFonts\(\)/g) || []).length === 2
         && /function showBubble\([^)]*\) \{\s*enableFonts\(\);/.test(src));
-    ok('applyLangFont fetches nothing until fonts are on', /if \(!srFontsOn \|\| !lang\.family\) return;/.test(src));
+    ok('applyLangFont fetches nothing until fonts are on, and never for a bundled script',
+       /if \(!srFontsOn \|\| !lang\.family \|\| lang\.bundled\) return;/.test(src));
     const printLinks = src.match(/<link [^>]*fonts\.googleapis\.com/g) || [];
     ok('markup font links in content.js are referrer-free', printLinks.every((l) => /referrerpolicy="no-referrer"/.test(l)), printLinks);
     for (const f of ['popup.html', 'options.html', 'welcome.html']) {

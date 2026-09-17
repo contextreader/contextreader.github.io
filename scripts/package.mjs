@@ -8,7 +8,7 @@
 // adding a content script or an options page cannot silently be left out of the
 // build. EXTRA covers what the manifest cannot express.
 
-import { readFileSync, existsSync, mkdirSync, rmSync } from 'node:fs';
+import { readFileSync, existsSync, mkdirSync, rmSync, readdirSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -22,7 +22,18 @@ const EXTRA = ['lib/diff.js', 'lib/lang-picker.js', 'options.js', 'popup.js', 'w
 const files = new Set(['manifest.json', ...EXTRA]);
 
 for (const cs of manifest.content_scripts ?? []) (cs.js ?? []).forEach((f) => files.add(f));
-for (const war of manifest.web_accessible_resources ?? []) (war.resources ?? []).forEach((f) => files.add(f));
+// web_accessible_resources may hold patterns (fonts/*.woff2); expand them, or
+// the existence check below rejects a pattern that is not a file.
+for (const war of manifest.web_accessible_resources ?? []) for (const res of war.resources ?? []) {
+    if (!res.includes('*')) { files.add(res); continue; }
+    const dir = dirname(res);
+    const suffix = res.slice(res.lastIndexOf('*') + 1);
+    const here = join(ROOT, dir);
+    if (!existsSync(here)) { console.error(`Refusing to package — ${res} matches nothing:`); process.exit(1); }
+    const hits = readdirSync(here).filter((f) => f.endsWith(suffix)).map((f) => join(dir, f));
+    if (!hits.length) { console.error(`Refusing to package — ${res} matches nothing.`); process.exit(1); }
+    hits.forEach((f) => files.add(f));
+}
 if (manifest.background?.service_worker) files.add(manifest.background.service_worker);
 if (manifest.action?.default_popup) files.add(manifest.action.default_popup);
 if (manifest.options_ui?.page) files.add(manifest.options_ui.page);

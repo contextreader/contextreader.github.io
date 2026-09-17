@@ -23,6 +23,7 @@
       ],
       "js": [
         "lib/languages.js",
+        "lib/fonts.js",
         "Readability.min.js",
         "content.js"
       ],
@@ -36,11 +37,7 @@
     {
       "resources": [
         "content.js",
-        "fonts/inter-400.woff2",
-        "fonts/inter-500.woff2",
-        "fonts/inter-600.woff2",
-        "fonts/inter-700.woff2",
-        "fonts/inter-800.woff2",
+        "fonts/*.woff2",
         "welcome.html"
       ],
       "matches": [

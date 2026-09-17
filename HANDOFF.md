@@ -5,7 +5,7 @@ Last updated 2026-09-14. Read this before changing anything.
 **Repo** `contextreader/contextreader.github.io` — private. Was public for about an hour on
 14 Sep; assume that window may have been cloned. Nothing sensitive was in it.
 
-**State** 62 commits · `npm test` → 572 assertions · `npm run package` → 235 KB ·
+**State** 63 commits · `npm test` → 578 assertions · `npm run package` → 1.9 MB ·
 110 languages on 29 typesets · 2 permissions · 1 host.
 
 ---
@@ -58,21 +58,26 @@ only in `showBubble()` via `enableFonts()`, with `referrerPolicy = 'no-referrer'
 re-recorded load makes 0 font requests. `test/copy.test.js` holds it. Bundling the fonts
 would remove the request entirely and is the open improvement.
 
-**Fonts (17 Sep).** Inter ships inside the extension (`fonts/inter-{400,500,600,700,800}.woff2`,
-124 KB, declared in `web_accessible_resources`) and is loaded through
-`chrome.runtime.getURL` from an `@font-face` block at the top of `content.js`'s stylesheet.
-So the interface needs no network, and a **Latin or Cyrillic reader makes no font request at
-all**. Verified with the unpacked extension in Chromium: five faces injected,
-`document.fonts.load()` resolving from `chrome-extension://…/fonts/inter-600.woff2`, and no
-request to Google — on example.com **and on github.com**, whose `font-src
-github.githubassets.com` refuses Google Fonts but does not block extension-origin files.
-(Extensions only load in **headed** Chromium; `--load-extension` is ignored in headless, and
-the unpacked id is the sha256 of the absolute path, first 32 hex digits mapped 0-f → a-p.)
+**Fonts are bundled (17 Sep).** `fonts/` holds 24 variable `.woff2` files, 1.7 MB: Inter in
+Latin, Cyrillic and Greek, and a Noto face for each of the 21 non-CJK typesets.
+`scripts/fetch-fonts.mjs` downloads them from the css2 API and generates `lib/fonts.js`
+(family, weight range, file, Google's own unicode-range); `content.js` turns that list into
+`@font-face` rules pointing at `chrome.runtime.getURL`, and `applyLangFont` fetches nothing
+for a typeset marked `bundled`. So **every language except Chinese, Japanese and Korean makes
+no font request at all**, on any site.
 
-What remains: a language whose script Inter does not cover still fetches one Noto file from
-Google Fonts when a bubble opens, with no referrer — and on a strict-CSP site that request is
-refused, so those scripts fall back to system faces there. Bundling per-script Noto would fix
-that too; CJK alone is several MB, so it was not done blindly.
+Verified with the unpacked extension in Chromium on example.com **and github.com** (whose
+`font-src github.githubassets.com` refuses Google Fonts): 3 Inter faces plus 21 Noto faces
+injected, and `document.fonts.load()` resolving Latin, Cyrillic, Sinhala and Arabic from
+`chrome-extension://…`, with no request to Google. Extension-origin fonts are not subject to
+the page's CSP, so the bubble now renders correctly on strict sites where it used to fall
+back to system faces.
+
+Two traps met on the way: Chrome loads extensions only in **headed** Chromium
+(`--load-extension` is ignored in headless; the unpacked id is the sha256 of the absolute
+path, first 32 hex digits mapped 0-f → a-p), and the css2 API serves **one variable file for
+every weight**, so saving per weight tripled `fonts/` to 5.3 MB before it was noticed.
+CJK stays remote: those families are megabytes each and every OS ships good ones.
 
 **How the bubble was measured.** `playwright-core` from `~/Desktop/interactive app/node_modules`
 (Chromium is in `~/Library/Caches/ms-playwright`). New page → `addScriptTag` a `window.chrome`
