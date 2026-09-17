@@ -158,18 +158,44 @@ No country of origin, no flag, no "built in" line anywhere on the site.
 
 ---
 
-## What exists now, and why it's being redesigned
+## What exists now
 
-`docs/index.html` was rebuilt on 15 Sep in one pass: masthead with the mark; headline
-"The word you're **stuck on**, in your language." with the lit-word device; a specimen of
-"culture" in a lab report and a job review resolving two ways, with the dictionary's third
-meaning struck through; three steps; a big "110" and an alphabetical wall of all native
-names; commitments; a "what leaves your machine" table; footer. Light + dark, 390px-safe,
-zero external requests.
+`docs/index.html` is the page built across 15–17 Sep in this session. Seven sections, each one
+scroll-driven — the visual pins and scrolling scrubs it, rather than a timed loop:
 
-Ian wants it **designed properly in its own session** — treat the current page as a
-content inventory and a set of verified claims, not as a layout to preserve. Ask him what
-he liked and didn't before settling a direction.
+1. **Try it** — five everyday documents (travel journal, landlord's text, court report, English
+   homework, tenancy agreement) where a word is selected, the trigger clicked and the bubble
+   answers. **In the visitor's own language**, picked from their browser languages, then their
+   timezone, then English. A switcher lets them change it; the choice is remembered.
+2. **Why it exists** — four beats on *significant* in a research paper: stuck on one word →
+   Google Translate (in Google's blue, with its real captured output) → a dictionary → Context
+   Reader. Sourced from Ian's own interview notes; no Sri Lanka framing.
+3. **In the bubble** — More, General and Simple clicked in turn on the real bubble.
+4. **Get started** — the three real setup steps played in a small browser window, ending on
+   Settings' own "Saved and verified", then "why a key, not an account".
+5. **Languages** — the same sentence answered in one captured language after another, and an
+   explanation of how the model handles languages **quoting Gemini itself**, unedited and dated.
+   No wall of 110 names: Ian dropped it on 16 Sep.
+6. **Privacy** — a request log that fills as you scroll: the lookup, and a font file for
+   Chinese, Japanese and Korean only. Plus what the site itself does (see analytics below).
+7. **The end** — a last invitation, links, and the colophon.
+
+**Every answer shown anywhere was captured through the real extension** (`ext-run.cjs` and
+`ext-modes.cjs` in the session scratchpad: unpacked build in Chromium, word double-clicked,
+trigger clicked, bubble read, with Google's responseId recorded). 25 languages. Nothing on the
+page is written by us in a reader's language.
+
+Also on the page: a **contents index** in the right margin (a Contents button under 1100px);
+**Copy for LLM / View as Markdown**, which build the page as text in the browser, including that
+visitor's answers; **JSON-LD** (SoftwareApplication + a 5-question FAQPage); and a **noscript**
+text version, because every demo is JS-driven and a crawler without JS would otherwise see nothing.
+
+**Analytics (17 Sep).** The site counts visits with Cloudflare Web Analytics, cookieless, token
+in the page. The extension collects nothing, and the page states both plainly rather than blurring
+them — in the privacy section, the footer, the Markdown template and the noscript fallback.
+GoatCounter was considered and dropped. Search Console needs a **URL-prefix** property (a domain
+property can't work: github.io's DNS isn't ours); `port-head.html` carries the meta tag, and the
+value may need replacing with the one Google issues for the HTML-tag method.
 
 ### Things that must survive any redesign
 

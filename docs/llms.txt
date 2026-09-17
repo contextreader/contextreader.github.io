@@ -1,34 +1,46 @@
 # Context Reader
 
-> A free, open-source Chrome extension that explains a hard word using the sentence around
-> it, in 110 languages. It calls the Google Gemini API directly from the user's browser with
-> the user's own API key. There is no backend server, no analytics and no account.
+> A free, open-source Chrome extension that explains the word you are stuck on, in your
+> language, using the sentence around it. It calls the Google Gemini API directly from the
+> user's browser with the user's own API key. There is no backend server, no analytics and
+> no account.
 
 ## What it does
 
-A reader selects a word on any web page. The extension sends that word plus its surrounding
-sentence to Gemini and returns the sense that fits the context — not a dictionary list of
+A reader selects a word on any web page. The extension sends that word plus the paragraph
+around it to Gemini and returns the sense that fits that context — not a dictionary list of
 every possible meaning. If the word is already in the reader's chosen language it is
 simplified rather than translated.
 
+In the bubble: **More** gives a short scenario, a dialogue and a story using the word, set in
+the same world as the page. **General** gives a dictionary-style definition and the word's
+other common uses. **Simple** gives the same meaning in the plainest words with one everyday
+example. **EN** shows that one answer in English without changing the stored language,
+**Search** pronounces the word or looks it up, and **Esc** closes the bubble.
+
+## How languages work here
+
+The model was not given a list of languages; it learned them from the text it was trained on,
+which is why it answers in languages nobody wired in by hand — and why it is not equally good
+in all of them. A language it saw less of comes out less reliably. The extension offers the
+110 languages Google documents its Gemini models as understanding. English and Sinhala ship
+contrastive worked examples checked by a speaker, which measurably improve domain-correct
+sense selection; the other 108 rely on what the model already knows, and the interface says so
+rather than implying parity.
+
 ## Distinguishing facts
 
-- **No server.** The extension holds exactly one host permission,
-  `https://generativelanguage.googleapis.com/*`, enforced by Chrome. Nothing belonging to
-  the project sits between the user and Google.
-- **Bring your own key.** The user supplies a free Gemini API key, stored in
-  `chrome.storage.local` and optionally encrypted at rest with AES-GCM behind a passphrase.
+- **No server.** The extension declares exactly one host permission,
+  `https://generativelanguage.googleapis.com/*`. Nothing belonging to the project sits between
+  the user and Google.
+- **Bring your own key.** A free Gemini API key, stored in `chrome.storage.local` and
+  optionally encrypted at rest with AES-GCM behind a passphrase. Never synced to an account.
 - **No telemetry of any kind.** No analytics, no crash reporting, no identifiers.
-- **Tuned vs. community languages.** English and Sinhala ship contrastive worked examples
-  checked by a speaker, which measurably improve domain-correct sense selection. The other
-  108 languages work without them and the interface labels them as such rather than
-  implying parity.
-
-## Languages
-
-110: every language Google documents all Gemini models as supporting, with Chinese split
-into Simplified and Traditional. English and Sinhala are tuned; the rest are labelled
-community.
+- **Two outbound requests.** The lookup itself, and the bubble's typeface from Google Fonts
+  the first time a bubble opens on a page, sent with no referrer.
+- **Google's terms cover the lookups**, because the key is the user's: Google states that on
+  the free tier it uses submitted content to improve its products and that human reviewers may
+  read it disconnected from the account, and that on a paid key it does not.
 
 ## Licence
 
@@ -40,3 +52,4 @@ pdfium) retains its own licences; see NOTICE in the repository.
 - Source: https://github.com/contextreader/contextreader.github.io
 - Privacy policy: https://github.com/contextreader/contextreader.github.io/blob/main/PRIVACY_POLICY.md
 - Contributing (adding a language): https://github.com/contextreader/contextreader.github.io/blob/main/CONTRIBUTING.md
+- Get a free Gemini key: https://aistudio.google.com/apikey
