@@ -81,10 +81,11 @@ sent anywhere but Google. Optionally you can encrypt it at rest with a passphras
 
 There is no analytics, no telemetry, no error reporting, no crash reporting, no server.
 
-Two honest caveats: when you open a bubble, its typefaces are fetched from Google Fonts —
-with no referrer, so Google sees your IP address but not the page you're on, and nothing is
-fetched on pages where you never open one; and Google sees your lookups, because it is the
-one answering them. Full detail in [PRIVACY_POLICY.md](PRIVACY_POLICY.md).
+Two honest caveats. The interface typeface ships inside the extension, but a language whose
+script it doesn't cover — Sinhala, Devanagari, Arabic and the rest — still fetches one file
+from Google Fonts when you open a bubble, with no referrer, so Google sees your IP address
+but not the page you're on; a Latin or Cyrillic reader fetches nothing. And Google sees your
+lookups, because it is the one answering them. Full detail in [PRIVACY_POLICY.md](PRIVACY_POLICY.md).
 
 ## Permissions
 

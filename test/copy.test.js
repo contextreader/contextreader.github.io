@@ -58,6 +58,17 @@ console.log('fonts do not tell Google which sites someone visits:');
     const creates = (src.match(/createElement\(['"]link['"]\)/g) || []).length;
     const noRef = (src.match(/referrerPolicy = 'no-referrer'/g) || []).length;
     ok('every font <link> content.js creates is referrer-free', creates === 1 && noRef === 1, { creates, noRef });
+    // Inter ships in the extension: no request for it, and nothing for a page's
+    // CSP to refuse. Verified 17 Sep with the unpacked extension on github.com,
+    // which refuses Google Fonts but serves chrome-extension:// fonts fine.
+    ok('Inter is bundled, not fetched', /@font-face/.test(src) && /chrome\.runtime\.getURL\(`fonts\/inter-/.test(src)
+        && !/googleapis[^`'"]*Inter/.test(src));
+    const manifest = JSON.parse(read('manifest.json'));
+    const war = (manifest.web_accessible_resources || []).flatMap((r) => r.resources || []);
+    const weights = [400, 500, 600, 700, 800];
+    ok('every bundled weight exists and is web-accessible',
+       weights.every((w) => war.includes(`fonts/inter-${w}.woff2`) && fs.existsSync(path.join(ROOT, `fonts/inter-${w}.woff2`))),
+       war.filter((r) => r.startsWith('fonts/')));
     ok('fonts are enabled only from showBubble', (src.match(/enableFonts\(\)/g) || []).length === 2
         && /function showBubble\([^)]*\) \{\s*enableFonts\(\);/.test(src));
     ok('applyLangFont fetches nothing until fonts are on', /if \(!srFontsOn \|\| !lang\.family\) return;/.test(src));

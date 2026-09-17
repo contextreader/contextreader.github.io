@@ -30,6 +30,6 @@ Wraps PDFium (BSD-3-Clause), Copyright The Chromium Authors.
 A full copy of the Apache License 2.0 is available at
 https://www.apache.org/licenses/LICENSE-2.0
 
-Inter (docs/fonts/, the website only)
+Inter  —  fonts/inter-*.woff2 (the extension), docs/fonts/ (the website)
   Copyright (c) 2016 The Inter Project Authors. SIL Open Font License 1.1 —
   see docs/fonts/Inter-OFL.txt.

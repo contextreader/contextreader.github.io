@@ -28,20 +28,21 @@ Note that the free tier of the Gemini API and the paid tier differ in whether yo
 may be used to improve Google's models. Which applies to you depends on your own key, not
 on this extension. If that matters to you, read the terms above before choosing a plan.
 
-### To Google Fonts, when you open a bubble
+### To Google Fonts, only for some languages, only when you open a bubble
 
-The bubble's typefaces come from `fonts.googleapis.com` and `fonts.gstatic.com`. They are
-requested **only when you open a bubble** on a page — never just because a page loaded —
-and **with no referrer**, so Google's font servers see your IP address and that a font was
-requested, but not which page or site you were on. **No word you look up and no page
-content is included.** The extension's own Settings, popup and welcome pages load the same
-typefaces the same way.
+The interface typeface (Inter) ships **inside the extension** as of 17 September 2026, so
+nothing is fetched for it, ever.
 
-Before 15 September 2026 this was worse: the fonts were requested on every page load, and
-the request carried the page's origin. That was fixed as soon as it was measured.
+What is left is the typeface for a language whose script Inter does not cover — Sinhala,
+Devanagari, Arabic, Thai and so on. That one file is requested from `fonts.googleapis.com`
+and `fonts.gstatic.com`, **only when you open a bubble** on a page, and **with no referrer**,
+so Google's font servers see your IP address and that a font was requested, but not which
+page or site you were on. **No word you look up and no page content is included.** If you
+read in a Latin or Cyrillic language, the extension makes no font request at all.
 
-This is still a genuine third-party request and we would rather it were not there.
-Bundling the fonts into the extension would remove it, and is an open improvement.
+Before 15 September 2026 this was worse: fonts were requested on every page load, and the
+request carried the page's origin. That was fixed as soon as it was measured, and bundling
+Inter removed most of what remained.
 
 ### Nowhere else
 

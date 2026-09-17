@@ -35,7 +35,22 @@ document.body.appendChild(triggerBtn);
 // ✨ GOLDEN RATIO STYLES ✨
 // (COMPLETELY UNCHANGED)
 // ========================================
-const styles = `
+const SR_INTER_WEIGHTS = [400, 500, 600, 700, 800];
+
+// Inter ships inside the extension (fonts/), so the interface needs no network
+// at all: nothing to ask Google for, nothing for a page's CSP to refuse, and
+// nothing to wait for. The per-language Noto face is still fetched on demand —
+// bundling every script would cost megabytes for CJK alone.
+const SR_INTER_FACES = SR_INTER_WEIGHTS.map((w) => `
+    @font-face {
+        font-family: 'Inter';
+        font-style: normal;
+        font-weight: ${w};
+        font-display: swap;
+        src: url('${chrome.runtime.getURL(`fonts/inter-${w}.woff2`)}') format('woff2');
+    }`).join('');
+
+const styles = SR_INTER_FACES + `
 
     /* ✨ NEW: Golden Ratio Design System */
     :root {
@@ -1184,17 +1199,17 @@ function fallbackNoteHTML(m) {
 
 let srLang = CRLanguages.getLang(CRLanguages.DEFAULT_LANG);
 
-// Fonts are fetched from Google Fonts only once the reader opens a bubble, and
-// never with a referrer. This script runs on every page; until 15 Sep it put an
-// @import in the stylesheet at load, so fonts.googleapis.com was asked for Inter
-// — with the page's origin as Referer — on every site visited, before anyone
-// looked anything up. Measured with a recorded page load; see HANDOFF.
-// A lookup already sends the word to Google; a font request at that moment,
-// without a referrer, tells Google Fonts nothing new.
+// The script font is fetched from Google Fonts only once the reader opens a
+// bubble, and never with a referrer. This script runs on every page; until
+// 15 Sep the stylesheet @imported Inter at load, so fonts.googleapis.com was
+// asked — with the page's origin as Referer — on every site visited, before
+// anyone looked anything up. Inter itself was bundled on 17 Sep, so what is
+// left is one request for the language's own Noto face, for languages Inter
+// does not cover. A lookup already sends the word to Google; a font request at
+// that moment, without a referrer, tells Google Fonts nothing new.
 //
 // The script font is still loaded per language rather than baked in: a Sinhala
 // reader should not pay for Devanagari. Inter covers Latin and Cyrillic.
-const SR_INTER_HREF = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap';
 let srFontsOn = false;
 
 function addFontLink(id, href) {
@@ -1209,10 +1224,11 @@ function addFontLink(id, href) {
     if (link.href !== href) link.href = href;
 }
 
+// Only the script font is left to fetch, and only for a language Inter does not
+// cover. A Latin or Cyrillic reader now makes no font request at all.
 function enableFonts() {
     if (srFontsOn) return;
     srFontsOn = true;
-    addFontLink('sr-inter-font', SR_INTER_HREF);
     applyLangFont(srLang);
 }
 
