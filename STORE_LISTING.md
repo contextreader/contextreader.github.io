@@ -18,7 +18,14 @@ cause of rejection.
 
 ## Category
 
-Productivity
+**Productivity → Education.**
+
+The dashboard groups categories now: Productivity is a heading, not a choice, and its leaves
+are Communication, Developer Tools, Education, Tools and Workflow & Planning. Education,
+because the product exists to help someone read something in a language that isn't their
+first, and its readers are students and working people. Tools is the fallback if discovery
+by general-utility browsing ever matters more; Communication is wrong — that is chat and
+mail. The category can be changed later without a re-review.
 
 ## Language
 
