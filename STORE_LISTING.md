@@ -58,7 +58,8 @@ charging.
 **No tracking. Verifiably.**
 No analytics. No telemetry. No account. No identifiers. The extension holds permission
 for exactly one API — Google's Gemini — and your lookups go nowhere else. (Its typefaces
-come from Google Fonts when a bubble opens, with no page address attached.) The entire
+ship inside the extension for every language except Chinese, Japanese and Korean; those
+three fetch one font file when a bubble opens, with no page address attached.) The entire
 source is public, so you don't have to take our word for it.
 
 Your API key is stored on your device, read only by the extension's background worker,
