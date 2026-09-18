@@ -135,6 +135,15 @@ text and clicks.
 
 ---
 
+## Additional fields
+
+| Field | Value |
+|---|---|
+| Official URL | `contextreader.github.io` — the dropdown lists sites verified in Search Console under the **same Google account as the developer account**. If it isn't there, "Add a new site" and verify; if Search Console is on another account, leave it None and rely on Homepage URL. |
+| Homepage URL | `https://contextreader.github.io` |
+| Support URL | `https://github.com/contextreader/contextreader.github.io/issues` — public and trackable, unlike an inbox |
+| Mature content | Off |
+
 ## Support contact
 
 `contextreader@gmail.com`
