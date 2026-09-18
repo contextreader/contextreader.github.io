@@ -144,6 +144,18 @@ text and clicks.
 | Support URL | `https://github.com/contextreader/contextreader.github.io/issues` — public and trackable, unlike an inbox |
 | Mature content | Off |
 
+**Search Console verification files** in `docs/`, one per owner — the site can have several,
+and each account collects its own search data:
+
+| File | Account |
+|---|---|
+| `googlecce9067cb0fa1b40.html` | the first account |
+| `google804277d37a9b5b86new.html` | the second, added 18 Sep so Official URL could offer the site |
+| `google804277d37a9b5b86.html` | the same token without the `new` suffix, kept until it is clear which name Google issued |
+
+Google checks only the filename it issued to that account and ignores the rest, so a spare
+costs nothing. Each file's single line must match its own filename.
+
 ## Support contact
 
 `contextreader@gmail.com`
