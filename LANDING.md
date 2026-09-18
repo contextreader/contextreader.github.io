@@ -197,6 +197,14 @@ GoatCounter was considered and dropped. Search Console needs a **URL-prefix** pr
 property can't work: github.io's DNS isn't ours); `port-head.html` carries the meta tag, and the
 value may need replacing with the one Google issues for the HTML-tag method.
 
+**Bing (18 Sep).** Bing Webmaster Tools is verified by **importing from Google Search Console**
+(Ian's account, Administrator role): no BingSiteAuth.xml, no msvalidate.01 tag, and none needed.
+The sitemap came across with the import. **IndexNow is not set up**, on purpose: three rarely
+changing pages, and the sitemap already covers them. Bing's site scan wants meta descriptions of
+160 characters or fewer, so keep each page's description under that. It also reports "alt
+attribute missing" for the brand-mark `<img alt="">`s; the empty alt is deliberate (decorative,
+next to the visible name) and stays.
+
 ### Things that must survive any redesign
 
 - The two marker comments around the language list — `<!-- languages:start … -->` and
