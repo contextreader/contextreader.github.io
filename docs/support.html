@@ -109,7 +109,7 @@ footer .spacer { margin-inline-start: auto; }
     <nav aria-label="Site">
       <a href="/privacy" class="hide-sm">Privacy</a>
       <a href="/#sec-start" class="hide-sm">Get started</a>
-      <a class="btn" href="https://github.com/contextreader/contextreader.github.io">Install from GitHub</a>
+      <a class="btn js-install" href="https://github.com/contextreader/contextreader.github.io">Install from GitHub</a>
     </nav>
   </div>
 </header>
@@ -190,5 +190,67 @@ footer .spacer { margin-inline-start: auto; }
 </footer>
 
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "ceec88afaf1f47a289d50d0a20bff3bb"}'></script>
+<script>
+/* Install button, per browser.
+ *
+ * The markup ships with the GitHub fallback, and this only UPGRADES a button
+ * when that browser's store listing actually exists. So: no JavaScript, or a
+ * browser we do not publish for, and the page still offers a real install
+ * instead of a dead "Add to X". Fill a URL in below on the day a listing goes
+ * live — nothing else needs touching, and test/copy.test.js checks that each
+ * URL points at that browser's own store.
+ *
+ * Brave, Edge, Opera and Vivaldi install from the Chrome Web Store: same build,
+ * same listing, different word on the button.
+ */
+(function () {
+  var STORES = {
+    chrome:  '',   /* https://chromewebstore.google.com/detail/<id> — in review */
+    brave:   '',   /* same Chrome Web Store URL */
+    edge:    '',   /* same Chrome Web Store URL, unless an Edge Add-ons listing happens */
+    opera:   '',
+    vivaldi: '',
+    firefox: ''    /* https://addons.mozilla.org/firefox/addon/<slug> — not built yet */
+  };
+  var NAMES = { chrome: 'Chrome', brave: 'Brave', edge: 'Edge', opera: 'Opera',
+                vivaldi: 'Vivaldi', firefox: 'Firefox', safari: 'Safari' };
+
+  function detect() {
+    var ua = navigator.userAgent;
+    /* Brave hides in the UA string and says so only through this API. */
+    if (navigator.brave && navigator.brave.isBrave) return 'brave';
+    if (/Edg\//.test(ua)) return 'edge';
+    if (/OPR\//.test(ua)) return 'opera';
+    if (/Vivaldi/.test(ua)) return 'vivaldi';
+    if (/Firefox\//.test(ua)) return 'firefox';
+    if (/Chrome\//.test(ua)) return 'chrome';
+    if (/Safari\//.test(ua)) return 'safari';
+    return '';
+  }
+
+  function apply(which) {
+    var url = STORES[which];
+    if (!url) return;                       /* no listing: leave the GitHub fallback alone */
+    var name = NAMES[which] || 'your browser';
+    var links = document.querySelectorAll('a.js-install');
+    for (var i = 0; i < links.length; i++) {
+      var a = links[i];
+      a.href = url;
+      a.textContent = a.getAttribute('data-long') ? 'Add to ' + name + ', free' : 'Add to ' + name;
+    }
+    var fine = document.getElementById('install-fine');
+    if (fine) fine.textContent = '';
+  }
+
+  var which = detect();
+  /* isBrave() is async; everything else is settled already. */
+  if (which === 'brave' && navigator.brave.isBrave.call) {
+    navigator.brave.isBrave().then(function (yes) { apply(yes ? 'brave' : 'chrome'); })
+      .catch(function () { apply('chrome'); });
+  } else {
+    apply(which);
+  }
+})();
+</script>
 </body>
 </html>

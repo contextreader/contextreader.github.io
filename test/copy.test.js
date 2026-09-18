@@ -136,6 +136,37 @@ function chromeLinksHonest(page) {
     return chromeLinksHonest.bad.length === 0;
 }
 
+console.log('the install button offers a store that exists, or GitHub:');
+{
+    // The markup ships the GitHub fallback and a script upgrades a button only
+    // when that browser's listing is filled in below. The rule this enforces:
+    // a URL, once filled in, must be that browser's OWN store — "Add to Firefox"
+    // pointing at the Chrome Web Store would be the same broken promise in a
+    // new costume.
+    const HOSTS = {
+        chrome: /chromewebstore\.google\.com|chrome\.google\.com\/webstore/,
+        brave: /chromewebstore\.google\.com|chrome\.google\.com\/webstore/,
+        edge: /chromewebstore\.google\.com|chrome\.google\.com\/webstore|microsoftedge\.microsoft\.com/,
+        opera: /chromewebstore\.google\.com|addons\.opera\.com/,
+        vivaldi: /chromewebstore\.google\.com/,
+        firefox: /addons\.mozilla\.org/,
+    };
+    for (const f of ['docs/index.html', 'docs/privacy.html', 'docs/support.html']) {
+        const page = read(f);
+        const table = page.slice(page.indexOf('var STORES = {'), page.indexOf('};', page.indexOf('var STORES = {')));
+        ok(`${f} has the install script`, table.length > 0);
+        const wrong = [];
+        for (const m of table.matchAll(/(\w+):\s*'([^']*)'/g)) {
+            const [, key, url] = m;
+            if (!url) continue;                       // empty means "no listing yet" — the fallback stands
+            if (!HOSTS[key] || !HOSTS[key].test(url)) wrong.push(`${key} -> ${url}`);
+        }
+        ok(`${f}: every store URL is that browser's own store`, wrong.length === 0, wrong);
+        const buttons = (page.match(/class="[^"]*js-install/g) || []).length;
+        ok(`${f}: install buttons are tagged for the script (${buttons})`, buttons > 0);
+    }
+}
+
 console.log('the site tells the truth about languages, however it presents them:');
 {
     const L = require('../lib/languages.js');

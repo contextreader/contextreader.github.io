@@ -817,7 +817,7 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
       <a href="#sec-languages" class="hide-sm">Languages</a>
       <a href="#sec-privacy" class="hide-sm">Privacy</a>
       <!-- No Chrome Web Store listing yet: points at the install guide until it exists. -->
-      <a class="btn primary sm" href="https://github.com/contextreader/contextreader.github.io">Install from GitHub</a>
+      <a class="btn primary sm js-install" href="https://github.com/contextreader/contextreader.github.io">Install from GitHub</a>
     </nav>
   </div>
 </header>
@@ -858,7 +858,7 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
       </div>
       <div class="get">
         <div class="cta">
-          <a class="btn primary" href="https://github.com/contextreader/contextreader.github.io">Install from GitHub</a>
+          <a class="btn primary js-install" href="https://github.com/contextreader/contextreader.github.io" data-long="1">Install from GitHub</a>
           <a class="btn" href="https://aistudio.google.com/apikey">Get a Gemini key</a>
         </div>
         <p class="fine">No account, no tracking. It runs on your own free Gemini key, which takes about a minute to get. The Chrome Web Store listing is in review, so installing is from GitHub for now — the same build runs in Chrome, Brave and Edge.</p>
@@ -954,7 +954,7 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
 
   <div class="get get-m">
     <div class="cta">
-      <a class="btn primary" href="https://github.com/contextreader/contextreader.github.io">Install from GitHub</a>
+      <a class="btn primary js-install" href="https://github.com/contextreader/contextreader.github.io" data-long="1">Install from GitHub</a>
       <a class="btn" href="https://aistudio.google.com/apikey">Get a Gemini key</a>
     </div>
     <p class="fine">No account, no tracking. It runs on your own free Gemini key, which takes about a minute to get.</p>
@@ -1107,7 +1107,7 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
             <h3>Paste it once.</h3>
             <p>Pick the language you read best and paste the key into Settings. It’s checked with Google, then kept on this device.</p>
             <div class="cta">
-              <a class="btn primary" href="https://github.com/contextreader/contextreader.github.io">Install from GitHub</a>
+              <a class="btn primary js-install" href="https://github.com/contextreader/contextreader.github.io" data-long="1">Install from GitHub</a>
               <a class="btn" href="https://aistudio.google.com/apikey">Get a Gemini key ↗</a>
             </div>
           </div></div>
@@ -1300,7 +1300,7 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
     <div class="end-cta">
       <h2>Read what you need to read.</h2>
       <div class="cta">
-        <a class="btn primary" href="https://github.com/contextreader/contextreader.github.io">Install from GitHub</a>
+        <a class="btn primary js-install" href="https://github.com/contextreader/contextreader.github.io" data-long="1">Install from GitHub</a>
         <a class="btn" href="https://aistudio.google.com/apikey">Get a free Gemini key ↗</a>
       </div>
       <p class="fine">Free for good. No account, no tracking. You’ll need a free Gemini key, which takes about a minute.</p>
@@ -2308,6 +2308,68 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
   }));
   dlg.querySelector('.md-close').addEventListener('click', () => dlg.close());
   dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });   // click the backdrop
+})();
+</script>
+<script>
+/* Install button, per browser.
+ *
+ * The markup ships with the GitHub fallback, and this only UPGRADES a button
+ * when that browser's store listing actually exists. So: no JavaScript, or a
+ * browser we do not publish for, and the page still offers a real install
+ * instead of a dead "Add to X". Fill a URL in below on the day a listing goes
+ * live — nothing else needs touching, and test/copy.test.js checks that each
+ * URL points at that browser's own store.
+ *
+ * Brave, Edge, Opera and Vivaldi install from the Chrome Web Store: same build,
+ * same listing, different word on the button.
+ */
+(function () {
+  var STORES = {
+    chrome:  '',   /* https://chromewebstore.google.com/detail/<id> — in review */
+    brave:   '',   /* same Chrome Web Store URL */
+    edge:    '',   /* same Chrome Web Store URL, unless an Edge Add-ons listing happens */
+    opera:   '',
+    vivaldi: '',
+    firefox: ''    /* https://addons.mozilla.org/firefox/addon/<slug> — not built yet */
+  };
+  var NAMES = { chrome: 'Chrome', brave: 'Brave', edge: 'Edge', opera: 'Opera',
+                vivaldi: 'Vivaldi', firefox: 'Firefox', safari: 'Safari' };
+
+  function detect() {
+    var ua = navigator.userAgent;
+    /* Brave hides in the UA string and says so only through this API. */
+    if (navigator.brave && navigator.brave.isBrave) return 'brave';
+    if (/Edg\//.test(ua)) return 'edge';
+    if (/OPR\//.test(ua)) return 'opera';
+    if (/Vivaldi/.test(ua)) return 'vivaldi';
+    if (/Firefox\//.test(ua)) return 'firefox';
+    if (/Chrome\//.test(ua)) return 'chrome';
+    if (/Safari\//.test(ua)) return 'safari';
+    return '';
+  }
+
+  function apply(which) {
+    var url = STORES[which];
+    if (!url) return;                       /* no listing: leave the GitHub fallback alone */
+    var name = NAMES[which] || 'your browser';
+    var links = document.querySelectorAll('a.js-install');
+    for (var i = 0; i < links.length; i++) {
+      var a = links[i];
+      a.href = url;
+      a.textContent = a.getAttribute('data-long') ? 'Add to ' + name + ', free' : 'Add to ' + name;
+    }
+    var fine = document.getElementById('install-fine');
+    if (fine) fine.textContent = '';
+  }
+
+  var which = detect();
+  /* isBrave() is async; everything else is settled already. */
+  if (which === 'brave' && navigator.brave.isBrave.call) {
+    navigator.brave.isBrave().then(function (yes) { apply(yes ? 'brave' : 'chrome'); })
+      .catch(function () { apply('chrome'); });
+  } else {
+    apply(which);
+  }
 })();
 </script>
 </body>
