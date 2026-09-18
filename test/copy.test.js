@@ -197,6 +197,29 @@ console.log('the site tells the truth about languages, however it presents them:
     ok('any analytics the site loads is named in the page itself', undisclosed.length === 0, undisclosed);
     const extension = read('content.js') + read('background.js') + read('popup.html') + read('options.html') + read('welcome.html');
     ok('and none of it is in the extension', !allowed.some((h) => extension.includes(h)));
+
+    // Every page the site serves, not just the home page: a privacy or support
+    // page added later is as public as index.html and must keep the same rules.
+    // The Search Console verification file is Google's own stub, not our page.
+    const pages = fs.readdirSync(path.join(ROOT, 'docs'))
+        .filter((f) => f.endsWith('.html') && f !== 'index.html' && !/^google[0-9a-f]+\.html$/.test(f));
+    for (const f of pages) {
+        const page = read(`docs/${f}`);
+        const subres = [];
+        for (const m of page.matchAll(/<link\b([^>]*)>/gi)) {
+            const rel = (m[1].match(/\brel\s*=\s*["']([^"']+)/i) || [, ''])[1].toLowerCase();
+            if (/canonical|alternate/.test(rel)) continue;
+            const href = (m[1].match(/\bhref\s*=\s*["']([^"']+)/i) || [, ''])[1].trim();
+            if (/^(https?:)?\/\//i.test(href)) subres.push(href);
+        }
+        for (const re of [/\b(?:src|srcset)\s*=\s*["']([^"',]+)/gi, /url\(\s*["']?([^"')]+)/gi, /@import\s+(?:url\()?\s*["']?([^"');]+)/gi])
+            for (const m of page.matchAll(re)) if (/^(https?:)?\/\//i.test((m[1] || '').trim())) subres.push(m[1].trim());
+        const strangersHere = subres.filter((u) => !allowed.includes(host(u)));
+        ok(`docs/${f} loads nothing from a third party, bar analytics`, strangersHere.length === 0, strangersHere);
+        const deadHere = DEAD.filter(([re]) => re.test(page)).map(([, what]) => what);
+        ok(`docs/${f} claims nothing the build cannot do`, deadHere.length === 0, deadHere);
+    }
+    ok(`checked every page the site serves (${pages.length + 1})`, true);
 }
 
 console.log(`\n${pass} passed, ${fail} failed`);
