@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Support — Context Reader</title>
+<meta name="description" content="Getting a free Gemini key, what each message in the bubble means, why an answer can be wrong, and how to report a problem.">
+<link rel="canonical" href="https://contextreader.github.io/support">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="icon" href="icon128.png" sizes="128x128" type="image/png">
+<link rel="apple-touch-icon" href="icon128.png">
+<meta name="theme-color" content="#eef0f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#101317" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Context Reader">
+<meta property="og:title" content="Support — Context Reader">
+<meta property="og:description" content="Set up a free key, read the messages the bubble can show, and report a problem.">
+<meta property="og:url" content="https://contextreader.github.io/support">
+<meta property="og:image" content="https://contextreader.github.io/icon128.png">
+<meta name="twitter:card" content="summary">
+<!-- Beyond the visit counter named at the foot of this page, it makes no third-party requests. -->
+<link rel="preload" href="fonts/inter-latin-600.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 400; font-display: swap; src: url("fonts/inter-latin-400.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 600; font-display: swap; src: url("fonts/inter-latin-600.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 800; font-display: swap; src: url("fonts/inter-latin-800.woff2") format("woff2"); }
+
+:root {
+  --ground: #eef0f3; --ground-a: rgba(238,240,243,.86); --paper: #fbfbfc; --rule: #d9dde3;
+  --ink: #111827; --ink-soft: #374151; --mute: #5b6472; --accent: #a84e08; --glow: #fbbf24;
+  --green-tag: #166534;
+  --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: ui-monospace, "SF Mono", "Menlo", "Consolas", monospace;
+  --t-fast: .236s; --t-norm: .382s; --ease: cubic-bezier(.16, 1, .3, 1);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #101317; --ground-a: rgba(16,19,23,.86); --paper: #1a1f26; --rule: #2a3039;
+    --ink: #eef0f3; --ink-soft: #c9ced6; --mute: #9aa3af; --accent: #fbbf24; --green-tag: #4ade80;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #101317; --ground-a: rgba(16,19,23,.86); --paper: #1a1f26; --rule: #2a3039;
+  --ink: #eef0f3; --ink-soft: #c9ced6; --mute: #9aa3af; --accent: #fbbf24; --green-tag: #4ade80;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--ground); color: var(--ink); font: 400 17px/1.7 var(--sans); -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 800px; margin: 0 auto; padding-inline: 21px; }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+
+.mast { position: sticky; top: 0; z-index: 20; background: var(--ground-a); -webkit-backdrop-filter: blur(13px) saturate(120%); backdrop-filter: blur(13px) saturate(120%); }
+.mast .wrap { max-width: 1180px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 13px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: -.01em; color: var(--ink); text-decoration: none; font-size: 16px; }
+.brand img { width: 28px; height: 28px; display: block; }
+.mast nav { display: flex; align-items: center; gap: 21px; font-size: 15px; }
+.mast nav a { color: var(--ink-soft); text-decoration: none; }
+.mast nav a:hover { color: var(--ink); }
+.btn { display: inline-flex; align-items: center; min-height: 38px; padding: 0 16px; border-radius: 999px; font: 600 14px/1 var(--sans); text-decoration: none; background: var(--ink); color: var(--ground); border: 1px solid var(--ink); }
+
+header.page { padding-block: 55px 0; }
+.kicker { font: 600 12px/1 var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--mute); margin: 0 0 13px; }
+h1 { margin: 0; font: 800 clamp(2.1rem, 5vw, 3.1rem)/1.05 var(--sans); letter-spacing: -.035em; color: var(--ink); text-wrap: balance; }
+.lede { margin-top: 21px; font-size: 1.14rem; line-height: 1.6; color: var(--ink-soft); max-width: 40em; }
+
+main { padding-block: 21px 89px; }
+h2 { margin: 55px 0 16px; font: 800 clamp(1.4rem, 2.6vw, 1.85rem)/1.2 var(--sans); letter-spacing: -.025em; color: var(--ink); text-wrap: balance; }
+p { margin: 0 0 16px; color: var(--ink-soft); }
+p strong, li strong, dd strong { color: var(--ink); font-weight: 700; }
+ol.steps { list-style: none; counter-reset: s; margin: 21px 0 0; padding: 0; display: grid; gap: 16px; }
+ol.steps li { counter-increment: s; display: grid; grid-template-columns: 34px 1fr; gap: 0 16px; }
+ol.steps li::before { content: counter(s); grid-row: span 2; width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--accent); color: var(--accent); display: grid; place-items: center; font: 700 13px/1 var(--sans); font-variant-numeric: tabular-nums; }
+ol.steps b { color: var(--ink); font-weight: 700; }
+ol.steps p { margin: 4px 0 0; }
+code { font: 13.5px/1.5 var(--mono); background: var(--paper); border: 1px solid var(--rule); border-radius: 6px; padding: 1px 5px; color: var(--ink); overflow-wrap: anywhere; }
+
+.cards { display: grid; gap: 13px; margin-top: 21px; }
+.card { background: var(--paper); border: 1px solid var(--rule); border-radius: 17px; padding: 18px 21px; }
+.card h3 { margin: 0 0 6px; font: 700 1.05rem/1.3 var(--sans); color: var(--ink); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.card .says { font: 600 12px/1 var(--sans); letter-spacing: .04em; color: var(--mute); border: 1px solid var(--rule); border-radius: 999px; padding: 5px 9px; }
+.card p { margin: 0; font-size: 15.5px; }
+.card p + p { margin-top: 10px; }
+
+.facts { border-top: 1px solid var(--rule); margin-top: 21px; padding-top: 16px; display: grid; gap: 13px; }
+.facts div { display: grid; grid-template-columns: 200px 1fr; gap: 6px 21px; }
+.facts dt { font-weight: 700; color: var(--ink); font-size: 15.5px; }
+.facts dd { margin: 0; color: var(--ink-soft); font-size: 15.5px; }
+.contact { margin-top: 21px; display: flex; flex-wrap: wrap; gap: 13px; }
+.contact a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; text-decoration: none; font: 600 15px/1 var(--sans); border: 1px solid var(--rule); color: var(--ink); background: var(--paper); }
+.contact a.primary { background: var(--ink); color: var(--ground); border-color: var(--ink); }
+
+footer { border-top: 1px solid var(--rule); padding-block: 34px 55px; font-size: 14.5px; color: var(--mute); }
+footer .wrap { max-width: 1180px; display: flex; flex-wrap: wrap; gap: 13px 26px; align-items: center; }
+footer a { color: var(--ink-soft); text-decoration: none; border-bottom: 1px solid transparent; }
+footer a:hover { color: var(--ink); border-bottom-color: var(--rule); }
+footer .spacer { margin-inline-start: auto; }
+@media (max-width: 620px) {
+  .facts div { grid-template-columns: 1fr; gap: 2px; }
+  .mast nav a.hide-sm { display: none; }
+  footer .spacer { margin-inline-start: 0; }
+}
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <div class="wrap">
+    <a class="brand" href="/"><img src="icon.svg" alt="" width="28" height="28">Context Reader</a>
+    <nav aria-label="Site">
+      <a href="/privacy" class="hide-sm">Privacy</a>
+      <a href="/#sec-start" class="hide-sm">Get started</a>
+      <a class="btn" href="https://github.com/contextreader/contextreader.github.io">Add to Chrome</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <header class="page">
+    <p class="kicker">Support</p>
+    <h1>Setting it up, and what to do when it stops.</h1>
+    <p class="lede">Context Reader runs on your own free Gemini key, so most problems are a key problem or a limit on Google’s side. Here is how to set it up, what each message in the bubble means, and where to reach a person.</p>
+  </header>
+
+  <main>
+    <h2>Setting up your key</h2>
+    <p>You need a free Gemini API key before the first lookup. It takes about a minute and asks for no card.</p>
+    <ol class="steps">
+      <li><b>Create the key</b><p>Open <a href="https://aistudio.google.com/apikey">aistudio.google.com/apikey</a>, sign in with a Google account, and choose <strong>Create API key</strong>. Copy it.</p></li>
+      <li><b>Paste it into Settings</b><p>Right-click the Context Reader icon and choose <strong>Options</strong>, or open the extension and use the settings link. Paste the key and press <strong>Save</strong>.</p></li>
+      <li><b>Wait for it to be checked</b><p>Settings asks Google whether the key works before storing it, and then says <strong>Saved and verified</strong>. If it says something else, the key was not accepted and nothing was stored.</p></li>
+      <li><b>Pick your language, then read something</b><p>Select any word on any page and click the amber mark beside it. The key stays on that device: nothing about your account is sent anywhere.</p></li>
+    </ol>
+
+    <h2>What the bubble is telling you</h2>
+    <p>Four messages can appear in place of an answer. Each one means something specific.</p>
+    <div class="cards">
+      <div class="card">
+        <h3>API key needed <span class="says">🔑</span></h3>
+        <p>No key is stored yet. Open Settings and paste one — the card links to Google AI Studio, where you make it.</p>
+      </div>
+      <div class="card">
+        <h3>Key locked <span class="says">🔒</span></h3>
+        <p>You encrypted the key with a passphrase, and this browser session has not been unlocked. Open Settings and enter the passphrase; it stays unlocked until the browser restarts.</p>
+        <p>If the passphrase is lost there is no recovery, by design. Use <strong>Revoke</strong> in Settings and paste the key again.</p>
+      </div>
+      <div class="card">
+        <h3>Rate limit <span class="says">⏳</span></h3>
+        <p>Google’s free tier allows about 20 requests a minute, and a daily cap as well. Wait a moment and try the word again.</p>
+        <p>When a model is rate-limited the extension automatically tries another free model rather than failing, and the bubble notes which one answered. It never falls back to a paid model on its own.</p>
+      </div>
+      <div class="card">
+        <h3>Gemini error <span class="says">⚠️</span></h3>
+        <p>Google returned an error. <code>UNAVAILABLE</code> means their service is busy and the same word usually works a minute later. Anything mentioning the key means Settings should be checked.</p>
+      </div>
+    </div>
+
+    <h2>When the answer itself looks wrong</h2>
+    <p><strong>Your language may be one the model saw less of.</strong> English and Sinhala ship worked examples checked by a speaker, which teach the model to pick the sense a field uses. The other 108 languages work without them, so a specialist term can come back with its everyday meaning instead. The <strong>EN</strong> button in the bubble shows that same answer in English, which is often the quickest way to tell whether the model understood the sentence or the language let it down.</p>
+    <p><strong>Try a fuller sentence.</strong> The extension sends the paragraph around the word, so a word standing alone in a heading or a table cell has less to work with than one inside prose.</p>
+    <p><strong>A wrong answer is worth reporting.</strong> If a word in your language comes back with the wrong sense, that is exactly the case worked examples fix, and adding them is a small edit: see <a href="https://github.com/contextreader/contextreader.github.io/blob/main/CONTRIBUTING.md">contributing a language</a>.</p>
+
+    <h2>Things worth knowing</h2>
+    <dl class="facts">
+      <div><dt>It is free, permanently</dt><dd>There is no plan, no quota of ours and no account. The only limits are Google’s, on your own key.</dd></div>
+      <div><dt>Changing language</dt><dd>Settings, or the popup on the toolbar. The bubble’s <strong>EN</strong> button is a one-off and does not change what you chose.</dd></div>
+      <div><dt>Removing your key</dt><dd><strong>Revoke</strong> in Settings deletes it. Uninstalling the extension deletes everything it stored.</dd></div>
+      <div><dt>Some pages resist selection</dt><dd>A few sites block text selection or run inside their own frame. Selecting a word inside a PDF viewer or a subtitle track may not offer the mark.</dd></div>
+      <div><dt>Chinese, Japanese and Korean</dt><dd>Those three fetch one font file when a bubble first opens; every other language uses typefaces bundled in the extension. On sites with a strict content policy that font request is refused and the bubble falls back to a system face — the answer is unaffected.</dd></div>
+    </dl>
+
+    <h2>Reporting a problem</h2>
+    <p>Bugs and wrong answers are useful. Please say which word, the sentence it was in, and the language you had chosen. Screenshots help.</p>
+    <div class="contact">
+      <a class="primary" href="https://github.com/contextreader/contextreader.github.io/issues">Open an issue on GitHub</a>
+      <a href="mailto:contextreader@gmail.com">contextreader@gmail.com</a>
+      <a href="/privacy">Privacy policy</a>
+    </div>
+    <p style="margin-top:21px">Questions about how Google handles the lookups themselves go to Google: the project never receives them, and there is no server here to receive them with.</p>
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">
+    <a href="/">Home</a>
+    <a href="/privacy">Privacy</a>
+    <a href="https://github.com/contextreader/contextreader.github.io">Source</a>
+    <a href="https://github.com/contextreader/contextreader.github.io/blob/main/LICENSE">MIT licence</a>
+    <span class="spacer">The extension collects nothing; this site counts visits with Cloudflare Web Analytics, cookieless.</span>
+  </div>
+</footer>
+
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "ceec88afaf1f47a289d50d0a20bff3bb"}'></script>
+</body>
+</html>

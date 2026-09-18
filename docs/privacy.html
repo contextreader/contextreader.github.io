@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy — Context Reader</title>
+<meta name="description" content="What Context Reader collects (nothing), what leaves your device and where it goes, what is stored locally, and how your Gemini API key is held. The same policy as the one in the repository.">
+<link rel="canonical" href="https://contextreader.github.io/privacy">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="icon" href="icon128.png" sizes="128x128" type="image/png">
+<link rel="apple-touch-icon" href="icon128.png">
+<meta name="theme-color" content="#eef0f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#101317" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Context Reader">
+<meta property="og:title" content="Privacy — Context Reader">
+<meta property="og:description" content="No server, no account, no telemetry. What leaves your device, and where it goes.">
+<meta property="og:url" content="https://contextreader.github.io/privacy">
+<meta property="og:image" content="https://contextreader.github.io/icon128.png">
+<meta name="twitter:card" content="summary">
+<!-- Beyond the visit counter named in "About this website", this page makes no third-party requests. -->
+<link rel="preload" href="fonts/inter-latin-600.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 400; font-display: swap; src: url("fonts/inter-latin-400.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 600; font-display: swap; src: url("fonts/inter-latin-600.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 800; font-display: swap; src: url("fonts/inter-latin-800.woff2") format("woff2"); }
+
+:root {
+  --ground: #eef0f3; --ground-a: rgba(238,240,243,.86); --paper: #fbfbfc; --rule: #d9dde3;
+  --ink: #111827; --ink-soft: #374151; --mute: #5b6472; --accent: #a84e08; --glow: #fbbf24;
+  --green-tag: #166534;
+  --serif: "Iowan Old Style", "Charter", "Georgia", "Cambria", serif;
+  --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: ui-monospace, "SF Mono", "Menlo", "Consolas", monospace;
+  --t-fast: .236s; --t-norm: .382s;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #101317; --ground-a: rgba(16,19,23,.86); --paper: #1a1f26; --rule: #2a3039;
+    --ink: #eef0f3; --ink-soft: #c9ced6; --mute: #9aa3af; --accent: #fbbf24; --green-tag: #4ade80;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #101317; --ground-a: rgba(16,19,23,.86); --paper: #1a1f26; --rule: #2a3039;
+  --ink: #eef0f3; --ink-soft: #c9ced6; --mute: #9aa3af; --accent: #fbbf24; --green-tag: #4ade80;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--ground); color: var(--ink); font: 400 17px/1.7 var(--sans); -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 760px; margin: 0 auto; padding-inline: 21px; }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+
+.mast { position: sticky; top: 0; z-index: 20; background: var(--ground-a); -webkit-backdrop-filter: blur(13px) saturate(120%); backdrop-filter: blur(13px) saturate(120%); border-bottom: 1px solid transparent; }
+.mast .wrap { max-width: 1180px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 13px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: -.01em; color: var(--ink); text-decoration: none; font-size: 16px; }
+.brand img { width: 28px; height: 28px; display: block; }
+.mast nav { display: flex; align-items: center; gap: 21px; font-size: 15px; }
+.mast nav a { color: var(--ink-soft); text-decoration: none; }
+.mast nav a:hover { color: var(--ink); }
+.btn { display: inline-flex; align-items: center; min-height: 38px; padding: 0 16px; border-radius: 999px; font: 600 14px/1 var(--sans); text-decoration: none; background: var(--ink); color: var(--ground); border: 1px solid var(--ink); }
+
+header.page { padding-block: 55px 0; }
+.kicker { font: 600 12px/1 var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--mute); margin: 0 0 13px; }
+h1 { margin: 0; font: 800 clamp(2.1rem, 5vw, 3.1rem)/1.05 var(--sans); letter-spacing: -.035em; color: var(--ink); text-wrap: balance; }
+.stamp { margin-top: 16px; font-size: 14.5px; color: var(--mute); }
+.lede { margin-top: 21px; font-size: 1.14rem; line-height: 1.6; color: var(--ink-soft); }
+.source-note { margin-top: 21px; padding: 13px 16px; border-inline-start: 2px solid var(--accent); background: var(--paper); border-radius: 0 13px 13px 0; font-size: 15px; color: var(--ink-soft); }
+
+main { padding-block: 21px 89px; }
+h2 { margin: 55px 0 13px; font: 800 clamp(1.4rem, 2.6vw, 1.85rem)/1.2 var(--sans); letter-spacing: -.025em; color: var(--ink); text-wrap: balance; }
+h3 { margin: 34px 0 8px; font: 700 1.1rem/1.3 var(--sans); color: var(--ink); }
+p { margin: 0 0 16px; color: var(--ink-soft); }
+p strong, li strong { color: var(--ink); font-weight: 700; }
+ul { margin: 0 0 16px; padding-inline-start: 21px; color: var(--ink-soft); }
+li { margin-bottom: 8px; }
+code { font: 13.5px/1.5 var(--mono); background: var(--paper); border: 1px solid var(--rule); border-radius: 6px; padding: 1px 5px; color: var(--ink); overflow-wrap: anywhere; }
+.big-no { margin: 21px 0; padding: 21px 24px; background: var(--paper); border-radius: 17px; border: 1px solid var(--rule); }
+.big-no p { margin: 0; }
+.big-no .word { display: block; font: 800 2.2rem/1 var(--sans); letter-spacing: -.03em; color: var(--ink); margin-bottom: 8px; }
+.tablewrap { overflow-x: auto; margin: 21px 0; }
+table { border-collapse: collapse; width: 100%; min-width: 480px; font-size: 15px; }
+th, td { text-align: left; padding: 11px 16px 11px 0; border-bottom: 1px solid var(--rule); vertical-align: top; color: var(--ink-soft); }
+th { font: 600 11.5px/1.4 var(--sans); letter-spacing: .1em; text-transform: uppercase; color: var(--mute); }
+td:first-child { color: var(--ink); }
+td code { background: transparent; border: 0; padding: 0; color: var(--ink); }
+.plain { border-top: 1px solid var(--rule); margin-top: 55px; padding-top: 21px; font-size: 15px; color: var(--mute); }
+
+footer { border-top: 1px solid var(--rule); padding-block: 34px 55px; font-size: 14.5px; color: var(--mute); }
+footer .wrap { max-width: 1180px; display: flex; flex-wrap: wrap; gap: 13px 26px; align-items: center; }
+footer a { color: var(--ink-soft); text-decoration: none; border-bottom: 1px solid transparent; }
+footer a:hover { color: var(--ink); border-bottom-color: var(--rule); }
+footer .spacer { margin-inline-start: auto; }
+@media (max-width: 560px) { .mast nav a.hide-sm { display: none; } footer .spacer { margin-inline-start: 0; } }
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <div class="wrap">
+    <a class="brand" href="/"><img src="icon.svg" alt="" width="28" height="28">Context Reader</a>
+    <nav aria-label="Site">
+      <a href="/#sec-languages" class="hide-sm">Languages</a>
+      <a href="/#sec-privacy" class="hide-sm">How it works</a>
+      <a class="btn" href="https://github.com/contextreader/contextreader.github.io">Add to Chrome</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <header class="page">
+    <p class="kicker">Privacy policy</p>
+    <h1>Context Reader has no server.</h1>
+    <p class="stamp">Last updated 14 September 2026 · covering the extension and this website</p>
+    <p class="lede">There is no account, no sign-in, and no backend belonging to this project. Everything below can be checked against the source in the repository.</p>
+    <p class="source-note">This page is the policy kept at <a href="https://github.com/contextreader/contextreader.github.io/blob/main/PRIVACY_POLICY.md">PRIVACY_POLICY.md</a> in the repository, which is version-controlled alongside the code it describes. If the two ever disagree, that file is the one with a history you can read.</p>
+  </header>
+
+  <main>
+    <h2>What the extension collects</h2>
+    <div class="big-no">
+      <p><span class="word">Nothing.</span>No analytics, no telemetry, no usage statistics, no error or crash reporting. No identifier is generated for you, and nothing is sent to the developer — there is nowhere for it to be sent to.</p>
+    </div>
+
+    <h2>What leaves your device, and where it goes</h2>
+
+    <h3>To Google, when you look up a word</h3>
+    <p>The word you selected and the sentence around it are sent to the Google Gemini API using <strong>your own API key</strong>. This is the entire function of the extension.</p>
+    <p>Google is the data controller for that request. Its handling is governed by the terms you accepted when you created the key:</p>
+    <ul>
+      <li><a href="https://ai.google.dev/gemini-api/terms">Gemini API Additional Terms of Service</a></li>
+      <li><a href="https://policies.google.com/privacy">Google Privacy Policy</a></li>
+    </ul>
+    <p>Note that the free tier of the Gemini API and the paid tier differ in whether your prompts may be used to improve Google’s models. Which applies to you depends on your own key, not on this extension. If that matters to you, read the terms above before choosing a plan.</p>
+
+    <h3>To Google Fonts — only for Chinese, Japanese and Korean</h3>
+    <p>Every typeface the bubble uses ships <strong>inside the extension</strong> as of 17 September 2026: Inter for the interface, in Latin, Cyrillic and Greek, and a Noto face for each of the 21 other scripts. Nothing is fetched for them, ever, on any site.</p>
+    <p>The exception is Chinese, Japanese and Korean. Those families are megabytes each, so they are still requested from <code>fonts.googleapis.com</code> and <code>fonts.gstatic.com</code> — <strong>only when you open a bubble</strong> on a page, and <strong>with no referrer</strong>, so Google’s font servers see your IP address and that a font was requested, but not which page or site you were on. <strong>No word you look up and no page content is included.</strong> Every other language fetches nothing.</p>
+    <p>Before 15 September 2026 this was worse: fonts were requested on every page load, with the page’s origin attached. That was fixed as soon as it was measured, and bundling removed the rest.</p>
+
+    <h3>Nowhere else</h3>
+    <p><code>manifest.json</code> grants exactly one host permission: <code>https://generativelanguage.googleapis.com/*</code>. Chrome enforces that list. The extension cannot contact any other server for data, and there is no code in it that tries.</p>
+
+    <h2>What is stored on your device</h2>
+    <p>All of this stays in your browser’s local extension storage. None of it is transmitted.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th scope="col">Stored</th><th scope="col">What it is</th></tr></thead>
+        <tbody>
+          <tr><td><code>geminiApiKey</code> or <code>geminiApiKeyEnc</code></td><td>Your API key — plain, or encrypted if you set a passphrase</td></tr>
+          <tr><td><code>targetLanguage</code></td><td>The language you chose</td></tr>
+          <tr><td><code>modelPref</code>, <code>modelListCache</code>, <code>modelCooldowns</code></td><td>Which Gemini model to use, and which are rate-limited</td></tr>
+          <tr><td><code>promptOverrides</code>, <code>promptHistory</code></td><td>Prompts you edited, and their version history</td></tr>
+          <tr><td><code>savedWords</code></td><td>Words you explicitly saved</td></tr>
+          <tr><td><code>localLookupCount</code></td><td>A counter shown in the popup</td></tr>
+          <tr><td><code>latencyLog</code>, <code>latencyDaily</code></td><td>Response times per model, for the speed table in Settings</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The latency records deliberately do <strong>not</strong> include the words you looked up. They hold a model name, a timestamp and a duration.</p>
+    <p>Uninstalling the extension deletes all of it. You can also clear the key at any time with <strong>Revoke</strong> in Settings.</p>
+
+    <h2>Your API key</h2>
+    <ul>
+      <li>Stored with <code>chrome.storage.local</code>, never <code>chrome.storage.sync</code> — <code>sync</code> would replicate it to Google’s servers.</li>
+      <li>Read only inside the extension’s service worker. It is never handed to a content script, so no web page can reach it.</li>
+      <li>Shown masked in Settings (<code>AIza…3f2</code>) after saving, never in full.</li>
+      <li>Never written to logs.</li>
+      <li>Optionally encrypted at rest with AES-GCM, using a key derived from a passphrase via PBKDF2. The passphrase is never stored, so there is no recovery — forgetting it means entering the API key again.</li>
+    </ul>
+    <p>Being straight about the limit of this: hardening protects against page scripts and accidental exposure. Only the passphrase option protects against someone who can read your browser profile off the disk. An extension cannot hide a key from software already running as you, and we will not claim otherwise.</p>
+
+    <h2>About this website</h2>
+    <p>The paragraphs above describe the extension, which collects nothing. This website is a separate thing, and it does count visits: <strong>Cloudflare Web Analytics</strong>, which is cookieless, sets no identifier and does not follow you between sites. It records the page, the referrer and a coarse location, so we can tell whether anyone is reading.</p>
+    <p>That is the only thing this site loads from anywhere else. There are no other trackers, no advertising, no embedded video, and the typeface is served from this site rather than from a font host. Nothing here is shared with the extension, which has no analytics of any kind and never will.</p>
+
+    <h2>Children</h2>
+    <p>Not directed at children under 13 and collects nothing from anyone.</p>
+
+    <h2>Changes</h2>
+    <p>Material changes will be noted in the repository history and the date above updated. The history of this file is public.</p>
+
+    <h2>Contact</h2>
+    <p>Email <a href="mailto:contextreader@gmail.com">contextreader@gmail.com</a>, or open an issue on the <a href="https://github.com/contextreader/contextreader.github.io/issues">project’s GitHub repository</a>.</p>
+    <p>Questions about how Google handles the lookups themselves go to Google — this project never receives them.</p>
+
+    <p class="plain">The extension is open source under the MIT licence, so none of this has to be taken on trust: <a href="https://github.com/contextreader/contextreader.github.io">read the source</a>.</p>
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">
+    <a href="/">Home</a>
+    <a href="https://github.com/contextreader/contextreader.github.io">Source</a>
+    <a href="https://github.com/contextreader/contextreader.github.io/blob/main/LICENSE">MIT licence</a>
+    <a href="mailto:contextreader@gmail.com">contextreader@gmail.com</a>
+    <span class="spacer">The extension collects nothing; this site counts visits with Cloudflare Web Analytics, cookieless.</span>
+  </div>
+</footer>
+
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "ceec88afaf1f47a289d50d0a20bff3bb"}'></script>
+</body>
+</html>
