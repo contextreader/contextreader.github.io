@@ -87,6 +87,23 @@ accidental exposure. Only the passphrase option protects against someone who can
 browser profile off the disk. An extension cannot hide a key from software already running
 as you, and we will not claim otherwise.
 
+## About this website
+
+The extension and the website are different things, and only one of them counts anything.
+
+**The extension collects nothing.** No analytics, no telemetry, no account, no identifiers,
+no crash reports. That does not change.
+
+**The website counts visits.** `contextreader.github.io` uses Cloudflare Web Analytics,
+which is cookieless, sets no identifier and cannot follow you between sites. It records the
+page you looked at, where you arrived from, and a coarse location — no more. Nothing about
+the extension, and nothing you look up, ever reaches it: a lookup happens in your browser
+and never touches this site.
+
+This page is also published at
+[contextreader.github.io/privacy](https://contextreader.github.io/privacy). Where the two
+differ, this file — which is version-controlled and public — is the one that counts.
+
 ## Children
 
 Not directed at children under 13 and collects nothing from anyone.
