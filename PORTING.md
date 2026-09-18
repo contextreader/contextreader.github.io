@@ -14,7 +14,7 @@ Written 2026-09-18, while the Chrome listing is in review.
 | Brave, Opera, Vivaldi | **None** | Free | They install from the Chrome Web Store already. Nothing to build, nothing to submit. |
 | Edge | Repackage nothing — same zip | Free | Separate store, separate review, same artefact. An hour, mostly forms. |
 | Firefox | A second manifest and a build step | Free | Worth doing. The API surface we use is portable; the manifest and the permission model are not. |
-| Safari | An Xcode project, wrapped in a macOS app | **99 USD/year** Apple Developer Program | Only with Ian's word. It is a real app to maintain, not a zip to upload. |
+| Safari | An Xcode project, wrapped in a macOS app | **99 USD/year** Apple Developer Program | **Not doing it (Ian, 18 Sep).** The analysis below stays for whenever that changes. |
 
 **Do not start until the Chrome review lands.** If review asks for a change, it changes the
 source every port copies from.
@@ -79,7 +79,10 @@ the code is minified — ours is not, and the repo is public, so this is simple.
 
 ---
 
-## Safari
+## Safari — deferred, not rejected
+
+**Ian's call on 18 Sep: Firefox only.** Nothing below is scheduled; it is here so the decision
+does not have to be re-derived if Safari readers ever become an audience worth 99 USD a year.
 
 **What it actually involves.** `xcrun safari-web-extension-converter <dir>` generates an Xcode
 project wrapping the extension in a macOS app. You then build, sign and ship *an app*, through
@@ -107,8 +110,9 @@ Chrome review change would have to be re-uploaded twice.
 
 `docs/` belongs to the website session — coordinate rather than edit it. What it needs:
 
-- Detect the browser and offer the right store: Chrome/Brave/Opera/Vivaldi → Chrome Web Store;
-  Edge → Edge Add-ons; Firefox → AMO; Safari → App Store.
+- Detect the browser and offer the right store. Scope as of 18 Sep: **Chrome, Brave and
+  Firefox**. Chrome and Brave go to the same Chrome Web Store listing; Firefox goes to AMO.
+  Edge would too if that listing ever happens; Safari is not planned.
 - **Only show a button for a store that exists.** Until a listing is live, that browser gets
   the "install from GitHub" path, not a dead link or a promise.
 - Brave reports itself as Chrome in the UA string; `navigator.brave?.isBrave()` resolves it,
