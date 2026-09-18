@@ -59,7 +59,9 @@ function marqueeHTML() {
 
 // What Twitter, Slack, Discord and LinkedIn show when the repo link is pasted.
 // GitHub asks for 1280×640 and crops the edges on some surfaces, so nothing that
-// matters goes near them.
+// matters goes near them. Two columns: the claim on the left, the product making
+// good on it on the right — the same "culture" pair the site leads with, because
+// a card that shows the thing beats a card that describes it.
 function socialHTML() {
     const svg = fs.readFileSync(path.join(ROOT, 'icon.svg'), 'utf8').replace(/<!--[\s\S]*?-->/g, '');
     const font = (w) => `@font-face{font-family:Inter;font-weight:${w};src:url("file://${ROOT}/docs/fonts/inter-latin-${w}.woff2")}`;
@@ -67,20 +69,43 @@ function socialHTML() {
       ${font(400)}${font(600)}${font(800)}
       html,body{margin:0}
       body{width:1280px;height:640px;overflow:hidden;background:#eef0f3;color:#111827;
-           font-family:Inter,sans-serif;display:flex;flex-direction:column;justify-content:center;
-           gap:30px;padding:0 104px;box-sizing:border-box}
-      .top{display:flex;align-items:center;gap:22px}
-      .top svg{width:88px;height:88px}
-      .top span{font-size:34px;font-weight:800;letter-spacing:-.02em}
-      h1{margin:0;font-size:68px;line-height:1.06;font-weight:800;letter-spacing:-.035em;max-width:17ch}
+           font-family:Inter,sans-serif;display:grid;grid-template-columns:1fr 1fr;
+           align-items:center;gap:56px;padding:0 84px;box-sizing:border-box}
+      .top{display:flex;align-items:center;gap:18px;margin-bottom:26px}
+      .top svg{width:66px;height:66px}
+      .top span{font-size:27px;font-weight:800;letter-spacing:-.02em}
+      h1{margin:0;font-size:53px;line-height:1.07;font-weight:800;letter-spacing:-.035em}
       .lit{background:#fbbf24;border-radius:.26em;padding:0 .12em;margin:0 -.03em;-webkit-box-decoration-break:clone}
-      p{margin:0;font-size:26px;line-height:1.5;color:#374151;max-width:34ch}
-      .foot{font-size:19px;font-weight:600;color:#5b6472}
+      .sub{margin:22px 0 0;font-size:21px;line-height:1.5;color:#374151;max-width:26ch}
+      .foot{margin-top:24px;font-size:17px;font-weight:600;color:#5b6472}
+
+      .spec{background:#fbfbfc;border:1px solid #d9dde3;border-radius:20px;padding:26px 28px 24px;
+            box-shadow:0 18px 40px -22px rgba(17,24,39,.35)}
+      .spec + .spec{margin-top:18px}
+      .where{display:block;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+             color:#5b6472;margin-bottom:12px}
+      .src{margin:0;font-family:Georgia,serif;font-size:23px;line-height:1.5}
+      .means{margin:14px 0 0;padding-top:13px;border-top:1px dashed #d9dde3;font-size:19px;
+             font-weight:600;color:#a84e08}
     </style></head><body>
-      <div class="top">${svg}<span>Context Reader</span></div>
-      <h1>The word you’re <span class="lit">stuck on</span>, in your language.</h1>
-      <p>It reads the sentence around the word first, so you get the meaning that fits.</p>
-      <div class="foot">${L.listLangs().length} languages · free · open source · no tracking</div>
+      <div>
+        <div class="top">${svg}<span>Context Reader</span></div>
+        <h1>The word you’re <span class="lit">stuck on</span>, in your language.</h1>
+        <p class="sub">It reads the sentence around the word first, so you get the meaning that fits.</p>
+        <div class="foot">${L.listLangs().length} languages · free · open source · no tracking</div>
+      </div>
+      <div>
+        <div class="spec">
+          <span class="where">A lab report</span>
+          <p class="src">The blood <span class="lit">culture</span> came back positive.</p>
+          <p class="means">a sample grown in a lab to find bacteria</p>
+        </div>
+        <div class="spec">
+          <span class="where">A job review</span>
+          <p class="src">The company <span class="lit">culture</span> rewards long hours.</p>
+          <p class="means">the shared habits and values of a workplace</p>
+        </div>
+      </div>
     </body></html>`;
 }
 
