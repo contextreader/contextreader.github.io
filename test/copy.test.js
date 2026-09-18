@@ -121,6 +121,21 @@ ok('key status is wired', /welcome-key-status/.test(read('welcome.js')) && /getK
 ok('says the free/paid tiers differ on training, as the policy does',
    /free and paid tiers[^<]*Gemini API differ in whether/i.test(welcome.replace(/\s+/g, ' ')) && /gemini-api\/terms/.test(welcome));
 
+// A button that says "Add to Chrome" has to install from Chrome's store. While
+// the listing was in review these pointed at the GitHub repo, so a visitor
+// clicking Add to Chrome got a code repository — true link, false promise.
+// Anchors only: the site also draws a mock store button inside an illustration.
+function chromeLinksHonest(page) {
+    chromeLinksHonest.bad = [];
+    for (const m of page.matchAll(/<a\b([^>]*)>([^<]*)<\/a>/gi)) {
+        const label = m[2].trim();
+        if (!/^add to chrome\b/i.test(label)) continue;
+        const href = (m[1].match(/href\s*=\s*["']([^"']+)/i) || [, ''])[1];
+        if (!/chromewebstore\.google\.com|chrome\.google\.com\/webstore/.test(href)) chromeLinksHonest.bad.push(`${label} -> ${href}`);
+    }
+    return chromeLinksHonest.bad.length === 0;
+}
+
 console.log('the site tells the truth about languages, however it presents them:');
 {
     const L = require('../lib/languages.js');
@@ -218,7 +233,9 @@ console.log('the site tells the truth about languages, however it presents them:
         ok(`docs/${f} loads nothing from a third party, bar analytics`, strangersHere.length === 0, strangersHere);
         const deadHere = DEAD.filter(([re]) => re.test(page)).map(([, what]) => what);
         ok(`docs/${f} claims nothing the build cannot do`, deadHere.length === 0, deadHere);
+        ok(`docs/${f}: an "Add to Chrome" link goes to the Chrome Web Store`, chromeLinksHonest(page), chromeLinksHonest.bad);
     }
+    ok('docs/index.html: an "Add to Chrome" link goes to the Chrome Web Store', chromeLinksHonest(site), chromeLinksHonest.bad);
     ok(`checked every page the site serves (${pages.length + 1})`, true);
 }
 
