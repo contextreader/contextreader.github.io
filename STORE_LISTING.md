@@ -156,17 +156,22 @@ here; the privacy policy names the same address so the two agree.
 ## Assets still required
 
 - [x] Screenshots, 1280×800 — the store takes five. Upload in this order, all from `store/`:
-  1. `1-english-significant.png` — the lead. The bubble over an article, English: "significant"
-     in "the difference was not significant", answered "statistically meaningful".
-  2. `2-hindi-significant.png` — the same word and sentence, Hindi.
-  3. `5-simple-panel.png` — the Simple panel open in Sinhala, in the bundled Noto face: the
-     panel treatment and a third script in one frame.
-  4. `4-more-panel.png` — the More panel open, Hindi: English scenario above, Hindi below.
-  5. `screenshot-language.png` — Settings, the language picker mid-search, Tuned and Community.
+  1. `2x-a-english.png` — the lead. The bubble over an article, English: "significant" in
+     "the difference was not significant", answered "statistically meaningful".
+  2. `2x-b-spanish.png` — the same word and sentence, Spanish.
+  3. `2x-c-arabic.png` — Arabic. The bubble is genuinely mirrored, not just right-aligned:
+     answer to the right, CONTEXT pill on the right of its line, action row reversed. The one
+     image that argues this is not an English-only product.
+  4. `2x-e-hindi-simple.png` — the Simple panel open in Hindi, full-width card.
+  5. `screenshot-language.png` — Settings, the language picker mid-search: English under
+     Tuned, Basque, Esperanto, Estonian and Spanish under Community.
 
-  All four bubble shots were captured through the unpacked extension with a real key, on a
-  plain article written for the purpose — real model output, nothing staged or edited.
-  `3-sinhala-significant.png` is the alternate: the same word in Sinhala without a panel open.
+  All four bubble shots are real model output, captured through the unpacked extension with a
+  real key on a plain article written for the purpose — shot at 2560×1600 and downsampled, so
+  the small type and the amber trigger stay crisp.
+
+  Alternates in `store/`: `2x-d-japanese.png` (dense script), `2x-f-spanish-more.png` (the More
+  panel in a Latin script), and the earlier 1× Sinhala captures.
 
 - [x] Small promo tile, 440×280 — `store/promo-440x280.png`
 
