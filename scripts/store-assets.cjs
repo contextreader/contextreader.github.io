@@ -1,6 +1,7 @@
 // Renders Chrome Web Store assets that need no model output:
 //   store/promo-440x280.png          small promo tile (brand art)
 //   store/marquee-1400x560.png       marquee tile, for the featured shelves
+//   store/social-1280x640.png        GitHub social preview / link unfurls
 //   store/screenshot-language.png    Settings → language picker, 1280×800
 //
 // Screenshots that show an ANSWER (the bubble over an article) or measured
@@ -53,6 +54,33 @@ function marqueeHTML() {
         <p>It reads the sentence around the word first, so you get the meaning that fits — not every meaning it has.</p>
         <div class="foot">${L.listLangs().length} languages · free · open source · no tracking</div>
       </div>
+    </body></html>`;
+}
+
+// What Twitter, Slack, Discord and LinkedIn show when the repo link is pasted.
+// GitHub asks for 1280×640 and crops the edges on some surfaces, so nothing that
+// matters goes near them.
+function socialHTML() {
+    const svg = fs.readFileSync(path.join(ROOT, 'icon.svg'), 'utf8').replace(/<!--[\s\S]*?-->/g, '');
+    const font = (w) => `@font-face{font-family:Inter;font-weight:${w};src:url("file://${ROOT}/docs/fonts/inter-latin-${w}.woff2")}`;
+    return `<!doctype html><html><head><style>
+      ${font(400)}${font(600)}${font(800)}
+      html,body{margin:0}
+      body{width:1280px;height:640px;overflow:hidden;background:#eef0f3;color:#111827;
+           font-family:Inter,sans-serif;display:flex;flex-direction:column;justify-content:center;
+           gap:30px;padding:0 104px;box-sizing:border-box}
+      .top{display:flex;align-items:center;gap:22px}
+      .top svg{width:88px;height:88px}
+      .top span{font-size:34px;font-weight:800;letter-spacing:-.02em}
+      h1{margin:0;font-size:68px;line-height:1.06;font-weight:800;letter-spacing:-.035em;max-width:17ch}
+      .lit{background:#fbbf24;border-radius:.26em;padding:0 .12em;margin:0 -.03em;-webkit-box-decoration-break:clone}
+      p{margin:0;font-size:26px;line-height:1.5;color:#374151;max-width:34ch}
+      .foot{font-size:19px;font-weight:600;color:#5b6472}
+    </style></head><body>
+      <div class="top">${svg}<span>Context Reader</span></div>
+      <h1>The word you’re <span class="lit">stuck on</span>, in your language.</h1>
+      <p>It reads the sentence around the word first, so you get the meaning that fits.</p>
+      <div class="foot">${L.listLangs().length} languages · free · open source · no tracking</div>
     </body></html>`;
 }
 
@@ -112,6 +140,12 @@ function settingsHTML() {
 
     const tmp = path.join(OUT, '.settings-harness.html');
     fs.writeFileSync(tmp, settingsHTML());
+    const social = await browser.newPage({ viewport: { width: 1280, height: 640 }, deviceScaleFactor: 2 });
+    await social.setContent(socialHTML(), { waitUntil: 'load' });
+    await social.waitForTimeout(600);
+    await social.screenshot({ path: path.join(OUT, 'social-1280x640.png') });
+    halve(path.join(OUT, 'social-1280x640.png'));
+
     const marquee = await browser.newPage({ viewport: { width: 1400, height: 560 }, deviceScaleFactor: 2 });
     await marquee.setContent(marqueeHTML(), { waitUntil: 'load' });
     await marquee.waitForTimeout(600);
@@ -146,5 +180,5 @@ function settingsHTML() {
     fs.unlinkSync(tmp);
 
     await browser.close();
-    console.log('store/promo-440x280.png, store/marquee-1400x560.png, store/screenshot-language.png');
+    console.log('store/promo-440x280.png, store/marquee-1400x560.png, store/social-1280x640.png, store/screenshot-language.png');
 })().catch((e) => { console.error(e); process.exit(1); });
