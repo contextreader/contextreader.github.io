@@ -226,6 +226,20 @@ Still open from that run:
 
 ---
 
+## Other browsers
+
+**[PORTING.md](PORTING.md)** carries the brief: what each target costs, what the manifest has
+to change, and the one behavioural difference that matters (Firefox MV3 grants host
+permissions only when the user allows them, so a first lookup can fail on a correct install).
+Brave, Opera and Vivaldi need no work at all — they install from the Chrome Web Store. Edge
+takes the same zip. Firefox needs a derived manifest and a build step. Safari needs an Xcode
+project, an App Store listing and 99 USD a year, so it waits for Ian's word.
+
+Nothing starts until the Chrome review lands: a change asked for there changes the source
+every port copies.
+
+---
+
 ## Traps that have already cost time
 
 1. **`node --check` passes badly broken CSS.** All of `content.js`'s styles are one template
