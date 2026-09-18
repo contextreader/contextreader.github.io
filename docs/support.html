@@ -54,8 +54,8 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-
 .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: -.01em; color: var(--ink); text-decoration: none; font-size: 16px; }
 .brand img { width: 28px; height: 28px; display: block; }
 .mast nav { display: flex; align-items: center; gap: 21px; font-size: 15px; }
-.mast nav a { color: var(--ink-soft); text-decoration: none; }
-.mast nav a:hover { color: var(--ink); }
+.mast nav a:not(.btn) { color: var(--ink-soft); text-decoration: none; }
+.mast nav a:not(.btn):hover { color: var(--ink); }
 .btn { display: inline-flex; align-items: center; min-height: 38px; padding: 0 16px; border-radius: 999px; font: 600 14px/1 var(--sans); text-decoration: none; background: var(--ink); color: var(--ground); border: 1px solid var(--ink); }
 
 header.page { padding-block: 55px 0; }
