@@ -151,7 +151,7 @@ console.log('the install button offers a store that exists, or GitHub:');
         vivaldi: /chromewebstore\.google\.com/,
         firefox: /addons\.mozilla\.org/,
     };
-    for (const f of ['docs/index.html', 'docs/privacy.html', 'docs/support.html']) {
+    for (const f of ['docs/index.html', 'docs/privacy.html', 'docs/support.html', 'docs/vs-reverso.html']) {
         const page = read(f);
         const table = page.slice(page.indexOf('var STORES = {'), page.indexOf('};', page.indexOf('var STORES = {')));
         ok(`${f} has the install script`, table.length > 0);

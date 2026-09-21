@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Context Reader vs Reverso Context — an honest comparison</title>
+<meta name="description" content="Reverso Context shows a word across millions of real example sentences. Context Reader explains it for the sentence you’re reading. Where each one is better.">
+<link rel="canonical" href="https://contextreader.github.io/vs-reverso">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="icon" href="icon128.png" sizes="128x128" type="image/png">
+<link rel="apple-touch-icon" href="icon128.png">
+<meta name="theme-color" content="#eef0f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#101317" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Context Reader">
+<meta property="og:title" content="Context Reader vs Reverso Context">
+<meta property="og:description" content="One shows a word across millions of real sentences; the other explains it for yours. Where each is better, checked 21 September 2026.">
+<meta property="og:url" content="https://contextreader.github.io/vs-reverso">
+<meta property="og:image" content="https://contextreader.github.io/icon128.png">
+<meta name="twitter:card" content="summary">
+<!-- Beyond the visit counter named at the foot of this page, it makes no third-party requests.
+     Every statement about Reverso below was read off its own pages on 21 Sep 2026:
+     context.reverso.net/translation/, documents.reverso.net/Pricing.aspx (USD),
+     reverso.net/download-browser-extension and its Chrome Web Store listing (v3.14.417).
+     Re-check them before changing a Reverso fact, and move the date in the page with it. -->
+<link rel="preload" href="fonts/inter-latin-800.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 400; font-display: swap; src: url("fonts/inter-latin-400.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 600; font-display: swap; src: url("fonts/inter-latin-600.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 800; font-display: swap; src: url("fonts/inter-latin-800.woff2") format("woff2"); }
+
+:root {
+  --ground: #eef0f3; --ground-a: rgba(238,240,243,.86); --paper: #fbfbfc; --rule: #d9dde3;
+  --ink: #111827; --ink-soft: #374151; --mute: #5b6472; --accent: #a84e08; --glow: #fbbf24;
+  --lit-ink: #111827; --green-tag: #166534;
+  --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --serif: "Iowan Old Style", "Charter", "Georgia", "Cambria", serif;
+  --mono: ui-monospace, "SF Mono", "Menlo", "Consolas", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #101317; --ground-a: rgba(16,19,23,.86); --paper: #1a1f26; --rule: #2a3039;
+    --ink: #eef0f3; --ink-soft: #c9ced6; --mute: #9aa3af; --accent: #fbbf24; --green-tag: #4ade80;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #101317; --ground-a: rgba(16,19,23,.86); --paper: #1a1f26; --rule: #2a3039;
+  --ink: #eef0f3; --ink-soft: #c9ced6; --mute: #9aa3af; --accent: #fbbf24; --green-tag: #4ade80;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--ground); color: var(--ink); font: 400 17px/1.7 var(--sans); -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 800px; margin: 0 auto; padding-inline: 21px; }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+
+.mast { position: sticky; top: 0; z-index: 20; background: var(--ground-a); -webkit-backdrop-filter: blur(13px) saturate(120%); backdrop-filter: blur(13px) saturate(120%); }
+.mast .wrap { max-width: 1180px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 13px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: -.01em; color: var(--ink); text-decoration: none; font-size: 16px; }
+.brand img { width: 28px; height: 28px; display: block; }
+.mast nav { display: flex; align-items: center; gap: 21px; font-size: 15px; }
+.mast nav a:not(.btn) { color: var(--ink-soft); text-decoration: none; }
+.mast nav a:not(.btn):hover { color: var(--ink); }
+.btn { display: inline-flex; align-items: center; min-height: 38px; padding: 0 16px; border-radius: 999px; font: 600 14px/1 var(--sans); text-decoration: none; background: var(--ink); color: var(--ground); border: 1px solid var(--ink); }
+
+header.page { padding-block: 55px 0; }
+.kicker { font: 600 12px/1 var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--mute); margin: 0 0 13px; }
+h1 { margin: 0; font: 800 clamp(2.1rem, 5vw, 3.1rem)/1.05 var(--sans); letter-spacing: -.035em; color: var(--ink); text-wrap: balance; }
+.lede { margin-top: 21px; font-size: 1.14rem; line-height: 1.6; color: var(--ink-soft); max-width: 40em; }
+.checked { margin-top: 13px; font-size: 14px; color: var(--mute); }
+
+main { padding-block: 21px 89px; }
+h2 { margin: 55px 0 16px; font: 800 clamp(1.4rem, 2.6vw, 1.85rem)/1.2 var(--sans); letter-spacing: -.025em; color: var(--ink); text-wrap: balance; }
+h3 { margin: 0 0 6px; font: 700 1.05rem/1.3 var(--sans); color: var(--ink); }
+p { margin: 0 0 16px; color: var(--ink-soft); }
+p strong, li strong, td strong { color: var(--ink); font-weight: 700; }
+
+/* The one bold element: the lit word, as the logo draws it. */
+.lit { background: var(--glow); color: var(--lit-ink); border-radius: .26em; padding: 0 .14em; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+
+.specimen { margin: 21px 0; background: var(--paper); border: 1px solid var(--rule); border-radius: 17px; padding: 21px 24px; }
+.specimen q { display: block; font: 400 1.2rem/1.55 var(--serif); color: var(--ink); quotes: none; }
+.specimen .two { display: grid; grid-template-columns: 1fr 1fr; gap: 21px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--rule); }
+.specimen .two p { margin: 0; font-size: 15.5px; }
+.specimen .who { display: block; font: 600 12px/1 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--mute); margin-bottom: 8px; }
+
+.cards { display: grid; gap: 13px; margin-top: 21px; }
+.card { background: var(--paper); border: 1px solid var(--rule); border-radius: 17px; padding: 18px 21px; }
+.card p { margin: 0; font-size: 15.5px; }
+.card p + p { margin-top: 10px; }
+
+table.cmp { width: 100%; border-collapse: collapse; margin-top: 21px; font-size: 15px; line-height: 1.5; }
+.cmp th, .cmp td { text-align: start; vertical-align: top; padding: 12px 13px; border-bottom: 1px solid var(--rule); }
+.cmp thead th { font: 700 13px/1.3 var(--sans); letter-spacing: .04em; color: var(--mute); border-bottom-color: var(--ink-soft); }
+.cmp tbody th { font-weight: 700; color: var(--ink); width: 22%; }
+.cmp td { color: var(--ink-soft); width: 39%; }
+.cmp tbody th, .cmp td:first-of-type { padding-inline-start: 0; }
+.cmp tbody th + td { padding-inline-start: 13px; }
+
+.pick { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; margin-top: 21px; }
+.pick .card h3 { margin-bottom: 8px; }
+.pick ul { margin: 0; padding-inline-start: 1.1em; color: var(--ink-soft); font-size: 15.5px; }
+.pick li + li { margin-top: 6px; }
+
+.faq { border-top: 1px solid var(--rule); margin-top: 21px; }
+.faq div { padding-block: 16px; border-bottom: 1px solid var(--rule); }
+.faq p { margin: 0; font-size: 15.5px; }
+.cta { margin-top: 21px; display: flex; flex-wrap: wrap; gap: 13px; }
+.cta a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; text-decoration: none; font: 600 15px/1 var(--sans); border: 1px solid var(--rule); color: var(--ink); background: var(--paper); }
+.cta a.primary { background: var(--ink); color: var(--ground); border-color: var(--ink); }
+.fine { font-size: 14px; color: var(--mute); margin-top: 13px; }
+
+footer { border-top: 1px solid var(--rule); padding-block: 34px 55px; font-size: 14.5px; color: var(--mute); }
+footer .wrap { max-width: 1180px; display: flex; flex-wrap: wrap; gap: 13px 26px; align-items: center; }
+footer a { color: var(--ink-soft); text-decoration: none; border-bottom: 1px solid transparent; }
+footer a:hover { color: var(--ink); border-bottom-color: var(--rule); }
+footer .spacer { margin-inline-start: auto; }
+footer .tm { flex-basis: 100%; margin: 0; font-size: 13.5px; color: var(--mute); }
+@media (max-width: 620px) {
+  .mast nav a.hide-sm { display: none; }
+  footer .spacer { margin-inline-start: 0; }
+  .specimen .two, .pick { grid-template-columns: 1fr; }
+  /* The table becomes one block per row, each cell labelled by its column. */
+  .cmp thead { display: none; }
+  .cmp tr { display: block; padding-block: 13px; border-bottom: 1px solid var(--rule); }
+  .cmp th, .cmp td { display: block; width: auto; border: 0; padding: 0; }
+  .cmp tbody th { margin-bottom: 6px; width: auto; }
+  .cmp tbody th + td { padding-inline-start: 0; }
+  .cmp td + td { margin-top: 6px; }
+  .cmp td::before { content: attr(data-col); display: block; font: 700 12px/1.4 var(--sans); letter-spacing: .04em; color: var(--mute); }
+}
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <div class="wrap">
+    <a class="brand" href="/"><img src="icon.svg" alt="" width="28" height="28">Context Reader</a>
+    <nav aria-label="Site">
+      <a href="/support" class="hide-sm">Support</a>
+      <a href="/#sec-start" class="hide-sm">Get started</a>
+      <a class="btn js-install" href="https://github.com/contextreader/contextreader.github.io">Install from GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <header class="page">
+    <p class="kicker">Comparison</p>
+    <h1>Context Reader vs Reverso Context</h1>
+    <p class="lede">Reverso Context shows how a word or expression is used across millions of real sentences from bilingual texts, and you pick the translation that fits. Context Reader reads the sentence you are looking at and explains the one meaning that fits <em>it</em>, in your language. If you are learning a language, Reverso does more. If you are stuck on one word in something you need to understand, that is the job Context Reader was built for.</p>
+    <p class="checked">Written by the makers of Context Reader. Every fact about Reverso here was checked on Reverso’s own pages on 21 September 2026 — linked where it appears.</p>
+  </header>
+
+  <main>
+    <h2>The difference, in one sentence</h2>
+    <div class="specimen">
+      <q>The <span class="lit">culture</span> came back positive after forty-eight hours, so the ward started antibiotics.</q>
+      <div class="two">
+        <p><span class="who">A corpus tool</span>gives you the ways <em>culture</em> is translated — the arts, a company’s habits, a lab sample grown to find bacteria — with real example sentences for each, and leaves the choice to you. Reverso puts it this way: <em>“Pick the right translation for your context thanks to real-life sentences.”</em></p>
+        <p><span class="who">Context Reader</span>sends the word together with the paragraph around it, so the model makes that choice — here it has the ward and the antibiotics to go on. You get one meaning, in your language, with a short explanation tied to this sentence.</p>
+      </div>
+    </div>
+    <p>Neither approach is simply better. Seeing many real examples teaches you how a word behaves; being told what it means <em>here</em> lets you keep reading. Which one you want depends on why you are reading.</p>
+
+    <h2>Where Reverso Context is better</h2>
+    <div class="cards">
+      <div class="card">
+        <h3>Idioms, expressions and slang</h3>
+        <p>Reverso lists over 100,000 expressions, and its browser extension widens your selection to catch one: select <em>suit</em> in “public speaking is not his strong suit” and it looks up <em>strong suit</em>. Its <a href="https://context.reverso.net/translation/">site</a> covers slang and everyday phrases that dictionaries miss.</p>
+      </div>
+      <div class="card">
+        <h3>Real bilingual examples</h3>
+        <p>Reverso’s examples are real sentences from bilingual texts — film dialogue, official documents, articles — shown in both languages. You see a word used for real, many times over. A Context Reader answer is written by a language model for your sentence: often exactly what you needed, but generated, so it can be wrong in a way a real example cannot.</p>
+      </div>
+      <div class="card">
+        <h3>Learning, not just reading</h3>
+        <p>Reverso keeps a history of what you looked up, lets you star favourites into lists synced across devices, and turns them into flashcards and quizzes with spaced repetition. It has pronunciation in different accents and a visual dictionary of 40,000 images. Context Reader keeps no list; it is built for getting through the page in front of you.</p>
+      </div>
+      <div class="card">
+        <h3>Films, phones and desktops</h3>
+        <p>Reverso’s <a href="https://www.reverso.net/download-browser-extension">extension</a> translates Netflix and YouTube subtitles on hover, and Reverso runs as a website, an iOS and Android app, and a Mac and Windows app. Context Reader is a desktop browser extension only: Chrome, Brave and Edge.</p>
+      </div>
+      <div class="card">
+        <h3>Nothing to set up</h3>
+        <p>You install Reverso and use it. Context Reader needs a free Gemini API key from Google first. It takes about a minute and asks for no card, but it is a step Reverso does not have.</p>
+      </div>
+    </div>
+
+    <h2>Where Context Reader is different</h2>
+    <div class="cards">
+      <div class="card">
+        <h3>It answers for your sentence</h3>
+        <p>The paragraph around the word goes with every lookup, so the answer is the sense that paragraph uses — the finance <em>bank</em> or the river one, the clinical <em>acute</em> or the geometric one. If you want more, <strong>More</strong> shows the word in a short scenario set in the same world as the page, <strong>General</strong> gives its other meanings, and <strong>Simple</strong> says it again in the plainest words.</p>
+      </div>
+      <div class="card">
+        <h3>It works inside one language</h3>
+        <p>Reading English with English chosen, you get the word in plainer English rather than a translation. That helps with a register you don’t use every day — a medical report, a lease, a paper’s methods section. Reverso has English definitions too; Context Reader’s is the meaning this sentence uses.</p>
+      </div>
+      <div class="card">
+        <h3>More languages, not all equally good</h3>
+        <p>Context Reader answers in 110 languages — the ones Google documents its Gemini models as understanding. Reverso’s extension page lists 28. But only English and Sinhala in Context Reader carry worked examples checked by a speaker; the other 108 rely on what the model already knows, and a specialist term can come back with its everyday meaning. Reverso’s examples, in the languages it has, are real translations.</p>
+      </div>
+      <div class="card">
+        <h3>Free with no paid tier, and no ads</h3>
+        <p>There is nothing to buy. It can be free because there is no server: your lookup goes from your browser to Google’s Gemini API on your own key. Reverso is free with ads; <a href="https://documents.reverso.net/Pricing.aspx?lang=en&amp;origin=1">Reverso Premium</a> removes them and adds more results and examples, unlimited saved vocabulary and AI translation, for $9.99 a month or $6.49 a month billed yearly ($77.88), with 75% off for students and teachers.</p>
+      </div>
+      <div class="card">
+        <h3>No account, and the code is open</h3>
+        <p>Context Reader has no account, analytics or telemetry, and is MIT-licensed, so that can be checked. The trade-off is Google’s: on a free key, Google’s terms let it use what you send to improve its products, and human reviewers may read it. A paid key is not used that way. <a href="/privacy">The privacy policy</a> has the detail.</p>
+      </div>
+    </div>
+
+    <h2>At a glance</h2>
+    <table class="cmp">
+      <thead><tr><td></td><th scope="col">Reverso Context</th><th scope="col">Context Reader</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">What you get</th><td data-col="Reverso Context">Translations ranked by relevance, with real example sentences to choose from</td><td data-col="Context Reader">One meaning, chosen for your sentence, in your language</td></tr>
+        <tr><th scope="row">Idioms and slang</th><td data-col="Reverso Context"><strong>Stronger</strong> — 100,000+ expressions, detected around your selection</td><td data-col="Context Reader">Explained when you select them, from the model’s knowledge</td></tr>
+        <tr><th scope="row">Where answers come from</th><td data-col="Reverso Context">Real bilingual texts, plus Reverso’s own AI translation</td><td data-col="Context Reader">Google’s Gemini, on your key</td></tr>
+        <tr><th scope="row">Languages</th><td data-col="Reverso Context">28 (extension page)</td><td data-col="Context Reader">110; English and Sinhala tuned, 108 untuned</td></tr>
+        <tr><th scope="row">Same-language help</th><td data-col="Reverso Context">English definitions</td><td data-col="Context Reader">Plainer words for the sense this sentence uses</td></tr>
+        <tr><th scope="row">Learning tools</th><td data-col="Reverso Context"><strong>Stronger</strong> — history, favourites, flashcards, quizzes, pronunciation</td><td data-col="Context Reader">None; a Search button to pronounce or look the word up</td></tr>
+        <tr><th scope="row">Where it runs</th><td data-col="Reverso Context">Web, iOS, Android, Mac, Windows, browser extension, video subtitles</td><td data-col="Context Reader">Chrome, Brave and Edge on desktop</td></tr>
+        <tr><th scope="row">Price</th><td data-col="Reverso Context">Free with ads; Premium $9.99/month or $77.88/year</td><td data-col="Context Reader">Free, no paid tier, no ads</td></tr>
+        <tr><th scope="row">Setup</th><td data-col="Reverso Context">Install and go; account optional, for sync</td><td data-col="Context Reader">A free Gemini key, about a minute; no account</td></tr>
+        <tr><th scope="row">Source code</th><td data-col="Reverso Context">Proprietary</td><td data-col="Context Reader">Open, MIT</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Which one to use</h2>
+    <div class="pick">
+      <div class="card">
+        <h3>Reverso Context, if you are…</h3>
+        <ul>
+          <li>learning a language and want to see how words are really used</li>
+          <li>working with idioms, slang or set expressions</li>
+          <li>building vocabulary you want to review later</li>
+          <li>watching films or reading on your phone</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Context Reader, if you are…</h3>
+        <ul>
+          <li>reading something you need to understand, and one word is in the way</li>
+          <li>reading a field’s own English — medicine, law, research</li>
+          <li>reading in a language Reverso doesn’t cover</li>
+          <li>after something free, open and account-free</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>Questions</h2>
+    <div class="faq">
+      <div><h3>Is Context Reader a free alternative to Reverso Context?</h3><p>For understanding a word while you read, yes: it is free with no paid tier, and it needs your own free Gemini key. It is not a replacement for Reverso’s example sentences, idiom search or learning tools, which it does not have.</p></div>
+      <div><h3>Does Reverso look at the sentence I’m reading?</h3><p>Its extension reads the words next to your selection to catch multi-word expressions. The translations and examples it then shows come from its corpus rather than being written for your sentence; you choose the one that fits.</p></div>
+      <div><h3>Which is better for idioms?</h3><p>Reverso. Its expression search and real examples are the strongest thing about it.</p></div>
+      <div><h3>Can Context Reader be wrong?</h3><p>Yes. Its answers are generated by a model, and it is less reliable in languages the model saw less of. The <strong>EN</strong> button shows the same answer in English, which is a quick way to check.</p></div>
+    </div>
+
+    <div class="cta">
+      <a class="primary js-install" href="https://github.com/contextreader/contextreader.github.io">Install from GitHub</a>
+      <a href="/">See it working</a>
+    </div>
+    <p class="fine" id="install-fine">The Chrome Web Store listing is in review, so installing is from GitHub for now.</p>
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">
+    <a href="/">Home</a>
+    <a href="/support">Support</a>
+    <a href="/privacy">Privacy</a>
+    <a href="https://github.com/contextreader/contextreader.github.io">Source</a>
+    <span class="spacer">The extension collects nothing; this site counts visits with Cloudflare Web Analytics, cookieless.</span>
+    <p class="tm">Reverso and Reverso Context are trademarks of their owner. Context Reader is an independent project, not affiliated with or endorsed by Reverso.</p>
+  </div>
+</footer>
+
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "ceec88afaf1f47a289d50d0a20bff3bb"}'></script>
+<script>
+/* Install button, per browser.
+ *
+ * The markup ships with the GitHub fallback, and this only UPGRADES a button
+ * when that browser's store listing actually exists. So: no JavaScript, or a
+ * browser we do not publish for, and the page still offers a real install
+ * instead of a dead "Add to X". Fill a URL in below on the day a listing goes
+ * live — nothing else needs touching, and test/copy.test.js checks that each
+ * URL points at that browser's own store.
+ *
+ * Brave, Edge, Opera and Vivaldi install from the Chrome Web Store: same build,
+ * same listing, different word on the button.
+ */
+(function () {
+  var STORES = {
+    chrome:  '',   /* https://chromewebstore.google.com/detail/<id> — in review */
+    brave:   '',   /* same Chrome Web Store URL */
+    edge:    '',   /* same Chrome Web Store URL, unless an Edge Add-ons listing happens */
+    opera:   '',
+    vivaldi: '',
+    firefox: ''    /* https://addons.mozilla.org/firefox/addon/<slug> — not built yet */
+  };
+  var NAMES = { chrome: 'Chrome', brave: 'Brave', edge: 'Edge', opera: 'Opera',
+                vivaldi: 'Vivaldi', firefox: 'Firefox', safari: 'Safari' };
+
+  function detect() {
+    var ua = navigator.userAgent;
+    /* Brave hides in the UA string and says so only through this API. */
+    if (navigator.brave && navigator.brave.isBrave) return 'brave';
+    if (/Edg\//.test(ua)) return 'edge';
+    if (/OPR\//.test(ua)) return 'opera';
+    if (/Vivaldi/.test(ua)) return 'vivaldi';
+    if (/Firefox\//.test(ua)) return 'firefox';
+    if (/Chrome\//.test(ua)) return 'chrome';
+    if (/Safari\//.test(ua)) return 'safari';
+    return '';
+  }
+
+  function apply(which) {
+    var url = STORES[which];
+    if (!url) return;                       /* no listing: leave the GitHub fallback alone */
+    var name = NAMES[which] || 'your browser';
+    var links = document.querySelectorAll('a.js-install');
+    for (var i = 0; i < links.length; i++) {
+      var a = links[i];
+      a.href = url;
+      a.textContent = a.getAttribute('data-long') ? 'Add to ' + name + ', free' : 'Add to ' + name;
+    }
+    var fine = document.getElementById('install-fine');
+    if (fine) fine.textContent = '';
+  }
+
+  var which = detect();
+  /* isBrave() is async; everything else is settled already. */
+  if (which === 'brave' && navigator.brave.isBrave.call) {
+    navigator.brave.isBrave().then(function (yes) { apply(yes ? 'brave' : 'chrome'); })
+      .catch(function () { apply('chrome'); });
+  } else {
+    apply(which);
+  }
+})();
+</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"Is Context Reader a free alternative to Reverso Context?","acceptedAnswer":{"@type":"Answer","text":"For understanding a word while you read, yes: it is free with no paid tier, and it needs your own free Gemini key. It is not a replacement for Reverso’s example sentences, idiom search or learning tools, which it does not have."}},
+{"@type":"Question","name":"Does Reverso look at the sentence I’m reading?","acceptedAnswer":{"@type":"Answer","text":"Its extension reads the words next to your selection to catch multi-word expressions. The translations and examples it then shows come from its corpus rather than being written for your sentence; you choose the one that fits."}},
+{"@type":"Question","name":"Which is better for idioms?","acceptedAnswer":{"@type":"Answer","text":"Reverso. Its expression search and real examples are the strongest thing about it."}},
+{"@type":"Question","name":"Can Context Reader be wrong?","acceptedAnswer":{"@type":"Answer","text":"Yes. Its answers are generated by a model, and it is less reliable in languages the model saw less of. The EN button shows the same answer in English, which is a quick way to check."}}
+]}</script>
+</body>
+</html>

@@ -31,6 +31,22 @@ Both pages sit under the same rules as every other page: `npm test` walks every
 `docs/*.html`, and a claim the build cannot back fails it. Link the new page from the home
 page and from `llms.txt`.
 
+**Done 21 Sep (both, reviewed by Ian and shipped; next pages wait for him):**
+- Home: title "Context Reader — translate in context, in your language"; description (151
+  chars) carries "the word’s meaning in context". The H1 stays "The word you’re stuck on, in
+  your language." — Ian rejected "translated in context": the extension doesn't translate for
+  same-language readers, and the H1 is the brand line on the store tiles and social preview.
+  The title carries the search phrase. Footer and noscript link to the comparison.
+- `docs/vs-reverso.html`: answer-first lede, where Reverso is better (idioms, real bilingual
+  examples, learning tools, subtitles/apps, no setup), where Context Reader differs, a table,
+  which-to-use, and a 4-question FAQ mirrored in FAQPage JSON-LD. Every Reverso fact was read off
+  Reverso’s own pages on 21 Sep (sources listed in the page's head comment): 28 languages
+  (extension page), 100,000+ expressions, Premium $9.99/mo or $77.88/yr, 75% off for students
+  and teachers. WebFetch gets 403 from reverso.net; a headless Chromium with a desktop UA works.
+  The DEAD regexes in `test/copy.test.js` can't tell whose feature a sentence names, so
+  Reverso's features are worded around them ("pronunciation", "favourites").
+  In the sitemap and llms.txt; `test/copy.test.js` now checks its install script too.
+
 **Pull before you start** — the extension session pushes to `main` too. Stage only `docs/`,
 `LANDING.md` and anything under it; never `git add -A`.
 
