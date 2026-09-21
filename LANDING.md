@@ -9,6 +9,33 @@ rest of `HANDOFF.md` — that is the extension's state, and another session owns
 
 ---
 
+## Start here — the current job (21 Sep)
+
+The site is built, live and verified. The job now is **search**: making the pages answer what
+people actually type. **Read [SEARCH.md](SEARCH.md) first** — it has the keyword data, the
+competitors, and six pages in priority order. Do the first two, then check in with Ian:
+
+1. **Tune the home page for "translate in context".** Title, meta description and H1 should use
+   the phrase people type — "translate in context", "word meaning in context" — naturally, once
+   each. It is the one query cluster that is ours by definition (5,000/mo each, low
+   competition). Keep the description under 160 characters: Bing flags longer ones.
+2. **Write "Context Reader vs Reverso Context"** as a new page, e.g. `docs/vs-reverso.html` and
+   `/vs-reverso` in the sitemap. Reverso Context is the direct competitor (582,000 searches/mo,
+   almost all its brand name). Be genuinely fair: Reverso shows many example sentences from a
+   corpus and is better for idioms and bilingual concordance; Context Reader reads *your*
+   sentence and answers for it. **A comparison that concedes nothing reads as an ad and ranks
+   like one.** Name only facts you can check: Reverso's current features and pricing from its
+   own site, fetched the day you write.
+
+Both pages sit under the same rules as every other page: `npm test` walks every
+`docs/*.html`, and a claim the build cannot back fails it. Link the new page from the home
+page and from `llms.txt`.
+
+**Pull before you start** — the extension session pushes to `main` too. Stage only `docs/`,
+`LANDING.md` and anything under it; never `git add -A`.
+
+---
+
 ## Scope — what this session may touch
 
 | Yours | Not yours — another session owns these |
