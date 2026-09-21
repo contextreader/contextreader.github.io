@@ -70,7 +70,7 @@
     card.innerHTML =
       '<p><strong>Help improve this site?</strong> If you allow it, Microsoft Clarity records how this page is used, ' +
       'scrolling and clicks but never what you type, and sets Microsoft’s cookies. ' +
-      '<a href="/privacy.html#clarity">Details</a></p>' +
+      '<a href="/privacy#clarity">Details</a></p>' +
       '<div class="acts"><button type="button" data-a="no">No thanks</button><button type="button" data-a="yes">Allow</button></div>';
     card.addEventListener('click', function (e) {
       var b = e.target.closest('button');
