@@ -226,7 +226,15 @@ console.log('the site tells the truth about languages, however it presents them:
     // to be named in the privacy section, or the page would be counting people
     // while telling them it doesn't. The extension takes neither: its "no
     // tracking" claim is absolute and stays that way.
-    const ANALYTICS = { 'static.cloudflareinsights.com': 'Cloudflare Web Analytics', 'gc.zgo.at': 'GoatCounter' };
+    // Umami added 21 Sep: Ian wants click events (install, get-a-key, language
+    // picked) that Cloudflare cannot record. Cookieless, no identifier, so no
+    // consent banner — and, like the others, only allowed while the page names
+    // it in its own prose. Google Analytics is deliberately NOT here: it sets an
+    // identifying cookie, needs a consent banner for EU/UK visitors, and is
+    // deferred until Google Ads makes that worth it. Adding it means adding it
+    // here, on purpose, with the disclosure to match.
+    const ANALYTICS = { 'static.cloudflareinsights.com': 'Cloudflare Web Analytics', 'gc.zgo.at': 'GoatCounter',
+                        'cloud.umami.is': 'Umami' };
     const allowed = Object.keys(ANALYTICS);
     const host = (u) => (u.match(/^(?:https?:)?\/\/([^/]+)/i) || [, ''])[1].toLowerCase();
     const strangers = external.filter((e) => !allowed.includes(host(e.split(': ')[1] || '')));
