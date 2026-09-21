@@ -94,11 +94,25 @@ The extension and the website are different things, and only one of them counts 
 **The extension collects nothing.** No analytics, no telemetry, no account, no identifiers,
 no crash reports. That does not change.
 
-**The website counts visits.** `contextreader.github.io` uses Cloudflare Web Analytics,
-which is cookieless, sets no identifier and cannot follow you between sites. It records the
-page you looked at, where you arrived from, and a coarse location — no more. Nothing about
-the extension, and nothing you look up, ever reaches it: a lookup happens in your browser
-and never touches this site.
+**The website counts visits and a few clicks, with two services.** Cloudflare Web Analytics
+counts visits. Umami counts visits and a few clicks: the install and "Get a Gemini key"
+buttons (with which browser the page detected), "Copy for LLM" and "View as Markdown", and
+the language chosen in the home page's demo. Umami's script comes from `cloud.umami.is` and
+reports to `gateway.umami.is`.
+
+Neither service sets a cookie or stores anything in your browser, and neither follows you
+between sites. Between them they record the page, the referrer, the browser, operating system
+and device type, and a coarse location (the country) — so we can tell whether anyone is
+reading and what leads to an install. They are the only things the site loads from anywhere
+else: no other trackers, no advertising, no embedded video, and the typeface is served from
+the site itself.
+
+**The site itself remembers one thing:** the language you pick in the home page's demo, kept
+in your browser's local storage so it is still chosen next time. It never leaves your device,
+and clearing the site's data in your browser removes it.
+
+Nothing about the extension, and nothing you look up, ever reaches the website: a lookup
+happens in your browser and never touches this site.
 
 This page is also published at
 [contextreader.github.io/privacy](https://contextreader.github.io/privacy). Where the two
