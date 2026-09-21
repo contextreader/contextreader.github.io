@@ -1,6 +1,6 @@
 # Privacy Policy — Context Reader
 
-Last updated: 14 September 2026
+Last updated: 21 September 2026
 
 Context Reader has no server. There is no account, no sign-in, and no backend belonging to
 this project. Everything below can be checked against the source in this repository.
@@ -94,22 +94,39 @@ The extension and the website are different things, and only one of them counts 
 **The extension collects nothing.** No analytics, no telemetry, no account, no identifiers,
 no crash reports. That does not change.
 
-**The website counts visits and a few clicks, with two services.** Cloudflare Web Analytics
+**The website counts visits and a few clicks, with two services, and records pages only with your yes.** Cloudflare Web Analytics
 counts visits. Umami counts visits and a few clicks: the install and "Get a Gemini key"
 buttons (with which browser the page detected), "Copy for LLM" and "View as Markdown", and
-the language chosen in the home page's demo. Umami's script comes from `cloud.umami.is` and
-reports to `gateway.umami.is`.
+the language chosen in the home page's demo, and your answer to the Clarity question below.
+Umami's script comes from `cloud.umami.is` and reports to `gateway.umami.is`.
 
 Neither service sets a cookie or stores anything in your browser, and neither follows you
 between sites. Between them they record the page, the referrer, the browser, operating system
 and device type, and a coarse location (the country) — so we can tell whether anyone is
-reading and what leads to an install. They are the only things the site loads from anywhere
-else: no other trackers, no advertising, no embedded video, and the typeface is served from
-the site itself.
+reading and what leads to an install.
 
-**The site itself remembers one thing:** the language you pick in the home page's demo, kept
-in your browser's local storage so it is still chosen next time. It never leaves your device,
-and clearing the site's data in your browser removes it.
+**Microsoft Clarity, only if you allow it.** After you first scroll, the site asks once
+whether it may use Microsoft Clarity. If you allow it, Clarity records how the page is used —
+scrolling, clicks and mouse movement, replayed to us as a recording and a heatmap — so we can
+see where the page loses people. Anything typed into a field is masked and never sent. Clarity
+sets its own cookies on the site, and Microsoft sets its `MUID` cookie on `clarity.ms` and
+`bing.com`, which Microsoft can recognise across its own sites. We ask Clarity not to use any
+of it for advertising. Its scripts come from `www.clarity.ms` and `scripts.clarity.ms` and
+report to `clarity.ms`; [Microsoft's privacy statement](https://privacy.microsoft.com/privacystatement)
+covers what it does with the data.
+
+If you say no, or never answer, nothing of Clarity loads: no script, no cookie, no request to
+Microsoft. A browser that sends Global Privacy Control is never asked. You can change your
+answer at any time from the website's privacy page.
+
+Those three are the only things the site loads from anywhere else, and Clarity only with your
+yes: no other trackers, no advertising, no embedded video, and the typeface is served from the
+site itself.
+
+**The site itself remembers two things,** in your browser's local storage: the language you
+pick in the home page's demo, so it is still chosen next time, and your answer to the Clarity
+question, so you are asked only once. Neither leaves your device, and clearing the site's data
+in your browser removes both.
 
 Nothing about the extension, and nothing you look up, ever reaches the website: a lookup
 happens in your browser and never touches this site.
@@ -120,7 +137,7 @@ differ, this file — which is version-controlled and public — is the one that
 
 ## Children
 
-Not directed at children under 13 and collects nothing from anyone.
+Not directed at children under 13. The extension collects nothing from anyone; the website counts visits as described above.
 
 ## Changes
 

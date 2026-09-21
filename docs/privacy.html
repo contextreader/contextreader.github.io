@@ -49,6 +49,10 @@ body { margin: 0; background: var(--ground); color: var(--ink); font: 400 17px/1
 .wrap { max-width: 760px; margin: 0 auto; padding-inline: 21px; }
 a { color: var(--accent); text-underline-offset: 3px; }
 a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+.linkish { margin: 0; padding: 0; border: 0; background: none; font: inherit; color: var(--accent); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.linkish:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+[hidden] { display: none !important; }
+h2[id], h3[id] { scroll-margin-top: 89px; }
 
 .mast { position: sticky; top: 0; z-index: 20; background: var(--ground-a); -webkit-backdrop-filter: blur(13px) saturate(120%); backdrop-filter: blur(13px) saturate(120%); border-bottom: 1px solid transparent; }
 .mast .wrap { max-width: 1180px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 13px; }
@@ -170,12 +174,16 @@ footer .spacer { margin-inline-start: auto; }
     <p>Being straight about the limit of this: hardening protects against page scripts and accidental exposure. Only the passphrase option protects against someone who can read your browser profile off the disk. An extension cannot hide a key from software already running as you, and we will not claim otherwise.</p>
 
     <h2>About this website</h2>
-    <p>The paragraphs above describe the extension, which collects nothing. This website is a separate thing, and it does count, with two services. <strong>Cloudflare Web Analytics</strong> counts visits. <strong>Umami</strong> counts visits and a few clicks: the install and <em>Get a Gemini key</em> buttons (with which browser the page detected), <em>Copy for LLM</em> and <em>View as Markdown</em>, and the language chosen in the home page’s demo. Umami’s script comes from cloud.umami.is and reports to gateway.umami.is.</p>
+    <p>The paragraphs above describe the extension, which collects nothing. This website is a separate thing, and it does count, with two services. <strong>Cloudflare Web Analytics</strong> counts visits. <strong>Umami</strong> counts visits and a few clicks: the install and <em>Get a Gemini key</em> buttons (with which browser the page detected), <em>Copy for LLM</em> and <em>View as Markdown</em>, the language chosen in the home page’s demo, and your answer to the Clarity question below. Umami’s script comes from cloud.umami.is and reports to gateway.umami.is.</p>
     <p>Neither sets a cookie or stores anything in your browser, and neither follows you between sites. Between them they record the page, the referrer, the browser, operating system and device type, and a coarse location (the country), so we can tell whether anyone is reading and what leads to an install.</p>
-    <p>Those two are the only things this site loads from anywhere else. There are no other trackers, no advertising, no embedded video, and the typeface is served from this site rather than from a font host. Nothing here is shared with the extension, which has no analytics of any kind and never will.</p>
+    <h3 id="clarity">Microsoft Clarity, only if you allow it</h3>
+    <p>After you first scroll, the site asks once whether it may use <strong>Microsoft Clarity</strong>. If you allow it, Clarity records how the page is used: scrolling, clicks and mouse movement, replayed to us as a recording and a heatmap, so we can see where the page loses people. Anything typed into a field is masked and never sent. Clarity sets its own cookies on this site, and Microsoft sets its <code>MUID</code> cookie on clarity.ms and bing.com, which Microsoft can recognise across its own sites. We ask Clarity not to use any of it for advertising. Its scripts come from www.clarity.ms and scripts.clarity.ms and report to clarity.ms. Microsoft’s <a href="https://privacy.microsoft.com/privacystatement">privacy statement</a> covers what it does with the data.</p>
+    <p>If you say no, or never answer, nothing of Clarity loads: no script, no cookie, no request to Microsoft. A browser that sends Global Privacy Control is never asked. <button class="linkish" type="button" data-clarity-choice>Change your answer</button></p>
+    <p>The site itself remembers two things, in your browser’s local storage: the language you pick in the home page’s demo, so it is still chosen next time, and your answer to the Clarity question, so you are asked only once. Neither leaves your device, and clearing the site’s data in your browser removes both.</p>
+    <p>Those three are the only things this site loads from anywhere else, and Clarity only with your yes. There are no other trackers, no advertising, no embedded video, and the typeface is served from this site rather than from a font host. Nothing here is shared with the extension, which has no analytics of any kind and never will.</p>
 
     <h2>Children</h2>
-    <p>Not directed at children under 13 and collects nothing from anyone.</p>
+    <p>Not directed at children under 13. The extension collects nothing from anyone; the website counts visits as described above.</p>
 
     <h2>Changes</h2>
     <p>Material changes will be noted in the repository history and the date above updated. The history of this file is public.</p>
@@ -194,12 +202,13 @@ footer .spacer { margin-inline-start: auto; }
     <a href="https://github.com/contextreader/contextreader.github.io">Source</a>
     <a href="https://github.com/contextreader/contextreader.github.io/blob/main/LICENSE">MIT licence</a>
     <a href="mailto:contextreader@gmail.com">contextreader@gmail.com</a>
-    <span class="spacer">The extension collects nothing; this site counts visits with Cloudflare Web Analytics, and visits and clicks with Umami, both cookieless.</span>
+    <span class="spacer">The extension collects nothing; this site counts visits with Cloudflare Web Analytics, and visits and clicks with Umami, both cookieless. Microsoft Clarity records how pages are used only if you allow it.</span>
   </div>
 </footer>
 
 <script defer src="https://cloud.umami.is/script.js" data-website-id="583c9618-5c32-40a5-b0dd-33b2d8f7048d"></script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "ceec88afaf1f47a289d50d0a20bff3bb"}'></script>
+<script defer src="clarity.js"></script>
 <script>
 /* Install button, per browser.
  *

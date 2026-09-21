@@ -233,8 +233,12 @@ console.log('the site tells the truth about languages, however it presents them:
     // identifying cookie, needs a consent banner for EU/UK visitors, and is
     // deferred until Google Ads makes that worth it. Adding it means adding it
     // here, on purpose, with the disclosure to match.
+    // Microsoft Clarity added 21 Sep (Ian) on a different condition: it is NOT
+    // cookieless (its loader sets Microsoft's MUID on clarity.ms and bing.com),
+    // so it may only load through docs/clarity.js, after the visitor says yes.
+    // The checks for that are below the page loop.
     const ANALYTICS = { 'static.cloudflareinsights.com': 'Cloudflare Web Analytics', 'gc.zgo.at': 'GoatCounter',
-                        'cloud.umami.is': 'Umami' };
+                        'cloud.umami.is': 'Umami', 'www.clarity.ms': 'Clarity' };
     const allowed = Object.keys(ANALYTICS);
     const host = (u) => (u.match(/^(?:https?:)?\/\/([^/]+)/i) || [, ''])[1].toLowerCase();
     const strangers = external.filter((e) => !allowed.includes(host(e.split(': ')[1] || '')));
@@ -256,7 +260,7 @@ console.log('the site tells the truth about languages, however it presents them:
     // page added later is as public as index.html and must keep the same rules.
     // The Search Console verification file is Google's own stub, not our page.
     const pages = fs.readdirSync(path.join(ROOT, 'docs'))
-        .filter((f) => f.endsWith('.html') && f !== 'index.html' && !/^google[0-9a-f]+\.html$/.test(f));
+        .filter((f) => f.endsWith('.html') && f !== 'index.html' && !/^google[0-9a-f]+(new)?\.html$/.test(f));
     for (const f of pages) {
         const page = read(`docs/${f}`);
         const subres = [];
@@ -275,6 +279,20 @@ console.log('the site tells the truth about languages, however it presents them:
         ok(`docs/${f}: an "Add to Chrome" link goes to the Chrome Web Store`, chromeLinksHonest(page), chromeLinksHonest.bad);
     }
     ok('docs/index.html: an "Add to Chrome" link goes to the Chrome Web Store', chromeLinksHonest(site), chromeLinksHonest.bad);
+
+    // Clarity is consent-gated. Its URL is built at runtime, so the subresource
+    // scan above cannot see it: check the gate itself instead.
+    const gate = read('docs/clarity.js');
+    const all = ['index.html', ...pages].map((f) => [f, read(`docs/${f}`)]);
+    ok('Clarity loads only from docs/clarity.js, never from a page', all.every(([, p]) => !/clarity\.ms/i.test(p.replace(/<!--[\s\S]*?-->/g, '').replace(/<(p|span|li)\b[^>]*>[\s\S]*?<\/\1>/gi, ''))),
+        all.filter(([, p]) => /clarity\.ms\/tag/i.test(p)).map(([f]) => f));
+    ok('every page loads the consent gate', all.every(([, p]) => /<script[^>]+src="clarity\.js"/.test(p)), all.filter(([, p]) => !/src="clarity\.js"/.test(p)).map(([f]) => f));
+    ok('every page names Clarity in its prose', all.every(([, p]) => /Clarity/.test(p.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<!--[\s\S]*?-->/g, ' '))));
+    ok('the gate loads Clarity only after a yes', /answer === 'yes'\) load\(\)/.test(gate) && /if \(yes\) load\(\)/.test(gate) && (gate.match(/[^n] load\(\)|\) load\(\)/g) || []).length === 2);
+    ok('the gate honours Global Privacy Control', /navigator\.globalPrivacyControl/.test(gate));
+    ok('the gate refuses advertising storage', /ad_Storage: 'denied', analytics_Storage: 'granted'/.test(gate));
+    ok('the privacy page lets a visitor change the answer', /data-clarity-choice/.test(read('docs/privacy.html')));
+    ok('and Clarity is nowhere in the extension', !/clarity\.ms/.test(extension));
     ok(`checked every page the site serves (${pages.length + 1})`, true);
 }
 
