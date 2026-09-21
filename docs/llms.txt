@@ -42,6 +42,12 @@ rather than implying parity.
   the free tier it uses submitted content to improve its products and that human reviewers may
   read it disconnected from the account, and that on a paid key it does not.
 
+## This website
+
+The website is separate from the extension. It counts visits with Cloudflare Web Analytics,
+and visits and clicks (install and get-a-key buttons, Copy for LLM, the demo's language) with
+Umami. Both are cookieless and store nothing in the browser. The extension collects nothing.
+
 ## Licence
 
 MIT. Bundled third-party code (Mozilla Readability, PDF.js, a Sinhala Unicode converter,

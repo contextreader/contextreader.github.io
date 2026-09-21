@@ -240,6 +240,15 @@ GoatCounter was considered and dropped. Search Console needs a **URL-prefix** pr
 property can't work: github.io's DNS isn't ours); `port-head.html` carries the meta tag, and the
 value may need replacing with the one Google issues for the HTML-tag method.
 
+**Umami (21 Sep).** Added alongside Cloudflare (Ian kept both), to count clicks. Website ID
+`583c9618-5c32-40a5-b0dd-33b2d8f7048d`, free Hobby plan. Events, via `data-umami-event`
+attributes: `install-click` (props `place`, `browser`, `to` = store|github — the last two set
+by the install script), `get-key-click` (`place`), `copy-for-llm`, `view-markdown`, and
+`demo-language` (`language`, `was`, `guessed`), which is sent from the picker's change handler
+with `umami.track`. The tracker loads from cloud.umami.is and posts to gateway.umami.is; it sets
+no cookie and writes nothing to storage (read on 21 Sep from the script itself). Every
+disclosure names both services. Google Analytics is deferred until Ian runs Google Ads.
+
 **Bing (18 Sep).** Bing Webmaster Tools is verified by **importing from Google Search Console**
 (Ian's account, Administrator role): no BingSiteAuth.xml, no msvalidate.01 tag, and none needed.
 The sitemap came across with the import. **IndexNow is not set up**, on purpose: three rarely

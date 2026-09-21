@@ -101,7 +101,7 @@ footer .spacer { margin-inline-start: auto; }
     <nav aria-label="Site">
       <a href="/#sec-languages" class="hide-sm">Languages</a>
       <a href="/#sec-privacy" class="hide-sm">How it works</a>
-      <a class="btn js-install" href="https://github.com/contextreader/contextreader.github.io">Install from GitHub</a>
+      <a class="btn js-install" data-umami-event="install-click" data-umami-event-place="privacy-masthead" href="https://github.com/contextreader/contextreader.github.io">Install from GitHub</a>
     </nav>
   </div>
 </header>
@@ -110,7 +110,7 @@ footer .spacer { margin-inline-start: auto; }
   <header class="page">
     <p class="kicker">Privacy policy</p>
     <h1>Context Reader has no server.</h1>
-    <p class="stamp">Last updated 14 September 2026 · covering the extension and this website</p>
+    <p class="stamp">Last updated 21 September 2026 · covering the extension and this website</p>
     <p class="lede">There is no account, no sign-in, and no backend belonging to this project. Everything below can be checked against the source in the repository.</p>
     <p class="source-note">This page is the policy kept at <a href="https://github.com/contextreader/contextreader.github.io/blob/main/PRIVACY_POLICY.md">PRIVACY_POLICY.md</a> in the repository, which is version-controlled alongside the code it describes. If the two ever disagree, that file is the one with a history you can read.</p>
   </header>
@@ -170,8 +170,9 @@ footer .spacer { margin-inline-start: auto; }
     <p>Being straight about the limit of this: hardening protects against page scripts and accidental exposure. Only the passphrase option protects against someone who can read your browser profile off the disk. An extension cannot hide a key from software already running as you, and we will not claim otherwise.</p>
 
     <h2>About this website</h2>
-    <p>The paragraphs above describe the extension, which collects nothing. This website is a separate thing, and it does count visits: <strong>Cloudflare Web Analytics</strong>, which is cookieless, sets no identifier and does not follow you between sites. It records the page, the referrer and a coarse location, so we can tell whether anyone is reading.</p>
-    <p>That is the only thing this site loads from anywhere else. There are no other trackers, no advertising, no embedded video, and the typeface is served from this site rather than from a font host. Nothing here is shared with the extension, which has no analytics of any kind and never will.</p>
+    <p>The paragraphs above describe the extension, which collects nothing. This website is a separate thing, and it does count, with two services. <strong>Cloudflare Web Analytics</strong> counts visits. <strong>Umami</strong> counts visits and a few clicks: the install and <em>Get a Gemini key</em> buttons (with which browser the page detected), <em>Copy for LLM</em> and <em>View as Markdown</em>, and the language chosen in the home page’s demo. Umami’s script comes from cloud.umami.is and reports to gateway.umami.is.</p>
+    <p>Neither sets a cookie or stores anything in your browser, and neither follows you between sites. Between them they record the page, the referrer, the browser, operating system and device type, and a coarse location (the country), so we can tell whether anyone is reading and what leads to an install.</p>
+    <p>Those two are the only things this site loads from anywhere else. There are no other trackers, no advertising, no embedded video, and the typeface is served from this site rather than from a font host. Nothing here is shared with the extension, which has no analytics of any kind and never will.</p>
 
     <h2>Children</h2>
     <p>Not directed at children under 13 and collects nothing from anyone.</p>
@@ -193,10 +194,11 @@ footer .spacer { margin-inline-start: auto; }
     <a href="https://github.com/contextreader/contextreader.github.io">Source</a>
     <a href="https://github.com/contextreader/contextreader.github.io/blob/main/LICENSE">MIT licence</a>
     <a href="mailto:contextreader@gmail.com">contextreader@gmail.com</a>
-    <span class="spacer">The extension collects nothing; this site counts visits with Cloudflare Web Analytics, cookieless.</span>
+    <span class="spacer">The extension collects nothing; this site counts visits with Cloudflare Web Analytics, and visits and clicks with Umami, both cookieless.</span>
   </div>
 </footer>
 
+<script defer src="https://cloud.umami.is/script.js" data-website-id="583c9618-5c32-40a5-b0dd-33b2d8f7048d"></script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "ceec88afaf1f47a289d50d0a20bff3bb"}'></script>
 <script>
 /* Install button, per browser.
@@ -238,6 +240,12 @@ footer .spacer { margin-inline-start: auto; }
 
   function apply(which) {
     var url = STORES[which];
+    /* Umami reads these on click: which browser was detected, and where the button went. */
+    var tagged = document.querySelectorAll('a.js-install');
+    for (var j = 0; j < tagged.length; j++) {
+      tagged[j].setAttribute('data-umami-event-browser', which || 'other');
+      tagged[j].setAttribute('data-umami-event-to', url ? 'store' : 'github');
+    }
     if (!url) return;                       /* no listing: leave the GitHub fallback alone */
     var name = NAMES[which] || 'your browser';
     var links = document.querySelectorAll('a.js-install');

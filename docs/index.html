@@ -817,21 +817,23 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
       <a href="#sec-languages" class="hide-sm">Languages</a>
       <a href="#sec-privacy" class="hide-sm">Privacy</a>
       <!-- No Chrome Web Store listing yet: points at the install guide until it exists. -->
-      <a class="btn primary sm js-install" href="https://github.com/contextreader/contextreader.github.io">Install from GitHub</a>
+      <a class="btn primary sm js-install" data-umami-event="install-click" data-umami-event-place="masthead" href="https://github.com/contextreader/contextreader.github.io">Install from GitHub</a>
     </nav>
   </div>
 </header>
 
-<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Context Reader","applicationCategory":"BrowserApplication","operatingSystem":"Chrome","description":"A free, open-source Chrome extension that explains the word you are stuck on, in your language, using the sentence around it. No server, no account, no tracking. Uses your own Gemini API key.","url":"https://contextreader.github.io/","image":"https://contextreader.github.io/icon128.png","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"license":"https://opensource.org/licenses/MIT","isAccessibleForFree":true,"featureList":["Explains a word using the sentence around it","Answers in the reader’s own language","A fuller explanation, the word’s other meanings, or a simpler wording","No account, no analytics, no server"]},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Is Context Reader free?","acceptedAnswer":{"@type":"Answer","text":"Yes, permanently. There is no plan, no quota of ours and no account, because there is no server: the extension calls Google’s Gemini API directly from your browser with your own free API key."}},{"@type":"Question","name":"Why does it need my own Gemini API key?","acceptedAnswer":{"@type":"Answer","text":"The key is what makes a serverless design possible. Nothing of the project sits between you and Google, so there is nothing to pay for and nowhere your reading could accumulate. Getting a key at Google AI Studio takes about a minute and needs no card."}},{"@type":"Question","name":"How is it different from Google Translate?","acceptedAnswer":{"@type":"Answer","text":"A translation gives you the words in your language; it does not tell you which meaning a word carries in this sentence. Context Reader sends the word together with the paragraph around it and explains the one sense that fits, in your language, without leaving the page."}},{"@type":"Question","name":"Which languages does it work in?","acceptedAnswer":{"@type":"Answer","text":"The extension offers the 110 languages Google documents its Gemini models as understanding. The model was not given a list of languages: it learned them from text, so quality follows how much of a language it saw. English and Sinhala are the tuned two, shipping worked examples checked by a speaker; the other 108 work without them, so specialist terms are less reliable there."}},{"@type":"Question","name":"What data leaves my computer?","acceptedAnswer":{"@type":"Answer","text":"Two requests. The word and the paragraph around it go to generativelanguage.googleapis.com with your key on each lookup, and, for Chinese, Japanese and Korean only, one font file is fetched from Google Fonts with no referrer the first time a bubble opens. Nothing else: no analytics, no telemetry, no account and no identifiers. Your key is stored on that device only and can be encrypted with a passphrase."}}]}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Context Reader","applicationCategory":"BrowserApplication","operatingSystem":"Chrome","description":"A free, open-source Chrome extension that explains the word you are stuck on, in your language, using the sentence around it. No server, no account, no tracking. Uses your own Gemini API key.","url":"https://contextreader.github.io/","image":"https://contextreader.github.io/icon128.png","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"license":"https://opensource.org/licenses/MIT","isAccessibleForFree":true,"featureList":["Explains a word using the sentence around it","Answers in the reader’s own language","A fuller explanation, the word’s other meanings, or a simpler wording","No account, no analytics, no server"]},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Is Context Reader free?","acceptedAnswer":{"@type":"Answer","text":"Yes, permanently. There is no plan, no quota of ours and no account, because there is no server: the extension calls Google’s Gemini API directly from your browser with your own free API key."}},{"@type":"Question","name":"Why does it need my own Gemini API key?","acceptedAnswer":{"@type":"Answer","text":"The key is what makes a serverless design possible. Nothing of the project sits between you and Google, so there is nothing to pay for and nowhere your reading could accumulate. Getting a key at Google AI Studio takes about a minute and needs no card."}},{"@type":"Question","name":"How is it different from Google Translate?","acceptedAnswer":{"@type":"Answer","text":"A translation gives you the words in your language; it does not tell you which meaning a word carries in this sentence. Context Reader sends the word together with the paragraph around it and explains the one sense that fits, in your language, without leaving the page."}},{"@type":"Question","name":"Which languages does it work in?","acceptedAnswer":{"@type":"Answer","text":"The extension offers the 110 languages Google documents its Gemini models as understanding. The model was not given a list of languages: it learned them from text, so quality follows how much of a language it saw. English and Sinhala are the tuned two, shipping worked examples checked by a speaker; the other 108 work without them, so specialist terms are less reliable there."}},{"@type":"Question","name":"What data leaves my computer?","acceptedAnswer":{"@type":"Answer","text":"Two requests. The word and the paragraph around it go to generativelanguage.googleapis.com with your key on each lookup, and, for Chinese, Japanese and Korean only, one font file is fetched from Google Fonts with no referrer the first time a bubble opens. Nothing else: no analytics, no telemetry, no account and no identifiers. Your key is stored on that device only and can be encrypted with a passphrase. That is the extension; this website counts visits with Cloudflare Web Analytics, and visits and clicks with Umami, both cookieless."}}]}]}</script>
 
-<!-- This site counts visits; the extension never does, and the privacy section says so in both
-     directions. Cloudflare Web Analytics is cookieless and sets no identifier. GoatCounter was
-     considered and dropped (Ian, 17 Sep). Search Console verification goes in the head at port
+<!-- This site counts visits and clicks; the extension never does, and the privacy section says so
+     in both directions. Cloudflare Web Analytics counts visits; Umami (added 21 Sep, Ian) counts
+     visits and the click events tagged data-umami-event. Both are cookieless and store nothing in
+     the browser. GoatCounter was considered and dropped (Ian, 17 Sep). Google Analytics is deferred. Search Console verification goes in the head at port
      time — see port-head.html. -->
+<script defer src="https://cloud.umami.is/script.js" data-website-id="583c9618-5c32-40a5-b0dd-33b2d8f7048d"></script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "ceec88afaf1f47a289d50d0a20bff3bb"}'></script>
 
 <dialog class="md-view" id="md-view" aria-label="This page as Markdown">
-  <div class="bar"><h3>This page as Markdown</h3><div class="bar-acts"><button class="llm-act" type="button" data-md="copy"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="2.5" width="8" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 13.5v.5a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span>Copy</span></button><button class="md-close" type="button">Close</button></div></div>
+  <div class="bar"><h3>This page as Markdown</h3><div class="bar-acts"><button class="llm-act" type="button" data-md="copy" data-umami-event="copy-for-llm"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="2.5" width="8" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 13.5v.5a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span>Copy</span></button><button class="md-close" type="button">Close</button></div></div>
   <textarea readonly aria-label="Markdown source"></textarea>
 </dialog>
 
@@ -858,14 +860,14 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
       </div>
       <div class="get">
         <div class="cta">
-          <a class="btn primary js-install" href="https://github.com/contextreader/contextreader.github.io" data-long="1">Install from GitHub</a>
-          <a class="btn" href="https://aistudio.google.com/apikey">Get a Gemini key</a>
+          <a class="btn primary js-install" data-umami-event="install-click" data-umami-event-place="hero" href="https://github.com/contextreader/contextreader.github.io" data-long="1">Install from GitHub</a>
+          <a class="btn" href="https://aistudio.google.com/apikey" data-umami-event="get-key-click" data-umami-event-place="hero">Get a Gemini key</a>
         </div>
         <p class="fine">No account, no tracking. It runs on your own free Gemini key, which takes about a minute to get. The Chrome Web Store listing is in review, so installing is from GitHub for now — the same build runs in Chrome, Brave and Edge.</p>
         <div class="llm-row">
-          <button class="llm-act" type="button" data-md="copy"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="2.5" width="8" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 13.5v.5a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span>Copy for LLM</span></button>
+          <button class="llm-act" type="button" data-md="copy" data-umami-event="copy-for-llm"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="2.5" width="8" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 13.5v.5a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span>Copy for LLM</span></button>
           <span class="sep" aria-hidden="true"></span>
-          <button class="llm-act" type="button" data-md="view"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="3.5" width="13" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M4 10.5v-5l2 2.4 2-2.4v5M11 5.5v3.6m0 0 1.4-1.5M11 9.1 9.6 7.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>View as Markdown</span></button>
+          <button class="llm-act" type="button" data-md="view" data-umami-event="view-markdown"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="3.5" width="13" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M4 10.5v-5l2 2.4 2-2.4v5M11 5.5v3.6m0 0 1.4-1.5M11 9.1 9.6 7.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>View as Markdown</span></button>
         </div>
       </div>
 
@@ -954,14 +956,14 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
 
   <div class="get get-m">
     <div class="cta">
-      <a class="btn primary js-install" href="https://github.com/contextreader/contextreader.github.io" data-long="1">Install from GitHub</a>
-      <a class="btn" href="https://aistudio.google.com/apikey">Get a Gemini key</a>
+      <a class="btn primary js-install" data-umami-event="install-click" data-umami-event-place="hero-phone" href="https://github.com/contextreader/contextreader.github.io" data-long="1">Install from GitHub</a>
+      <a class="btn" href="https://aistudio.google.com/apikey" data-umami-event="get-key-click" data-umami-event-place="hero-phone">Get a Gemini key</a>
     </div>
     <p class="fine">No account, no tracking. It runs on your own free Gemini key, which takes about a minute to get.</p>
     <div class="llm-row">
-      <button class="llm-act" type="button" data-md="copy"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="2.5" width="8" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 13.5v.5a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span>Copy for LLM</span></button>
+      <button class="llm-act" type="button" data-md="copy" data-umami-event="copy-for-llm"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="2.5" width="8" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 13.5v.5a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span>Copy for LLM</span></button>
       <span class="sep" aria-hidden="true"></span>
-      <button class="llm-act" type="button" data-md="view"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="3.5" width="13" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M4 10.5v-5l2 2.4 2-2.4v5M11 5.5v3.6m0 0 1.4-1.5M11 9.1 9.6 7.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>View as Markdown</span></button>
+      <button class="llm-act" type="button" data-md="view" data-umami-event="view-markdown"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="3.5" width="13" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M4 10.5v-5l2 2.4 2-2.4v5M11 5.5v3.6m0 0 1.4-1.5M11 9.1 9.6 7.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>View as Markdown</span></button>
     </div>
     <p class="source">Real answers, unedited, captured with the extension on <code>gemini-3.1-flash-lite</code>.</p>
   </div>
@@ -1107,8 +1109,8 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
             <h3>Paste it once.</h3>
             <p>Pick the language you read best and paste the key into Settings. It’s checked with Google, then kept on this device.</p>
             <div class="cta">
-              <a class="btn primary js-install" href="https://github.com/contextreader/contextreader.github.io" data-long="1">Install from GitHub</a>
-              <a class="btn" href="https://aistudio.google.com/apikey">Get a Gemini key ↗</a>
+              <a class="btn primary js-install" data-umami-event="install-click" data-umami-event-place="get-started" href="https://github.com/contextreader/contextreader.github.io" data-long="1">Install from GitHub</a>
+              <a class="btn" href="https://aistudio.google.com/apikey" data-umami-event="get-key-click" data-umami-event-place="get-started">Get a Gemini key ↗</a>
             </div>
           </div></div>
         </div>
@@ -1264,7 +1266,7 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
           </div>
           <p class="pv-none">Nothing else. No analytics, no telemetry, no account.</p>
         </div>
-        <p class="pv-foot"><b>That is the extension.</b> This website is a different thing: it counts visits with Cloudflare Web Analytics, which is cookieless and sets no identifier. The extension has no analytics of any kind, and never will.</p>
+        <p class="pv-foot"><b>That is the extension.</b> This website is a different thing: it counts visits with Cloudflare Web Analytics, and visits and clicks with Umami. Both are cookieless and store nothing in your browser. The extension has no analytics of any kind, and never will.</p>
       </div>
 
       <div class="pv-steps">
@@ -1282,7 +1284,7 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
           <div class="pv-step"><div class="pv-si">
             <h3>There’s nothing to log in to.</h3>
             <ul class="pv-list">
-              <li><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>No account, no analytics, no telemetry, no identifiers, no crash reports — in the extension. This website counts visits with Cloudflare Web Analytics, cookieless and without identifiers; that is the site, not the product.</span></li>
+              <li><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>No account, no analytics, no telemetry, no identifiers, no crash reports — in the extension. This website counts visits with Cloudflare Web Analytics, and visits and clicks with Umami, both cookieless; that is the site, not the product.</span></li>
               <li><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Your key is stored on this device only, never synced to a Google account, and read only by the extension’s background worker. A passphrase encrypts it at rest.</span></li>
               <li><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>The whole extension is open source under MIT, so none of this has to be taken on trust.</span></li>
             </ul>
@@ -1300,8 +1302,8 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
     <div class="end-cta">
       <h2>Read what you need to read.</h2>
       <div class="cta">
-        <a class="btn primary js-install" href="https://github.com/contextreader/contextreader.github.io" data-long="1">Install from GitHub</a>
-        <a class="btn" href="https://aistudio.google.com/apikey">Get a free Gemini key ↗</a>
+        <a class="btn primary js-install" data-umami-event="install-click" data-umami-event-place="end" href="https://github.com/contextreader/contextreader.github.io" data-long="1">Install from GitHub</a>
+        <a class="btn" href="https://aistudio.google.com/apikey" data-umami-event="get-key-click" data-umami-event-place="end">Get a free Gemini key ↗</a>
       </div>
       <p class="fine">Free for good. No account, no tracking. You’ll need a free Gemini key, which takes about a minute.</p>
     </div>
@@ -1326,14 +1328,14 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
       </nav>
       <div class="copy-wrap" style="grid-column: 1 / -1; margin-top: 8px; display: grid; gap: 6px;">
         <div class="llm-row" style="margin-top: 0">
-          <button class="llm-act" type="button" data-md="copy"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="2.5" width="8" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 13.5v.5a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span>Copy for LLM</span></button>
+          <button class="llm-act" type="button" data-md="copy" data-umami-event="copy-for-llm"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="2.5" width="8" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 13.5v.5a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span>Copy for LLM</span></button>
           <span class="sep" aria-hidden="true"></span>
-          <button class="llm-act" type="button" data-md="view"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="3.5" width="13" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M4 10.5v-5l2 2.4 2-2.4v5M11 5.5v3.6m0 0 1.4-1.5M11 9.1 9.6 7.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>View as Markdown</span></button>
+          <button class="llm-act" type="button" data-md="view" data-umami-event="view-markdown"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="3.5" width="13" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M4 10.5v-5l2 2.4 2-2.4v5M11 5.5v3.6m0 0 1.4-1.5M11 9.1 9.6 7.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>View as Markdown</span></button>
         </div>
         <p class="llm-note">The whole page as plain text for an LLM, with the answers in the language you’re seeing. There’s a short machine-readable version at <a href="https://contextreader.github.io/llms.txt">/llms.txt</a>.</p>
       </div>
       <div class="colophon">
-        <span>Open source under MIT. The extension collects nothing; this site counts visits with Cloudflare Web Analytics, cookieless.</span>
+        <span>Open source under MIT. The extension collects nothing; this site counts visits with Cloudflare Web Analytics, and visits and clicks with Umami, both cookieless.</span>
         <button class="to-top" type="button" id="to-top"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 13V3m0 0L3.5 7.5M8 3l4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Back to the top</button>
       </div>
     </footer>
@@ -1356,7 +1358,7 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
     <h3>Setup</h3>
     <p>Add the extension, create a free Gemini API key at Google AI Studio (about a minute, no card), then paste it once in Settings and choose your language.</p>
     <h3>What leaves your machine</h3>
-    <p>The word and the paragraph around it go to generativelanguage.googleapis.com with your key on each lookup. For Chinese, Japanese and Korean only, one font file is fetched from Google Fonts with no referrer the first time a bubble opens on a page; every other language uses typefaces bundled inside the extension and fetches nothing. Nothing else: no analytics, no telemetry, no account, no identifiers. (The extension collects nothing; this website counts visits with Cloudflare Web Analytics, cookieless and without identifiers.) The extension declares one host permission and the key never leaves the device. Because the key is yours, Google’s terms cover the lookups.</p>
+    <p>The word and the paragraph around it go to generativelanguage.googleapis.com with your key on each lookup. For Chinese, Japanese and Korean only, one font file is fetched from Google Fonts with no referrer the first time a bubble opens on a page; every other language uses typefaces bundled inside the extension and fetches nothing. Nothing else: no analytics, no telemetry, no account, no identifiers. (The extension collects nothing; this website counts visits with Cloudflare Web Analytics, and visits and clicks with Umami, both cookieless.) The extension declares one host permission and the key never leaves the device. Because the key is yours, Google’s terms cover the lookups.</p>
     <p><a href="https://github.com/contextreader/contextreader.github.io">Source</a> · <a href="/privacy">Privacy policy</a> · <a href="/vs-reverso">Compared with Reverso Context</a> · <a href="https://aistudio.google.com/apikey">Get a Gemini key</a></p>
   </section>
 </noscript>
@@ -1480,8 +1482,11 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
   }
   const chosen = pickLang();
   applyLang(chosen.code, chosen.why);
+  let shownLang = chosen.code;
   pick.addEventListener('change', () => {
     try { localStorage.setItem(SAVE_KEY, pick.value); } catch (e) {}
+    try { if (window.umami) umami.track('demo-language', { language: pick.value, was: shownLang, guessed: chosen.why }); } catch (e) {}
+    shownLang = pick.value;
     applyLang(pick.value, 'saved');
   });
 
@@ -2279,7 +2284,7 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
       '- `GET fonts.googleapis.com` / `fonts.gstatic.com` — only for Chinese, Japanese and Korean, whose faces are not bundled: one font file the first time a bubble opens on a page, sent with no referrer. Every other language uses typefaces shipped inside the extension and fetches nothing.',
       '- Nothing else: no analytics, no telemetry, no account, no identifiers.',
       '',
-      'The extension collects nothing. The website is separate: it counts visits with Cloudflare Web Analytics, which is cookieless and sets no identifier.',
+      'The extension collects nothing. The website is separate: it counts visits with Cloudflare Web Analytics, and visits and clicks with Umami. Both are cookieless and store nothing in the browser.',
       '',
       'The extension declares exactly one host permission, `https://generativelanguage.googleapis.com/*`. The font request is made by the page rather than the extension, so that permission is not what constrains it; the code is. The key is stored in local extension storage only, never synced, read only by the background worker, and can be encrypted with a passphrase.',
       '',
@@ -2351,6 +2356,12 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
 
   function apply(which) {
     var url = STORES[which];
+    /* Umami reads these on click: which browser was detected, and where the button went. */
+    var tagged = document.querySelectorAll('a.js-install');
+    for (var j = 0; j < tagged.length; j++) {
+      tagged[j].setAttribute('data-umami-event-browser', which || 'other');
+      tagged[j].setAttribute('data-umami-event-to', url ? 'store' : 'github');
+    }
     if (!url) return;                       /* no listing: leave the GitHub fallback alone */
     var name = NAMES[which] || 'your browser';
     var links = document.querySelectorAll('a.js-install');

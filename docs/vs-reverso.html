@@ -138,7 +138,7 @@ footer .tm { flex-basis: 100%; margin: 0; font-size: 13.5px; color: var(--mute);
     <nav aria-label="Site">
       <a href="/support" class="hide-sm">Support</a>
       <a href="/#sec-start" class="hide-sm">Get started</a>
-      <a class="btn js-install" href="https://github.com/contextreader/contextreader.github.io">Install from GitHub</a>
+      <a class="btn js-install" data-umami-event="install-click" data-umami-event-place="vs-reverso-masthead" href="https://github.com/contextreader/contextreader.github.io">Install from GitHub</a>
     </nav>
   </div>
 </header>
@@ -206,7 +206,7 @@ footer .tm { flex-basis: 100%; margin: 0; font-size: 13.5px; color: var(--mute);
       </div>
       <div class="card">
         <h3>No account, and the code is open</h3>
-        <p>Context Reader has no account, analytics or telemetry, and is MIT-licensed, so that can be checked. The trade-off is Google’s: on a free key, Google’s terms let it use what you send to improve its products, and human reviewers may read it. A paid key is not used that way. <a href="/privacy">The privacy policy</a> has the detail.</p>
+        <p>The extension has no account, analytics or telemetry, and is MIT-licensed, so that can be checked. The trade-off is Google’s: on a free key, Google’s terms let it use what you send to improve its products, and human reviewers may read it. A paid key is not used that way. <a href="/privacy">The privacy policy</a> has the detail.</p>
       </div>
     </div>
 
@@ -258,7 +258,7 @@ footer .tm { flex-basis: 100%; margin: 0; font-size: 13.5px; color: var(--mute);
     </div>
 
     <div class="cta">
-      <a class="primary js-install" href="https://github.com/contextreader/contextreader.github.io">Install from GitHub</a>
+      <a class="primary js-install" data-umami-event="install-click" data-umami-event-place="vs-reverso-end" href="https://github.com/contextreader/contextreader.github.io">Install from GitHub</a>
       <a href="/">See it working</a>
     </div>
     <p class="fine" id="install-fine">The Chrome Web Store listing is in review, so installing is from GitHub for now.</p>
@@ -271,11 +271,12 @@ footer .tm { flex-basis: 100%; margin: 0; font-size: 13.5px; color: var(--mute);
     <a href="/support">Support</a>
     <a href="/privacy">Privacy</a>
     <a href="https://github.com/contextreader/contextreader.github.io">Source</a>
-    <span class="spacer">The extension collects nothing; this site counts visits with Cloudflare Web Analytics, cookieless.</span>
+    <span class="spacer">The extension collects nothing; this site counts visits with Cloudflare Web Analytics, and visits and clicks with Umami, both cookieless.</span>
     <p class="tm">Reverso and Reverso Context are trademarks of their owner. Context Reader is an independent project, not affiliated with or endorsed by Reverso.</p>
   </div>
 </footer>
 
+<script defer src="https://cloud.umami.is/script.js" data-website-id="583c9618-5c32-40a5-b0dd-33b2d8f7048d"></script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "ceec88afaf1f47a289d50d0a20bff3bb"}'></script>
 <script>
 /* Install button, per browser.
@@ -317,6 +318,12 @@ footer .tm { flex-basis: 100%; margin: 0; font-size: 13.5px; color: var(--mute);
 
   function apply(which) {
     var url = STORES[which];
+    /* Umami reads these on click: which browser was detected, and where the button went. */
+    var tagged = document.querySelectorAll('a.js-install');
+    for (var j = 0; j < tagged.length; j++) {
+      tagged[j].setAttribute('data-umami-event-browser', which || 'other');
+      tagged[j].setAttribute('data-umami-event-to', url ? 'store' : 'github');
+    }
     if (!url) return;                       /* no listing: leave the GitHub fallback alone */
     var name = NAMES[which] || 'your browser';
     var links = document.querySelectorAll('a.js-install');
