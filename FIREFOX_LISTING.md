@@ -1,0 +1,131 @@
+# FIREFOX_LISTING — the addons.mozilla.org submission, field by field
+
+Written 2026-09-22, the day the Chrome listing went live. `STORE_LISTING.md` is the Chrome
+version; this one says only what differs or what AMO asks for that Chrome did not.
+
+Upload: `npm run package` → **`dist/contextreader-firefox-<version>.zip`**.
+Submit at https://addons.mozilla.org/developers/addon/submit/distribution → **On this site**.
+
+---
+
+## Upload step
+
+- **Distribution:** On this site (listed on AMO).
+- **Platforms:** Firefox for desktop only. Leave Android unticked: the manifest needs
+  Firefox 140 and the data-consent key, and nobody has tried the bubble on a phone.
+- **Source code:** AMO asks whether the add-on uses minified code. Answer **yes**, and
+  upload nothing: the only minified file is `Readability.min.js`, an unmodified jsDelivr
+  build of Mozilla's own `@mozilla/readability@0.5.0` (the header says so). Everything else
+  ships as written, and the whole tree is public. Say this in *Notes to reviewer* below.
+
+## Name
+
+`Context Reader`
+
+## Add-on URL (slug)
+
+`context-reader` → https://addons.mozilla.org/firefox/addon/context-reader/
+When it is live, that URL goes into `STORES.firefox` in all four `docs/*.html` pages; the
+site test only accepts an addons.mozilla.org address there.
+
+## Summary (250 characters max)
+
+> The word you're stuck on, explained in your language, using the sentence around it. 110 languages. Free and open source, with no server, no account and no tracking: it uses your own free Gemini API key.
+
+*(202 characters)*
+
+## Description
+
+AMO renders a small subset of Markdown-like HTML; keep it plain. Same text as Chrome, with
+the language list reordered so no single language leads, and the Firefox specifics added.
+
+```
+Understand the word, not just its definition.
+
+A dictionary gives you every meaning of "culture". Context Reader reads the sentence you're actually looking at, works out that you're reading a lab report, and gives you the one that fits.
+
+Select a word on any page. You get the meaning that matches the context, in your language, in about two seconds.
+
+110 languages
+Every language Google lists Gemini as supporting, from Afrikaans to Zulu: Español, हिन्दी, العربية, Français, বাংলা, Português, 简体中文, 日本語, Kiswahili, தமிழ், اردو, 한국어 and the rest. English and Sinhala are tuned with checked examples; the extension tells you which languages are and which aren't.
+
+Already reading in your own language? It won't translate a word into itself. It gives you a simpler word for the one you're stuck on.
+
+Go deeper when you need to. Three further views on any word: a worked scenario, a dictionary-style entry, and a plain explanation pitched at a thirteen-year-old.
+
+Free, and built to stay that way
+Context Reader has no server. It calls Google's Gemini API directly from your browser using your own free API key, which takes about a minute to create. Nobody is paying per-lookup costs, so there is no subscription, no quota and no reason to ever start charging.
+
+No tracking. Verifiably.
+No analytics, no telemetry, no account, no identifiers. The extension has permission for exactly one site, Google's Gemini API, and your lookups go nowhere else. When you install it, Firefox will tell you it sends website content: that is the word you select and the sentence around it, sent to Google to get the explanation, and nothing else. Typefaces ship inside the extension for every language except Chinese, Japanese and Korean; those three fetch one font file when a bubble first opens, with no page address attached.
+
+Your API key is stored on your device only and can be encrypted with a passphrase.
+
+Open source (MIT). The entire source is public, so you don't have to take our word for it.
+```
+
+## Categories
+
+**Language Support.** (AMO allows up to three on desktop; one honest one is better than
+padding. *Search Tools* is wrong: it does not search.)
+
+## Tags
+
+`dictionary`, `translation`, `language learning`, `definitions`, `reading`
+
+## Support and links
+
+| Field | Value |
+|---|---|
+| Support email | contextreader@gmail.com |
+| Support website | https://contextreader.github.io/support |
+| Homepage | https://contextreader.github.io |
+| License | MIT |
+
+## Privacy policy
+
+AMO has a *Privacy policy* field, and an add-on that sends data off the device needs one.
+Paste the extension half of `PRIVACY_POLICY.md` (everything above "About this website"),
+or link it: https://contextreader.github.io/privacy
+
+## Data collection (asked by AMO, and declared in the manifest)
+
+`browser_specific_settings.gecko.data_collection_permissions.required = ["websiteContent"]`.
+Firefox shows it on the install prompt. This matches the Chrome disclosure exactly: website
+content yes, everything else no. The API key is the user's own credential sent only to the
+service that issued it, and never to us, so it is not declared as collected, the same
+answer the Chrome form got.
+
+## Screenshots
+
+AMO takes 1280×800. Upload in this order, same as Chrome, no Sinhala-first frame:
+`store/2x-a-english.png`, `store/2x-b-spanish.png`, `store/2x-c-arabic.png`,
+`store/2x-e-hindi-simple.png`, `store/screenshot-language.png`.
+They were captured in Chrome; the bubble is the same page content in Firefox.
+
+## Icon
+
+`icon128.png` (AMO scales it; the manifest icons carry the rest).
+
+## Notes to reviewer
+
+```
+Context Reader explains a selected word using the sentence around it. There is no backend: the background script calls the Google Gemini API (generativelanguage.googleapis.com, the only host permission) with the user's own API key, which the user pastes into Settings. No data goes anywhere else.
+
+Testing: you need a free Gemini key from https://aistudio.google.com/apikey (no card). Paste it in the extension's Settings, then select a word on any page and click the small mark that appears.
+
+Minified code: Readability.min.js is an unmodified jsDelivr build of @mozilla/readability 0.5.0 (see its header). Everything else is unminified source; the full repository is https://github.com/contextreader/contextreader.github.io
+
+innerHTML: every response from Gemini goes through sanitizeHTML() in content.js before it touches the page (an allowlist rebuilt from an inert DOMParser document: no scripts, event handlers, images, links or url() styles survive). The remaining innerHTML assignments build markup from the extension's own strings, with any data passed through escapeHTML()/esc(). The print-view code that calls document.write is unreachable (no button opens it).
+
+data_collection_permissions: websiteContent, because the selected word and its sentence are sent to Google's API to produce the answer.
+```
+
+---
+
+## After it is approved
+
+1. Put the AMO URL in `STORES.firefox` in `docs/index.html`, `privacy.html`, `support.html`,
+   `vs-reverso.html`; the Firefox visitor then gets "Add to Firefox". `npm test` checks the host.
+2. Add it to the README install step and `docs/llms.txt`.
+3. Screenshot the button with a Firefox user agent before pushing (Ian reviews first).

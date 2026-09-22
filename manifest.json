@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Context Reader",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Understands what you are reading and explains it in your language. Free, open source, no server, no tracking.",
   "permissions": [
     "storage",

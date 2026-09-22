@@ -1,4 +1,17 @@
-importScripts('lib/languages.js');
+// Chrome runs this as a service worker and pulls the language table in here.
+// Firefox runs it as an event page, where importScripts does not exist: its
+// manifest (derived by scripts/package.mjs) lists lib/languages.js first instead.
+if (typeof importScripts === 'function') importScripts('lib/languages.js');
+
+const GEMINI_ORIGINS = ['https://generativelanguage.googleapis.com/*'];
+
+// Firefox grants the host permission at install but lets the reader switch it
+// off afterwards, per extension, in about:addons. Chrome can also withhold it.
+// Without it the request fails in a way that looks like a broken key, so ask.
+async function hasGeminiAccess() {
+    try { return await chrome.permissions.contains({ origins: GEMINI_ORIGINS }); }
+    catch (e) { return true; }   // no permissions API: let the request speak for itself
+}
 
 // background.js — DIRECT GEMINI MODE (experiment build)
 // No Cloudflare Worker, no Supabase cache, no HMAC, no server-side rate limit.
@@ -1652,6 +1665,14 @@ async function callGemini(prompt, word = "", context = "", url = "", generationC
                 <div style="font-size:24px; margin-bottom:10px;">🔑</div>
                 <div style="font-weight:700; color:#92400e; margin-bottom:8px;">API key needed</div>
                 <p style="font-size:13px; color:#78716c; line-height:1.5;">Open the extension Settings and paste your free Gemini API key.<br>Get one at aistudio.google.com/apikey</p>
+            </div>`;
+        }
+
+        if (!(await hasGeminiAccess())) {
+            return `<div style="text-align:center; padding:20px;">
+                <div style="font-size:24px; margin-bottom:10px;">🔌</div>
+                <div style="font-weight:700; color:#92400e; margin-bottom:8px;">Access to Gemini is switched off</div>
+                <p style="font-size:13px; color:#78716c; line-height:1.5;">Your browser is not letting Context Reader reach Google's Gemini API, so it cannot look anything up. Open the extension Settings and click <b>Allow access</b>.</p>
             </div>`;
         }
 

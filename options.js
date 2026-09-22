@@ -27,6 +27,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const CUSTOM_MODEL = '__custom__';
 
+    // ---- Host access (Firefox can switch it off after install) ----
+    const GEMINI_ORIGINS = ['https://generativelanguage.googleapis.com/*'];
+    const checkAccess = () => {
+        if (!chrome.permissions || !chrome.permissions.contains) return;
+        chrome.permissions.contains({ origins: GEMINI_ORIGINS }).then((yes) => {
+            const card = $('opt-access');
+            if (card) card.hidden = !!yes;
+        }).catch(() => {});
+    };
+    checkAccess();
+    // A request needs the click itself as its user gesture, so nothing may be
+    // awaited before it.
+    on('opt-access-allow', 'click', () => {
+        chrome.permissions.request({ origins: GEMINI_ORIGINS }).then((granted) => {
+            if (granted) checkAccess();
+            else status('opt-access-status', 'Not allowed. Lookups stay off until you allow it.', 'bad');
+        }).catch((e) => status('opt-access-status', String(e && e.message || e), 'bad'));
+    });
+    if (chrome.permissions && chrome.permissions.onRemoved) {
+        chrome.permissions.onRemoved.addListener(checkAccess);
+        chrome.permissions.onAdded.addListener(checkAccess);
+    }
+
     // ---- About ----
     setText('opt-version', chrome.runtime.getManifest().version);
     setText('opt-ext-id', chrome.runtime.id);

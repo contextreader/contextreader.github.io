@@ -24,7 +24,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const isOwnPage = url.startsWith(ownExtUrl);
 
         // --- Restricted Page Detection (skip our own extension pages) ---
-        const isRestricted = !isOwnPage && (url.startsWith('chrome://') || url.startsWith('chrome-extension://') || url.startsWith('about:'));
+        const isRestricted = !isOwnPage && (url.startsWith('chrome://') || url.startsWith('chrome-extension://') || url.startsWith('about:')
+            || url.startsWith('moz-extension://') || url.startsWith('https://addons.mozilla.org/')
+            || url.startsWith('https://chromewebstore.google.com/'));
         if (isRestricted) {
             const msg = document.getElementById('restricted-page-msg');
             if (msg) msg.style.display = 'block';

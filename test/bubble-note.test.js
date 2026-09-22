@@ -50,5 +50,22 @@ ok('long word truncated', M.buildLookupHTML('a'.repeat(40), JSON.stringify({t:'x
 ok('missing d gives the loading placeholder',
    M.buildLookupHTML('w', JSON.stringify({t:'x'})).includes('sr-d-loading'));
 
+console.log('model HTML is sanitised before it reaches the page:');
+{
+    // Gemini reads the page, so a page can steer what it writes. Every place a
+    // background response is assigned to innerHTML must go through sanitizeHTML.
+    // (Its behaviour against real attacks is checked in a browser; Node has no
+    // DOMParser. This guards the wiring.)
+    const src = require('fs').readFileSync(require('path').join(__dirname, '..', 'content.js'), 'utf8');
+    ok('sanitizeHTML exists and parses inertly', /function sanitizeHTML\(html\)[\s\S]{0,200}new DOMParser\(\)\.parseFromString/.test(src));
+    ok('the More answer is sanitised', /placeholder\.innerHTML = sanitizeHTML\(response\)/.test(src));
+    ok('General and Simple are sanitised', /tempDiv\.innerHTML = sanitizeHTML\(htmlContent\)/.test(src));
+    ok('a non-JSON lookup is sanitised', /if \(finalHTML === null\) finalHTML = sanitizeHTML\(response\)/.test(src));
+    const raw = src.match(/\.innerHTML = (response|htmlContent)\s*;/g) || [];
+    ok('no response is assigned to innerHTML raw', raw.length === 0, raw);
+    ok('event handlers and images are not on the allowlist',
+       !/SR_SAFE_TAGS = new Set\([^)]*'(img|svg|a|iframe|script)'/.test(src));
+}
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail?1:0);

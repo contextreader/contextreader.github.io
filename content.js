@@ -1173,6 +1173,45 @@ function escapeHTML(str) {
     return el.innerHTML;
 }
 
+// Model output is HTML, and the model reads the page: a paragraph written to
+// steer it (a comment, a forum post) could have it return <img onerror=…>, and
+// assigning that to innerHTML would run it on whatever site the reader is on.
+// So everything that came back from Gemini goes through this allowlist first.
+// DOMParser builds an inert document — nothing in it loads or runs — and only
+// the tags and attributes the prompts actually ask for are copied out.
+const SR_SAFE_TAGS = new Set(['div', 'p', 'span', 'b', 'strong', 'i', 'em', 'u', 'br', 'hr', 'ul', 'ol', 'li',
+    'details', 'summary', 'h2', 'h3', 'h4', 'code', 'small', 'blockquote', 'sup', 'sub', 'button']);
+const SR_DROP_TAGS = new Set(['script', 'style', 'iframe', 'frame', 'object', 'embed', 'svg', 'math', 'template',
+    'img', 'video', 'audio', 'source', 'link', 'meta', 'base', 'form', 'input', 'textarea', 'select', 'noscript']);
+function sanitizeHTML(html) {
+    const doc = new DOMParser().parseFromString(`<body>${String(html == null ? '' : html)}</body>`, 'text/html');
+    const out = document.createElement('div');
+    const copy = (from, to) => {
+        for (const n of Array.from(from.childNodes)) {
+            if (n.nodeType === 3) { to.appendChild(document.createTextNode(n.nodeValue)); continue; }
+            if (n.nodeType !== 1) continue;
+            const tag = n.tagName.toLowerCase();
+            if (SR_DROP_TAGS.has(tag)) continue;
+            if (!SR_SAFE_TAGS.has(tag)) { copy(n, to); continue; }   // unknown tag: keep its text
+            const el = document.createElement(tag);
+            const cls = n.getAttribute('class');
+            if (cls) el.setAttribute('class', cls);
+            const id = n.getAttribute('id');
+            if (id && /^sr-[\w-]+$/.test(id)) el.setAttribute('id', id);
+            // Inline style is how the prompts lay things out; a url() in it would
+            // fetch from wherever the model was told to, so style with one is dropped.
+            const style = n.getAttribute('style');
+            if (style && !/url\s*\(|expression\s*\(|@import|javascript:|behavior\s*:/i.test(style)) el.setAttribute('style', style);
+            if (tag === 'details' && n.hasAttribute('open')) el.setAttribute('open', '');
+            if (tag === 'button') el.setAttribute('type', 'button');
+            copy(n, el);
+            to.appendChild(el);
+        }
+    };
+    copy(doc.body, out);
+    return out.innerHTML;
+}
+
 function buildLookupHTML(word, json) {
     const data = typeof json === 'string' ? JSON.parse(json) : json;
     const safeWord = escapeHTML(word.length > 18 ? word.substring(0, 18) + '...' : word);
@@ -2053,13 +2092,13 @@ function renderLookupResponse(response) {
         response = "<div class='sr-body' style='padding:20px; text-align:center;'><div style='font-size:24px; margin-bottom:8px;'>🤷</div><div style='font-size:13px; color:#6b7280;'>No definition found for this word. Try selecting a different word.</div></div>";
     }
     // JSON response from fast lookup — build HTML client-side
-    // Note: response data comes from our own Gemini API via signed HMAC Worker proxy, not user input
-    let finalHTML = response;
+    let finalHTML = null;
     if (typeof response === 'string' && response.trim().startsWith('{')) {
         try {
-            finalHTML = buildLookupHTML(currentSelection, response);
-        } catch(e) { /* fall through to raw HTML for backward compat */ }
+            finalHTML = buildLookupHTML(currentSelection, response);   // escapes everything itself
+        } catch(e) { /* fall through to the HTML path */ }
     }
+    if (finalHTML === null) finalHTML = sanitizeHTML(response);
     bubble.innerHTML = finalHTML;
     forceHighlightWord(bubble.querySelector('.sr-body'));
     injectControls(currentSelection);
@@ -2376,7 +2415,7 @@ function setupMoreBtn(word) {
                 lang: detectLanguage(currentSelection)
             }, response => {
                 if (response) {
-                    placeholder.innerHTML = response;
+                    placeholder.innerHTML = sanitizeHTML(response);
                     forceHighlightWord(placeholder);
                     btn.style.display = 'none';
                     setTimeout(repositionBubble, 50);
@@ -2466,7 +2505,7 @@ function showGeneralModal(htmlContent) {
     modal.style.justifyContent = 'center';
 
     const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = htmlContent;
+    tempDiv.innerHTML = sanitizeHTML(htmlContent);
     const defText = tempDiv.querySelector('.sr-def')?.innerHTML;
     const simpleBox = tempDiv.querySelector('.sr-simple-box')?.innerHTML;
     let contentHTML = "";

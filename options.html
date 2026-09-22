@@ -429,6 +429,21 @@
             <p>Settings &amp; Info</p>
         </div>
 
+        <!-- Shown only when the browser has withheld the Gemini host permission
+             (Firefox lets a reader switch it off in about:addons). -->
+        <div class="card" id="opt-access" hidden>
+            <div class="card-title">Access to Gemini is switched off</div>
+            <p class="note">
+                Your browser is not letting Context Reader reach generativelanguage.googleapis.com,
+                the one site it talks to, so lookups cannot work. Allowing it gives access to that
+                site only.
+            </p>
+            <div class="row">
+                <button id="opt-access-allow" class="btn btn-primary">Allow access</button>
+                <span id="opt-access-status" class="hint" style="margin-top:0"></span>
+            </div>
+        </div>
+
         <!-- API key first: nothing else works without it -->
         <div class="card">
             <div class="card-title">Gemini API Key</div>

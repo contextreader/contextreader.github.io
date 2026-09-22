@@ -1,4 +1,9 @@
-// Builds the .zip that goes to the Chrome Web Store.
+// Builds the two store zips from one source tree:
+//   dist/contextreader-chrome-<v>.zip   → Chrome Web Store (also Brave, Edge)
+//   dist/contextreader-firefox-<v>.zip  → addons.mozilla.org
+// The Firefox manifest is DERIVED from manifest.json in firefoxManifest() below,
+// so a permission added for Chrome cannot be forgotten in Firefox. dist/firefox/
+// is left unzipped too, for `npx web-ext run --source-dir=dist/firefox`.
 //
 // This exists because a CRX is just a zip of the directory — without an explicit
 // file list the PDF reader's 5.6MB ships whether or not the manifest references
@@ -8,10 +13,11 @@
 // adding a content script or an options page cannot silently be left out of the
 // build. EXTRA covers what the manifest cannot express.
 
-import { readFileSync, existsSync, mkdirSync, rmSync, readdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, rmSync, readdirSync, cpSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { firefoxManifest } from './firefox-manifest.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const manifest = JSON.parse(readFileSync(join(ROOT, 'manifest.json'), 'utf8'));
@@ -52,14 +58,25 @@ if (missing.length) {
 }
 
 const outDir = join(ROOT, 'dist');
-const out = join(outDir, `contextreader-${manifest.version}.zip`);
 mkdirSync(outDir, { recursive: true });
-rmSync(out, { force: true });
+const kb = (f) => (execFileSync('wc', ['-c', f]).toString().trim().split(/\s+/)[0] / 1024).toFixed(0);
 
-execFileSync('zip', ['-q', '-X', out, ...list], { cwd: ROOT });
+// Chrome: the tree as it is.
+const chromeZip = join(outDir, `contextreader-chrome-${manifest.version}.zip`);
+rmSync(chromeZip, { force: true });
+execFileSync('zip', ['-q', '-X', chromeZip, ...list], { cwd: ROOT });
 
-const bytes = execFileSync('wc', ['-c', out]).toString().trim().split(/\s+/)[0];
-console.log(`${out.replace(ROOT + '/', '')}  —  ${(bytes / 1024).toFixed(0)} KB, ${list.length} files\n`);
+// Firefox: the same files, with a derived manifest.
+const ffDir = join(outDir, 'firefox');
+rmSync(ffDir, { recursive: true, force: true });
+for (const f of list) cpSync(join(ROOT, f), join(ffDir, f));
+writeFileSync(join(ffDir, 'manifest.json'), JSON.stringify(firefoxManifest(manifest), null, 2) + '\n');
+const ffZip = join(outDir, `contextreader-firefox-${manifest.version}.zip`);
+rmSync(ffZip, { force: true });
+execFileSync('zip', ['-q', '-X', ffZip, ...list], { cwd: ffDir });
+
+console.log(`${chromeZip.replace(ROOT + '/', '')}  —  ${kb(chromeZip)} KB, ${list.length} files`);
+console.log(`${ffZip.replace(ROOT + '/', '')}  —  ${kb(ffZip)} KB, ${list.length} files\n`);
 list.forEach((f) => console.log('  ' + f));
 
 // The reason this script exists: fail loudly if the PDF reader creeps back in.
@@ -68,3 +85,4 @@ if (leaked.length) {
     console.error('\nPDF reader files are in the package:', leaked.join(', '));
     process.exit(1);
 }
+

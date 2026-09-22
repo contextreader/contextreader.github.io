@@ -16,8 +16,11 @@ Written 2026-09-18, while the Chrome listing is in review.
 | Firefox | A second manifest and a build step | Free | Worth doing. The API surface we use is portable; the manifest and the permission model are not. |
 | Safari | An Xcode project, wrapped in a macOS app | **99 USD/year** Apple Developer Program | **Not doing it (Ian, 18 Sep).** The analysis below stays for whenever that changes. |
 
-**Do not start until the Chrome review lands.** If review asks for a change, it changes the
-source every port copies from.
+**Status, 22 Sep:** Chrome is live. The Firefox build is done: `npm run package` emits both
+zips, `web-ext lint` reports 0 errors, and `FIREFOX_LISTING.md` has every AMO field. Two
+things below changed once the facts were checked: the minimum is **Firefox 140**, not 115,
+and host access is **granted at install** from 127 on, so the permission card is for a
+reader who later switches it off, not for every fresh install.
 
 ---
 
