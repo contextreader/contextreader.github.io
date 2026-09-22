@@ -5,6 +5,9 @@
 > user's browser with the user's own API key. There is no backend server, no analytics and
 > no account.
 
+Install: https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck
+(Chrome, Brave, Edge and other Chromium browsers.)
+
 ## What it does
 
 A reader selects a word on any web page. The extension sends that word plus the paragraph

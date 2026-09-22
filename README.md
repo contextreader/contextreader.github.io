@@ -9,7 +9,7 @@ fits.
 
 **Free. Open source. No server. No tracking. No account.**
 
-[contextreader site](https://contextreader.github.io/) · [Privacy](PRIVACY_POLICY.md) · [Contributing](CONTRIBUTING.md)
+[Add to Chrome](https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck) · [contextreader site](https://contextreader.github.io/) · [Privacy](PRIVACY_POLICY.md) · [Contributing](CONTRIBUTING.md)
 
 ---
 
@@ -29,7 +29,8 @@ and it's free.
 ## Install
 
 1. Get a free Gemini API key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey)
-2. Install the extension
+2. Add the extension from the [Chrome Web Store](https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck); it works in Chrome, Brave, Edge
+   and other Chromium browsers
 3. Pick your language and paste the key when the welcome page opens
 
 **From source:** clone this repo, open `chrome://extensions`, turn on Developer mode,

@@ -142,7 +142,7 @@ footer .tm { flex-basis: 100%; margin: 0; font-size: 13.5px; color: var(--mute);
     <nav aria-label="Site">
       <a href="/support" class="hide-sm">Support</a>
       <a href="/#sec-start" class="hide-sm">Get started</a>
-      <a class="btn js-install" data-umami-event="install-click" data-umami-event-place="vs-reverso-masthead" href="https://github.com/contextreader/contextreader.github.io">Install from GitHub</a>
+      <a class="btn js-install" data-umami-event="install-click" data-umami-event-place="vs-reverso-masthead" href="https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck">Add to Chrome</a>
     </nav>
   </div>
 </header>
@@ -262,10 +262,10 @@ footer .tm { flex-basis: 100%; margin: 0; font-size: 13.5px; color: var(--mute);
     </div>
 
     <div class="cta">
-      <a class="primary js-install" data-umami-event="install-click" data-umami-event-place="vs-reverso-end" href="https://github.com/contextreader/contextreader.github.io">Install from GitHub</a>
+      <a class="primary js-install" data-umami-event="install-click" data-umami-event-place="vs-reverso-end" href="https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck">Add to Chrome</a>
       <a href="/">See it working</a>
     </div>
-    <p class="fine" id="install-fine">The Chrome Web Store listing is in review, so installing is from GitHub for now.</p>
+    <p class="fine" id="install-fine">Free, from the Chrome Web Store. Works in Chrome, Brave and Edge.</p>
   </main>
 </div>
 
@@ -286,23 +286,20 @@ footer .tm { flex-basis: 100%; margin: 0; font-size: 13.5px; color: var(--mute);
 <script>
 /* Install button, per browser.
  *
- * The markup ships with the GitHub fallback, and this only UPGRADES a button
- * when that browser's store listing actually exists. So: no JavaScript, or a
- * browser we do not publish for, and the page still offers a real install
- * instead of a dead "Add to X". Fill a URL in below on the day a listing goes
- * live — nothing else needs touching, and test/copy.test.js checks that each
- * URL points at that browser's own store.
- *
- * Brave, Edge, Opera and Vivaldi install from the Chrome Web Store: same build,
- * same listing, different word on the button.
+ * The markup ships "Add to Chrome" pointing at the Chrome Web Store (live 22
+ * Sep), so with no JavaScript the button is still true. This only renames it
+ * for a browser whose store is filled in below: "Add to Brave" is the same
+ * listing with a different word. A browser with no listing (Firefox until its
+ * add-on ships, Safari, Opera) keeps "Add to Chrome", which stays honest.
+ * test/copy.test.js checks that each URL points at that browser's own store.
  */
 (function () {
   var STORES = {
-    chrome:  '',   /* https://chromewebstore.google.com/detail/<id> — in review */
-    brave:   '',   /* same Chrome Web Store URL */
-    edge:    '',   /* same Chrome Web Store URL, unless an Edge Add-ons listing happens */
-    opera:   '',
-    vivaldi: '',
+    chrome:  'https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck',
+    brave:   'https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck',
+    edge:    'https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck',   /* Edge installs from the Chrome Web Store too */
+    opera:   '',   /* Opera needs a helper add-on for the Chrome Web Store: the button stays "Add to Chrome" */
+    vivaldi: 'https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck',
     firefox: ''    /* https://addons.mozilla.org/firefox/addon/<slug> — not built yet */
   };
   var NAMES = { chrome: 'Chrome', brave: 'Brave', edge: 'Edge', opera: 'Opera',
@@ -327,9 +324,9 @@ footer .tm { flex-basis: 100%; margin: 0; font-size: 13.5px; color: var(--mute);
     var tagged = document.querySelectorAll('a.js-install');
     for (var j = 0; j < tagged.length; j++) {
       tagged[j].setAttribute('data-umami-event-browser', which || 'other');
-      tagged[j].setAttribute('data-umami-event-to', url ? 'store' : 'github');
+      tagged[j].setAttribute('data-umami-event-to', url ? 'store' : 'chrome-store');
     }
-    if (!url) return;                       /* no listing: leave the GitHub fallback alone */
+    if (!url) return;                       /* no listing: leave "Add to Chrome" alone */
     var name = NAMES[which] || 'your browser';
     var links = document.querySelectorAll('a.js-install');
     for (var i = 0; i < links.length; i++) {
@@ -337,8 +334,6 @@ footer .tm { flex-basis: 100%; margin: 0; font-size: 13.5px; color: var(--mute);
       a.href = url;
       a.textContent = a.getAttribute('data-long') ? 'Add to ' + name + ', free' : 'Add to ' + name;
     }
-    var fine = document.getElementById('install-fine');
-    if (fine) fine.textContent = '';
   }
 
   var which = detect();

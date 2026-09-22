@@ -820,12 +820,12 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
       <a href="#sec-languages" class="hide-sm">Languages</a>
       <a href="#sec-privacy" class="hide-sm">Privacy</a>
       <!-- No Chrome Web Store listing yet: points at the install guide until it exists. -->
-      <a class="btn primary sm js-install" data-umami-event="install-click" data-umami-event-place="masthead" href="https://github.com/contextreader/contextreader.github.io">Install from GitHub</a>
+      <a class="btn primary sm js-install" data-umami-event="install-click" data-umami-event-place="masthead" href="https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck">Add to Chrome</a>
     </nav>
   </div>
 </header>
 
-<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Context Reader","applicationCategory":"BrowserApplication","operatingSystem":"Chrome","description":"A free, open-source Chrome extension that explains the word you are stuck on, in your language, using the sentence around it. No server, no account, no tracking. Uses your own Gemini API key.","url":"https://contextreader.github.io/","image":"https://contextreader.github.io/icon128.png","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"license":"https://opensource.org/licenses/MIT","isAccessibleForFree":true,"featureList":["Explains a word using the sentence around it","Answers in the reader’s own language","A fuller explanation, the word’s other meanings, or a simpler wording","No account, no analytics, no server"]},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Is Context Reader free?","acceptedAnswer":{"@type":"Answer","text":"Yes, permanently. There is no plan, no quota of ours and no account, because there is no server: the extension calls Google’s Gemini API directly from your browser with your own free API key."}},{"@type":"Question","name":"Why does it need my own Gemini API key?","acceptedAnswer":{"@type":"Answer","text":"The key is what makes a serverless design possible. Nothing of the project sits between you and Google, so there is nothing to pay for and nowhere your reading could accumulate. Getting a key at Google AI Studio takes about a minute and needs no card."}},{"@type":"Question","name":"How is it different from Google Translate?","acceptedAnswer":{"@type":"Answer","text":"A translation gives you the words in your language; it does not tell you which meaning a word carries in this sentence. Context Reader sends the word together with the paragraph around it and explains the one sense that fits, in your language, without leaving the page."}},{"@type":"Question","name":"Which languages does it work in?","acceptedAnswer":{"@type":"Answer","text":"The extension offers the 110 languages Google documents its Gemini models as understanding. The model was not given a list of languages: it learned them from text, so quality follows how much of a language it saw. English and Sinhala are the tuned two, shipping worked examples checked by a speaker; the other 108 work without them, so specialist terms are less reliable there."}},{"@type":"Question","name":"What data leaves my computer?","acceptedAnswer":{"@type":"Answer","text":"Two requests. The word and the paragraph around it go to generativelanguage.googleapis.com with your key on each lookup, and, for Chinese, Japanese and Korean only, one font file is fetched from Google Fonts with no referrer the first time a bubble opens. Nothing else: no analytics, no telemetry, no account and no identifiers. Your key is stored on that device only and can be encrypted with a passphrase. That is the extension; this website counts visits with Cloudflare Web Analytics, and visits and clicks with Umami, both cookieless. Microsoft Clarity records how the page is used only if you allow it."}}]}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Context Reader","applicationCategory":"BrowserApplication","operatingSystem":"Chrome","description":"A free, open-source Chrome extension that explains the word you are stuck on, in your language, using the sentence around it. No server, no account, no tracking. Uses your own Gemini API key.","url":"https://contextreader.github.io/","installUrl":"https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck","image":"https://contextreader.github.io/icon128.png","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"license":"https://opensource.org/licenses/MIT","isAccessibleForFree":true,"featureList":["Explains a word using the sentence around it","Answers in the reader’s own language","A fuller explanation, the word’s other meanings, or a simpler wording","No account, no analytics, no server"]},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Is Context Reader free?","acceptedAnswer":{"@type":"Answer","text":"Yes, permanently. There is no plan, no quota of ours and no account, because there is no server: the extension calls Google’s Gemini API directly from your browser with your own free API key."}},{"@type":"Question","name":"Why does it need my own Gemini API key?","acceptedAnswer":{"@type":"Answer","text":"The key is what makes a serverless design possible. Nothing of the project sits between you and Google, so there is nothing to pay for and nowhere your reading could accumulate. Getting a key at Google AI Studio takes about a minute and needs no card."}},{"@type":"Question","name":"How is it different from Google Translate?","acceptedAnswer":{"@type":"Answer","text":"A translation gives you the words in your language; it does not tell you which meaning a word carries in this sentence. Context Reader sends the word together with the paragraph around it and explains the one sense that fits, in your language, without leaving the page."}},{"@type":"Question","name":"Which languages does it work in?","acceptedAnswer":{"@type":"Answer","text":"The extension offers the 110 languages Google documents its Gemini models as understanding. The model was not given a list of languages: it learned them from text, so quality follows how much of a language it saw. English and Sinhala are the tuned two, shipping worked examples checked by a speaker; the other 108 work without them, so specialist terms are less reliable there."}},{"@type":"Question","name":"What data leaves my computer?","acceptedAnswer":{"@type":"Answer","text":"Two requests. The word and the paragraph around it go to generativelanguage.googleapis.com with your key on each lookup, and, for Chinese, Japanese and Korean only, one font file is fetched from Google Fonts with no referrer the first time a bubble opens. Nothing else: no analytics, no telemetry, no account and no identifiers. Your key is stored on that device only and can be encrypted with a passphrase. That is the extension; this website counts visits with Cloudflare Web Analytics, and visits and clicks with Umami, both cookieless. Microsoft Clarity records how the page is used only if you allow it."}}]}]}</script>
 
 <!-- This site counts visits and clicks; the extension never does, and the privacy section says so
      in both directions. Cloudflare Web Analytics counts visits; Umami (added 21 Sep, Ian) counts
@@ -865,10 +865,10 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
       </div>
       <div class="get">
         <div class="cta">
-          <a class="btn primary js-install" data-umami-event="install-click" data-umami-event-place="hero" href="https://github.com/contextreader/contextreader.github.io" data-long="1">Install from GitHub</a>
+          <a class="btn primary js-install" data-umami-event="install-click" data-umami-event-place="hero" href="https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck" data-long="1">Add to Chrome, free</a>
           <a class="btn" href="https://aistudio.google.com/apikey" data-umami-event="get-key-click" data-umami-event-place="hero">Get a Gemini key</a>
         </div>
-        <p class="fine">No account, no tracking. It runs on your own free Gemini key, which takes about a minute to get. The Chrome Web Store listing is in review, so installing is from GitHub for now — the same build runs in Chrome, Brave and Edge.</p>
+        <p class="fine">No account, no tracking. It runs on your own free Gemini key, which takes about a minute to get. It works in Chrome, Brave, Edge and other Chromium browsers.</p>
         <div class="llm-row">
           <button class="llm-act" type="button" data-md="copy" data-umami-event="copy-for-llm"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="2.5" width="8" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 13.5v.5a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span>Copy for LLM</span></button>
           <span class="sep" aria-hidden="true"></span>
@@ -961,7 +961,7 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
 
   <div class="get get-m">
     <div class="cta">
-      <a class="btn primary js-install" data-umami-event="install-click" data-umami-event-place="hero-phone" href="https://github.com/contextreader/contextreader.github.io" data-long="1">Install from GitHub</a>
+      <a class="btn primary js-install" data-umami-event="install-click" data-umami-event-place="hero-phone" href="https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck" data-long="1">Add to Chrome, free</a>
       <a class="btn" href="https://aistudio.google.com/apikey" data-umami-event="get-key-click" data-umami-event-place="hero-phone">Get a Gemini key</a>
     </div>
     <p class="fine">No account, no tracking. It runs on your own free Gemini key, which takes about a minute to get.</p>
@@ -1114,7 +1114,7 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
             <h3>Paste it once.</h3>
             <p>Pick the language you read best and paste the key into Settings. It’s checked with Google, then kept on this device.</p>
             <div class="cta">
-              <a class="btn primary js-install" data-umami-event="install-click" data-umami-event-place="get-started" href="https://github.com/contextreader/contextreader.github.io" data-long="1">Install from GitHub</a>
+              <a class="btn primary js-install" data-umami-event="install-click" data-umami-event-place="get-started" href="https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck" data-long="1">Add to Chrome, free</a>
               <a class="btn" href="https://aistudio.google.com/apikey" data-umami-event="get-key-click" data-umami-event-place="get-started">Get a Gemini key ↗</a>
             </div>
           </div></div>
@@ -1307,7 +1307,7 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
     <div class="end-cta">
       <h2>Read what you need to read.</h2>
       <div class="cta">
-        <a class="btn primary js-install" data-umami-event="install-click" data-umami-event-place="end" href="https://github.com/contextreader/contextreader.github.io" data-long="1">Install from GitHub</a>
+        <a class="btn primary js-install" data-umami-event="install-click" data-umami-event-place="end" href="https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck" data-long="1">Add to Chrome, free</a>
         <a class="btn" href="https://aistudio.google.com/apikey" data-umami-event="get-key-click" data-umami-event-place="end">Get a free Gemini key ↗</a>
       </div>
       <p class="fine">Free for good. No account, no tracking. You’ll need a free Gemini key, which takes about a minute.</p>
@@ -2324,23 +2324,20 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
 <script>
 /* Install button, per browser.
  *
- * The markup ships with the GitHub fallback, and this only UPGRADES a button
- * when that browser's store listing actually exists. So: no JavaScript, or a
- * browser we do not publish for, and the page still offers a real install
- * instead of a dead "Add to X". Fill a URL in below on the day a listing goes
- * live — nothing else needs touching, and test/copy.test.js checks that each
- * URL points at that browser's own store.
- *
- * Brave, Edge, Opera and Vivaldi install from the Chrome Web Store: same build,
- * same listing, different word on the button.
+ * The markup ships "Add to Chrome" pointing at the Chrome Web Store (live 22
+ * Sep), so with no JavaScript the button is still true. This only renames it
+ * for a browser whose store is filled in below: "Add to Brave" is the same
+ * listing with a different word. A browser with no listing (Firefox until its
+ * add-on ships, Safari, Opera) keeps "Add to Chrome", which stays honest.
+ * test/copy.test.js checks that each URL points at that browser's own store.
  */
 (function () {
   var STORES = {
-    chrome:  '',   /* https://chromewebstore.google.com/detail/<id> — in review */
-    brave:   '',   /* same Chrome Web Store URL */
-    edge:    '',   /* same Chrome Web Store URL, unless an Edge Add-ons listing happens */
-    opera:   '',
-    vivaldi: '',
+    chrome:  'https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck',
+    brave:   'https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck',
+    edge:    'https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck',   /* Edge installs from the Chrome Web Store too */
+    opera:   '',   /* Opera needs a helper add-on for the Chrome Web Store: the button stays "Add to Chrome" */
+    vivaldi: 'https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck',
     firefox: ''    /* https://addons.mozilla.org/firefox/addon/<slug> — not built yet */
   };
   var NAMES = { chrome: 'Chrome', brave: 'Brave', edge: 'Edge', opera: 'Opera',
@@ -2365,9 +2362,9 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
     var tagged = document.querySelectorAll('a.js-install');
     for (var j = 0; j < tagged.length; j++) {
       tagged[j].setAttribute('data-umami-event-browser', which || 'other');
-      tagged[j].setAttribute('data-umami-event-to', url ? 'store' : 'github');
+      tagged[j].setAttribute('data-umami-event-to', url ? 'store' : 'chrome-store');
     }
-    if (!url) return;                       /* no listing: leave the GitHub fallback alone */
+    if (!url) return;                       /* no listing: leave "Add to Chrome" alone */
     var name = NAMES[which] || 'your browser';
     var links = document.querySelectorAll('a.js-install');
     for (var i = 0; i < links.length; i++) {
@@ -2375,8 +2372,6 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
       a.href = url;
       a.textContent = a.getAttribute('data-long') ? 'Add to ' + name + ', free' : 'Add to ' + name;
     }
-    var fine = document.getElementById('install-fine');
-    if (fine) fine.textContent = '';
   }
 
   var which = detect();
