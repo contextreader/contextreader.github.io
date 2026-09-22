@@ -49,9 +49,7 @@ rather than implying parity.
 
 The website is separate from the extension. It counts visits with Cloudflare Web Analytics,
 and visits and clicks (install and get-a-key buttons, Copy for LLM, the demo's language) with
-Umami. Both are cookieless and store nothing in the browser. If a visitor allows it, Microsoft
-Clarity records how the page is used (scrolling and clicks, never typing) and sets Microsoft's
-cookies; nothing of Clarity loads before that yes. The extension collects nothing.
+Umami. Both are cookieless and store nothing in the browser. The extension collects nothing.
 
 ## Licence
 

@@ -71,7 +71,8 @@ padding. *Search Tools* is wrong: it does not search.)
 
 ## Tags
 
-`dictionary`, `translation`, `language learning`, `definitions`, `reading`
+None. The submission form has no tags field (22 Sep 2026): AMO's tags are a short list
+applied by Mozilla, not typed by the developer. The category is what matters.
 
 ## Support and links
 

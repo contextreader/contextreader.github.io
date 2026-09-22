@@ -249,16 +249,11 @@ with `umami.track`. The tracker loads from cloud.umami.is and posts to gateway.u
 no cookie and writes nothing to storage (read on 21 Sep from the script itself). Every
 disclosure names both services. Google Analytics is deferred until Ian runs Google Ads.
 
-**Microsoft Clarity (21 Sep), consent-gated.** Project `ylv5kj8w7i`, category Careers &
-Education. Unlike the other two it is **not** cookieless: tested in a real browser, its loader
-fires a sync pixel that sets Microsoft's `MUID` on clarity.ms and bing.com on every load,
-whatever the project's cookie setting. So `docs/clarity.js` (on every page, after the Cloudflare
-tag) loads nothing of Clarity until the visitor says yes in a small card shown after the first
-scroll; both buttons are the same size. The answer is kept in localStorage `cr-clarity`, counted
-in Umami as `clarity-choice`, and consent is passed as analytics granted / ads denied. Global
-Privacy Control means never asked. The privacy page's `data-clarity-choice` button withdraws.
-`test/copy.test.js` enforces the gate: no page may name clarity.ms, every page loads the gate
-and names Clarity in its prose. A new page must include `<script defer src="clarity.js">`.
+**Microsoft Clarity (21–22 Sep): tried and removed.** It ran for a day behind a consent card
+(project `ylv5kj8w7i`) and Ian removed it on 22 Sep. It is **not** cookieless: tested in a real
+browser, its loader fires a sync pixel that sets Microsoft's `MUID` on clarity.ms and bing.com on
+every load, whatever the project's cookie setting. Do not re-add it, or anything like it, without
+a consent step; `test/copy.test.js` fails if clarity.ms appears on any page.
 
 **Bing (18 Sep).** Bing Webmaster Tools is verified by **importing from Google Search Console**
 (Ian's account, Administrator role): no BingSiteAuth.xml, no msvalidate.01 tag, and none needed.
