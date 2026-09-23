@@ -53,6 +53,14 @@ Umami. Both are cookieless and store nothing in the browser. The extension colle
 
 ## Writing
 
+Index: https://contextreader.github.io/blog/
+
+- How to understand English words when it isn't your first language (23 Sep 2026):
+  https://contextreader.github.io/blog/reading-english-second-language
+  The difficulty is not unknown words but known words used in a field's own sense (positive,
+  significant, execute). Four habits that need no tool, why translating a single word fails,
+  and how Context Reader answers for the paragraph you are reading.
+
 - Why Google Translate gets words wrong (23 Sep 2026):
   https://contextreader.github.io/blog/why-google-translate-gets-words-wrong
   Translation reads a sentence at a time, so a word alone loses what decides its meaning, and

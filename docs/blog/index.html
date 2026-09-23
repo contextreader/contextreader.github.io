@@ -3,30 +3,27 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Why Google Translate gets words wrong — and what to do</title>
-<meta name="description" content="Google Translate is usually fine with sentences and inaccurate with single words. Why that happens, and four things that help you find the meaning your sentence uses.">
-<link rel="canonical" href="https://contextreader.github.io/blog/why-google-translate-gets-words-wrong">
+<title>Writing — Context Reader</title>
+<meta name="description" content="Notes on reading in a language that isn’t your first: why translation misses single words, and how to get past the ones that stop you.">
+<link rel="canonical" href="https://contextreader.github.io/blog/">
 <link rel="icon" href="../icon.svg" type="image/svg+xml">
 <link rel="icon" href="../icon128.png" sizes="128x128" type="image/png">
 <link rel="apple-touch-icon" href="../icon128.png">
 <meta name="theme-color" content="#eef0f3" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#101317" media="(prefers-color-scheme: dark)">
-<meta property="og:type" content="article">
+<meta property="og:type" content="website">
 <meta property="og:site_name" content="Context Reader">
-<meta property="og:title" content="Why Google Translate gets words wrong">
-<meta property="og:description" content="It is rarely wrong about your sentence. It is wrong about your word, and the reason is the same thing that makes it good at sentences.">
-<meta property="og:url" content="https://contextreader.github.io/blog/why-google-translate-gets-words-wrong">
+<meta property="og:title" content="Writing — Context Reader">
+<meta property="og:description" content="Notes on reading in a language that isn’t your first.">
+<meta property="og:url" content="https://contextreader.github.io/blog/">
 <meta property="og:image" content="https://contextreader.github.io/share.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="640">
 <meta property="og:image:alt" content="Context Reader: the word you're stuck on, in your language. The word culture explained two ways, in a lab report and in a job review.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://contextreader.github.io/share.png">
-<!-- Beyond the visit counter named at the foot of this page, it makes no third-party requests.
-     Rules for this page: describe HOW translation behaves, never invent what a particular tool
-     returns for a particular word. No screenshot or quoted output belongs here unless it was
-     captured for real. The one external claim — that neural translation works a sentence at a
-     time — is Google's own, linked in the text. Paths are ../ because this page sits in /blog/. -->
+<!-- One list of the posts, so every page's footer needs a single link and a new post is one
+     entry here plus one line in sitemap.xml and llms.txt. Paths are ../ because this sits in /blog/. -->
 <link rel="preload" href="../fonts/inter-latin-800.woff2" as="font" type="font/woff2" crossorigin>
 <style>
 @font-face { font-family: "Inter"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/inter-latin-400.woff2") format("woff2"); }
@@ -133,6 +130,12 @@ footer .tm { flex-basis: 100%; margin: 0; font-size: 13.5px; color: var(--mute);
   .cmp td::before { content: attr(data-col); display: block; font: 700 12px/1.4 var(--sans); letter-spacing: .04em; color: var(--mute); }
 }
 </style>
+<style>
+.when { font-size: 13.5px; color: var(--mute); margin: 0 0 8px; }
+.card h3 a { color: var(--ink); text-decoration: none; }
+.card h3 a:hover { color: var(--accent); }
+.card h3 { font-size: 1.15rem; margin-bottom: 4px; }
+</style>
 </head>
 <body>
 
@@ -141,88 +144,38 @@ footer .tm { flex-basis: 100%; margin: 0; font-size: 13.5px; color: var(--mute);
     <a class="brand" href="/"><img src="../icon.svg" alt="" width="28" height="28">Context Reader</a>
     <nav aria-label="Site">
       <a href="/support" class="hide-sm">Support</a>
-      <a href="/blog/" class="hide-sm">Writing</a>
       <a href="/vs-reverso" class="hide-sm">vs Reverso</a>
-      <a class="btn js-install" data-umami-event="install-click" data-umami-event-place="gt-masthead" href="https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck">Add to Chrome</a>
+      <a class="btn js-install" data-umami-event="install-click" data-umami-event-place="blog-masthead" href="https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck">Add to Chrome</a>
     </nav>
   </div>
 </header>
 
 <div class="wrap">
   <header class="page">
-    <p class="kicker">Reading in another language</p>
-    <h1>Why Google Translate gets words wrong</h1>
-    <p class="lede">Usually it is not wrong about your sentence. It is wrong about your <em>word</em>. Words like <em>culture</em> or <em>acute</em> have more than one meaning. The translator has to pick one, and it picks the common one. In a medical paper or a contract, the common one is often not the right one. And if you translate the word alone, it gets worse, because now there is no sentence to go on.</p>
-    <p class="checked">Written on 23 September 2026. I build Context Reader, a free extension for this exact problem, so read this knowing that. Everything here works without it too.</p>
+    <p class="kicker">Writing</p>
+    <h1>Reading in a language that isn’t your first</h1>
+    <p class="lede">Notes from building Context Reader. Mostly about the same problem from different sides: a word you know, used to mean something you did not expect.</p>
   </header>
 
   <main>
-    <h2>The three ways it goes wrong</h2>
     <div class="cards">
-      <div class="card">
-        <h3>1. You translated the word alone</h3>
-        <p>When you copy one word into the box, you throw away the part that decides what it means. The translator has nothing to work with, so it gives you the everyday meaning. Put the whole sentence in and you often get a different answer. This one thing fixes most bad translations.</p>
-      </div>
-      <div class="card">
-        <h3>2. The subject is specialist, the word is not</h3>
-        <p>Every field takes normal words and gives them its own meaning. In medicine, a <span class="lit">culture</span> is a sample grown in a lab to find bacteria, and a <em>positive</em> result is bad news. In law, <em>consideration</em> is what each side gives, not being thoughtful. In statistics, <em>significant</em> means the result is probably not chance, not that it is big. The translator has read far more everyday text than lab reports, so it goes with the everyday meaning.</p>
-      </div>
-      <div class="card">
-        <h3>3. It reads well and is still wrong</h3>
-        <p>These tools are built to give you a sentence that sounds natural. A smooth sentence with one word wrong still sounds right, so nothing tells you to check. That is the dangerous one: the translation feels fine, and the word you were stuck on is the word it lost.</p>
-      </div>
-    </div>
-
-    <h2>Why it happens</h2>
-    <p>Since 2016 Google Translate reads <a href="https://research.google/blog/a-neural-network-for-machine-translation-at-production-scale/">a whole sentence at a time</a> instead of word by word. That is why it sounds natural now. But the sentence is also where it stops. It does not know what the page is about, what field you are reading, or which word you got stuck on. It gives the version that fits an average sentence.</p>
-    <p>A dictionary has the opposite problem. It gives you every meaning and lets you choose. That only helps if you already know enough to choose. So there is a question in the middle that neither one answers: <strong>what does this word mean here, in this sentence?</strong></p>
-
-    <div class="specimen">
-      <q>The <span class="lit">culture</span> came back positive after forty-eight hours, so the ward started antibiotics.</q>
-      <div class="two">
-        <p><span class="who">The everyday meaning</span>Culture as art, music and customs. <em>Positive</em> as good news. Those are the common meanings, and here both of them are wrong.</p>
-        <p><span class="who">What the sentence says</span>A sample was grown in a lab, bacteria were found, treatment started. The words that tell you this are <em>ward</em> and <em>antibiotics</em>, and they sit outside the word you selected.</p>
-      </div>
-    </div>
-
-    <h2>Four things that actually help</h2>
-    <div class="cards">
-      <div class="card">
-        <h3>Give it the sentence, not the word</h3>
-        <p>Paste the whole sentence, or the whole paragraph. It takes two seconds and it fixes most of these. If you only care about one word, read the translated sentence and find the word inside it.</p>
-      </div>
-      <div class="card">
-        <h3>Translate it back</h3>
-        <p>Take the answer and translate it back into the first language. If you do not get the word you started with, the meaning changed somewhere. It is a rough check, but it catches the bad ones.</p>
-      </div>
-      <div class="card">
-        <h3>Ask what the text is about</h3>
-        <p>Before you trust the answer, say what you are reading: a drug trial, a rent agreement, a bug report. Almost every wrong translation is a word taken out of its field, and you can see that faster than any tool.</p>
-      </div>
-      <div class="card">
-        <h3>Use something that reads the sentence</h3>
-        <p><a href="/vs-reverso">Reverso Context</a> shows you the word in many real sentences, and you pick the one closest to yours. <strong>Context Reader</strong>, the extension I build, does it the other way: select the word, and it sends the paragraph with it, then tells you the one meaning that fits, in your language, without leaving the page.</p>
-      </div>
-    </div>
-
-    <h2>Where translation is still the right tool</h2>
-    <p>None of this makes Google Translate bad. For a page in a language you cannot read at all, for travel, for a message from someone at work, it is the fastest thing we have and it is good enough. Just know which job you have. <strong>Turning a text into your language</strong> is one job. <strong>Understanding one word in a text you can mostly follow</strong> is another. Translation is built for the first one. The second one is where it lets you down quietly.</p>
-
-    <p>If English is not your first language, the companion piece is <a href="/blog/reading-english-second-language">how to understand English words when it isn’t your first language</a> — the same problem from the reader’s side, with four habits that need no tool.</p>
-
-    <h2>Questions</h2>
-    <div class="faq">
-      <div><h3>Is Google Translate accurate?</h3><p>For whole sentences between big languages, yes, it is good and getting better. It is weakest on a single word with several meanings, on specialist terms, and on idioms. Those are the cases where the right answer depends on what the text is about.</p></div>
-      <div><h3>Why does a word on its own translate differently?</h3><p>Because a word alone has no context. The tool reads the sentence to decide the meaning, so when there is no sentence it falls back on the most common meaning. Paste the whole sentence and the answer often changes.</p></div>
-      <div><h3>How do I know which meaning a sentence is using?</h3><p>Say what the text is about, then take the meaning that belongs to that subject. In a lab report, a culture is a sample grown to find bacteria. In a company, culture is how people work. You can also translate the answer back: if you do not get your original word, the meaning drifted.</p></div>
-      <div><h3>Is there a tool that explains the word for my sentence?</h3><p>Yes. Context Reader, the free extension I build, sends the word with the paragraph around it and gives you the one meaning that fits, in your language. Reverso Context does it another way, by showing the word in many real sentences so you can pick the closest one.</p></div>
+      <article class="card">
+        <h3><a href="/blog/reading-english-second-language">How to understand English words when it isn’t your first language</a></h3>
+        <p class="when">23 September 2026</p>
+        <p>The hard part is not the words you have never seen. It is the words you know, used to mean something else — <em>positive</em>, <em>significant</em>, <em>execute</em>. Four habits that help, why translating one word usually does not, and how Context Reader answers for your sentence.</p>
+      </article>
+      <article class="card">
+        <h3><a href="/blog/why-google-translate-gets-words-wrong">Why Google Translate gets words wrong</a></h3>
+        <p class="when">23 September 2026</p>
+        <p>It is rarely wrong about your sentence. It is wrong about your word, and the reason is the same thing that makes it good at sentences. What to do instead, in four steps.</p>
+      </article>
     </div>
 
     <div class="cta">
-      <a class="primary js-install" data-umami-event="install-click" data-umami-event-place="gt-end" href="https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck">Add to Chrome</a>
+      <a class="primary js-install" data-umami-event="install-click" data-umami-event-place="blog-index" href="https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck">Add to Chrome</a>
       <a href="/">See it working</a>
     </div>
-    <p class="fine" id="install-fine">Free, from the Chrome Web Store. Works in Chrome, Brave and Edge. It needs your own free Gemini API key, which takes about a minute to get.</p>
+    <p class="fine" id="install-fine">Free, from the Chrome Web Store. Works in Chrome, Brave and Edge.</p>
   </main>
 </div>
 
@@ -233,7 +186,6 @@ footer .tm { flex-basis: 100%; margin: 0; font-size: 13.5px; color: var(--mute);
     <a href="/privacy">Privacy</a>
     <a href="https://github.com/contextreader/contextreader.github.io">Source</a>
     <span class="spacer">The extension collects nothing; this site counts visits with Cloudflare Web Analytics, and visits and clicks with Umami, both cookieless.</span>
-    <p class="tm">Google, Google Translate and Gemini are trademarks of Google LLC. Context Reader is an independent project, not affiliated with or endorsed by Google.</p>
   </div>
 </footer>
 
@@ -302,13 +254,9 @@ footer .tm { flex-basis: 100%; margin: 0; font-size: 13.5px; color: var(--mute);
   }
 })();
 </script>
-<script type="application/ld+json">{"@context":"https://schema.org","@graph":[
-{"@type":"Article","headline":"Why Google Translate gets words wrong","datePublished":"2026-09-23","dateModified":"2026-09-23","author":{"@type":"Organization","name":"Context Reader","url":"https://contextreader.github.io"},"publisher":{"@type":"Organization","name":"Context Reader","url":"https://contextreader.github.io"},"mainEntityOfPage":"https://contextreader.github.io/blog/why-google-translate-gets-words-wrong","image":"https://contextreader.github.io/share.png","description":"Google Translate is usually fine with sentences and weak with single words. Why that happens, and four things that help."},
-{"@type":"FAQPage","mainEntity":[
-{"@type": "Question", "name": "Is Google Translate accurate?", "acceptedAnswer": {"@type": "Answer", "text": "For whole sentences between big languages, yes, it is good and getting better. It is weakest on a single word with several meanings, on specialist terms, and on idioms. Those are the cases where the right answer depends on what the text is about."}},
-{"@type": "Question", "name": "Why does a word on its own translate differently?", "acceptedAnswer": {"@type": "Answer", "text": "Because a word alone has no context. The tool reads the sentence to decide the meaning, so when there is no sentence it falls back on the most common meaning. Paste the whole sentence and the answer often changes."}},
-{"@type": "Question", "name": "How do I know which meaning a sentence is using?", "acceptedAnswer": {"@type": "Answer", "text": "Say what the text is about, then take the meaning that belongs to that subject. In a lab report, a culture is a sample grown to find bacteria. In a company, culture is how people work. You can also translate the answer back: if you do not get your original word, the meaning drifted."}},
-{"@type": "Question", "name": "Is there a tool that explains the word for my sentence?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Context Reader, the free extension I build, sends the word with the paragraph around it and gives you the one meaning that fits, in your language. Reverso Context does it another way, by showing the word in many real sentences so you can pick the closest one."}}
-]}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"ItemList","name":"Context Reader — writing","itemListElement":[
+{"@type":"ListItem","position":1,"url":"https://contextreader.github.io/blog/reading-english-second-language","name":"How to understand English words when it isn’t your first language"},
+{"@type":"ListItem","position":2,"url":"https://contextreader.github.io/blog/why-google-translate-gets-words-wrong","name":"Why Google Translate gets words wrong"}
+]}</script>
 </body>
 </html>
