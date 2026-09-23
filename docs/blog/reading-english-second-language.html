@@ -132,6 +132,11 @@ footer .tm { flex-basis: 100%; margin: 0; font-size: 13.5px; color: var(--mute);
   .cmp td::before { content: attr(data-col); display: block; font: 700 12px/1.4 var(--sans); letter-spacing: .04em; color: var(--mute); }
 }
 </style>
+<style>
+figure { margin: 21px 0; }
+figure img { display: block; margin-inline: auto; max-width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 17px; background: var(--paper); }
+figcaption { margin-top: 10px; font-size: 14px; line-height: 1.55; color: var(--mute); }
+</style>
 </head>
 <body>
 
@@ -194,6 +199,11 @@ footer .tm { flex-basis: 100%; margin: 0; font-size: 13.5px; color: var(--mute);
       </div>
     </div>
 
+    <figure>
+      <img src="img/word-in-context-english.webp" width="710" height="470" loading="lazy" decoding="async" alt="Context Reader open on a research article: the word significant is selected and the bubble explains that in science it means the difference was unlikely to be chance.">
+      <figcaption>The same problem, solved on the page: <em>significant</em> selected in a research article, explained for that sentence rather than in general. Captured from the extension, not a mockup.</figcaption>
+    </figure>
+
     <h2>Why translating the word usually does not fix it</h2>
     <p>The obvious move is to translate. For a whole page in a language you cannot read at all, that is the right move. For one word in a page you can mostly follow, it often gives you the same problem in your own language.</p>
     <p>A word on its own carries no context, so a translator answers with its most common meaning — the everyday one, not the one your page is using. Give it the whole sentence and it does better, but now the word you were stuck on comes back as a word in your language that you may also not know. I wrote about the mechanics of this in <a href="/blog/why-google-translate-gets-words-wrong">why Google Translate gets words wrong</a>. The short version: translation is built to move a sentence into another language, not to explain one word inside it.</p>
@@ -226,12 +236,17 @@ footer .tm { flex-basis: 100%; margin: 0; font-size: 13.5px; color: var(--mute);
         <h3>One answer, not a list</h3>
         <p>When you are stuck you do not want a menu. You get one meaning first. If you want more, <strong>More</strong> gives a short example in the same world as the page, <strong>General</strong> gives the word’s other uses, and <strong>Simple</strong> says it again in the plainest words.</p>
       </div>
+      <div class="card" style="padding:0; overflow:hidden">
+        <img src="img/simple-explanation-hindi.webp" width="680" height="620" loading="lazy" decoding="async" style="display:block;width:100%;height:auto" alt="The bubble showing the Simple explanation of the word significant in Hindi, with an everyday example sentence underneath.">
+        <p style="padding:16px 21px 18px"><strong>Simple</strong>, in Hindi: the same meaning again in the plainest words, with an everyday example. This is the button I use when a definition is still too technical.</p>
+      </div>
       <div class="card">
         <h3>It works inside one language too</h3>
         <p>If you are reading in your own language and a word stops you, it does not translate the word into itself. It gives you a simpler word for it. Being stuck is not only about foreign languages.</p>
       </div>
       <div class="card">
         <h3>Honest about where it is weak</h3>
+        <img src="img/language-picker.webp" width="820" height="570" loading="lazy" decoding="async" style="display:block;width:100%;height:auto;border:1px solid var(--rule);border-radius:13px;margin-bottom:13px" alt="The language picker with a search box, showing languages grouped under Tuned and Community headings.">
         <p>It offers 110 languages, but only English and Sinhala ship examples checked by a speaker, and the extension tells you which is which when you choose. The answers are written by a model, so they can be wrong. The <strong>EN</strong> button shows the same answer in English, which is the fastest way to check one.</p>
       </div>
       <div class="card">
@@ -338,7 +353,7 @@ footer .tm { flex-basis: 100%; margin: 0; font-size: 13.5px; color: var(--mute);
 })();
 </script>
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[
-{"@type":"Article","headline":"How to understand English words in a second language","datePublished":"2026-09-23","dateModified":"2026-09-23","author":{"@type":"Organization","name":"Context Reader","url":"https://contextreader.github.io"},"publisher":{"@type":"Organization","name":"Context Reader","url":"https://contextreader.github.io"},"mainEntityOfPage":"https://contextreader.github.io/blog/reading-english-second-language","image":"https://contextreader.github.io/share.png","description":"The hard part is not the words you have never seen, but the words you know used to mean something else. Habits that help, why translating one word does not, and how Context Reader answers for your sentence."},
+{"@type":"Article","headline":"How to understand English words in a second language","datePublished":"2026-09-23","dateModified":"2026-09-23","author":{"@type":"Organization","name":"Context Reader","url":"https://contextreader.github.io"},"publisher":{"@type":"Organization","name":"Context Reader","url":"https://contextreader.github.io"},"mainEntityOfPage":"https://contextreader.github.io/blog/reading-english-second-language","image":["https://contextreader.github.io/share.png","https://contextreader.github.io/blog/img/word-in-context-english.webp","https://contextreader.github.io/blog/img/simple-explanation-hindi.webp"],"description":"The hard part is not the words you have never seen, but the words you know used to mean something else. Habits that help, why translating one word does not, and how Context Reader answers for your sentence."},
 {"@type":"FAQPage","mainEntity":[
 {"@type": "Question", "name": "Why is reading in English hard even when I know the words?", "acceptedAnswer": {"@type": "Answer", "text": "Because the words you know are used differently in different subjects. English gives ordinary words a second job in medicine, law, business and software. You read the sentence, it makes sense, and it is not the sense the writer meant."}},
 {"@type": "Question", "name": "Does translating the page help?", "acceptedAnswer": {"@type": "Answer", "text": "For getting the general idea, yes. For one word you are stuck on, often not. A word on its own has no context, so a translator gives you its most common meaning, which is usually not the specialist one."}},

@@ -133,6 +133,11 @@ footer .tm { flex-basis: 100%; margin: 0; font-size: 13.5px; color: var(--mute);
   .cmp td::before { content: attr(data-col); display: block; font: 700 12px/1.4 var(--sans); letter-spacing: .04em; color: var(--mute); }
 }
 </style>
+<style>
+figure { margin: 21px 0; }
+figure img { display: block; margin-inline: auto; max-width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 17px; background: var(--paper); }
+figcaption { margin-top: 10px; font-size: 14px; line-height: 1.55; color: var(--mute); }
+</style>
 </head>
 <body>
 
@@ -184,6 +189,11 @@ footer .tm { flex-basis: 100%; margin: 0; font-size: 13.5px; color: var(--mute);
         <p><span class="who">What the sentence says</span>A sample was grown in a lab, bacteria were found, treatment started. The words that tell you this are <em>ward</em> and <em>antibiotics</em>, and they sit outside the word you selected.</p>
       </div>
     </div>
+
+    <figure>
+      <img src="img/word-in-context-spanish.webp" width="710" height="470" loading="lazy" decoding="async" alt="Context Reader open on an English research article, explaining the selected word significant in Spanish for that sentence.">
+      <figcaption>The other way round: the word stays in the article, and the explanation arrives in the reader’s language — here Spanish, for this sentence. Captured from the extension, not a mockup.</figcaption>
+    </figure>
 
     <h2>Four things that actually help</h2>
     <div class="cards">
@@ -303,7 +313,7 @@ footer .tm { flex-basis: 100%; margin: 0; font-size: 13.5px; color: var(--mute);
 })();
 </script>
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[
-{"@type":"Article","headline":"Why Google Translate gets words wrong","datePublished":"2026-09-23","dateModified":"2026-09-23","author":{"@type":"Organization","name":"Context Reader","url":"https://contextreader.github.io"},"publisher":{"@type":"Organization","name":"Context Reader","url":"https://contextreader.github.io"},"mainEntityOfPage":"https://contextreader.github.io/blog/why-google-translate-gets-words-wrong","image":"https://contextreader.github.io/share.png","description":"Google Translate is usually fine with sentences and weak with single words. Why that happens, and four things that help."},
+{"@type":"Article","headline":"Why Google Translate gets words wrong","datePublished":"2026-09-23","dateModified":"2026-09-23","author":{"@type":"Organization","name":"Context Reader","url":"https://contextreader.github.io"},"publisher":{"@type":"Organization","name":"Context Reader","url":"https://contextreader.github.io"},"mainEntityOfPage":"https://contextreader.github.io/blog/why-google-translate-gets-words-wrong","image":["https://contextreader.github.io/share.png","https://contextreader.github.io/blog/img/word-in-context-spanish.webp"],"description":"Google Translate is usually fine with sentences and weak with single words. Why that happens, and four things that help."},
 {"@type":"FAQPage","mainEntity":[
 {"@type": "Question", "name": "Is Google Translate accurate?", "acceptedAnswer": {"@type": "Answer", "text": "For whole sentences between big languages, yes, it is good and getting better. It is weakest on a single word with several meanings, on specialist terms, and on idioms. Those are the cases where the right answer depends on what the text is about."}},
 {"@type": "Question", "name": "Why does a word on its own translate differently?", "acceptedAnswer": {"@type": "Answer", "text": "Because a word alone has no context. The tool reads the sentence to decide the meaning, so when there is no sentence it falls back on the most common meaning. Paste the whole sentence and the answer often changes."}},
