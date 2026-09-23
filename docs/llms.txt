@@ -51,6 +51,14 @@ The website is separate from the extension. It counts visits with Cloudflare Web
 and visits and clicks (install and get-a-key buttons, Copy for LLM, the demo's language) with
 Umami. Both are cookieless and store nothing in the browser. The extension collects nothing.
 
+## Writing
+
+- Why Google Translate gets words wrong (23 Sep 2026):
+  https://contextreader.github.io/blog/why-google-translate-gets-words-wrong
+  Translation reads a sentence at a time, so a word alone loses what decides its meaning, and
+  specialist senses lose to everyday ones. What helps: give it the sentence, translate back,
+  name the subject, or use a tool that reads the sentence.
+
 ## Licence
 
 MIT. Bundled third-party code (Mozilla Readability, PDF.js, a Sinhala Unicode converter,

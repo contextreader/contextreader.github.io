@@ -259,7 +259,12 @@ console.log('the site tells the truth about languages, however it presents them:
     // Every page the site serves, not just the home page: a privacy or support
     // page added later is as public as index.html and must keep the same rules.
     // The Search Console verification file is Google's own stub, not our page.
-    const pages = fs.readdirSync(path.join(ROOT, 'docs'))
+    // Walk into subdirectories too: /blog/ pages are as public as the rest, and
+    // the first one shipped 23 Sep. Paths stay relative to docs/.
+    const walk = (dir, base = '') => fs.readdirSync(path.join(ROOT, 'docs', dir), { withFileTypes: true })
+        .flatMap((e) => e.isDirectory() ? walk(path.join(dir, e.name), path.join(base, e.name))
+                                        : [path.join(base, e.name)]);
+    const pages = walk('')
         .filter((f) => f.endsWith('.html') && f !== 'index.html' && !/^google[0-9a-f]+(new)?\.html$/.test(f));
     for (const f of pages) {
         const page = read(`docs/${f}`);
