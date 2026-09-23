@@ -985,7 +985,7 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
             </ul>
           </div>
         </div>
-        <p class="source">Real answers, unedited, captured with the extension on <code>gemini-3.1-flash-lite</code>. 25 languages are shown here, the ones with captured answers; the extension offers 110.</p>
+        <p class="source">Real answers, unedited, captured with the extension on <code>gemini-3.1-flash-lite</code>. 24 languages are shown here, the ones with captured answers; the extension offers 110.</p>
       </div>
     </div>
     <div class="runway" id="runway" aria-hidden="true"></div>
@@ -1002,7 +1002,7 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
       <span class="sep" aria-hidden="true"></span>
       <button class="llm-act" type="button" data-md="view" data-umami-event="view-markdown"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="3.5" width="13" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M4 10.5v-5l2 2.4 2-2.4v5M11 5.5v3.6m0 0 1.4-1.5M11 9.1 9.6 7.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>View as Markdown</span></button>
     </div>
-    <p class="source">Real answers, unedited, captured with the extension on <code>gemini-3.1-flash-lite</code>. 25 languages are shown here, the ones with captured answers; the extension offers 110.</p>
+    <p class="source">Real answers, unedited, captured with the extension on <code>gemini-3.1-flash-lite</code>. 24 languages are shown here, the ones with captured answers; the extension offers 110.</p>
   </div>
 
   <section class="why" id="sec-why" aria-labelledby="why-h">
@@ -1416,9 +1416,13 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
   const WORDS = ['bank', 'bank', 'sentence', 'sentence', 'indemnify'];
 
   // ── which language to show: URL, then a saved choice, then the browser's
-  // language list, then a timezone guess. All local; nothing is sent anywhere. ──
+  // language list, then English. All local; nothing is sent anywhere. ──
   const ALIASES = { iw: 'he', tl: 'fil', 'zh-hk': 'zh-TW', 'zh-mo': 'zh-TW', 'zh-hant': 'zh-TW', 'zh-cn': 'zh', 'zh-sg': 'zh', 'zh-hans': 'zh' };
-  const byLower = Object.fromEntries(Object.keys(DATA.langs).map((c) => [c.toLowerCase(), c]));
+  // Sinhala is not offered in the demo (Ian, 23 Sep): the site does not lead with it,
+  // and in the picker's Tuned group it sat second on the page. The extension still
+  // ships it, tuned, and the language list further down still names it.
+  const DEMO_CODES = Object.keys(DATA.langs).filter((c) => c !== 'si');
+  const byLower = Object.fromEntries(DEMO_CODES.map((c) => [c.toLowerCase(), c]));
   function norm(tag) {
     const parts = String(tag || '').toLowerCase().replace(/_/g, '-').split('-');
     for (const k of [parts.join('-'), parts.slice(0, 2).join('-'), parts[0]]) {
@@ -1466,9 +1470,9 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
   // this page has REAL captured answers for — the extension offers 110, and no
   // answer is shown here that was not captured from it.
   // English first, then tuned, then by English name — the picker groups them.
-  const DEMO_LANGS = Object.entries(DATA.langs)
+  const DEMO_LANGS = DEMO_CODES.map((code) => [code, DATA.langs[code]])
     .sort(([a, x], [b, y]) => (a === 'en' ? -1 : b === 'en' ? 1 : x.name.localeCompare(y.name)))
-    .map(([code, l]) => ({ code, name: l.name, nativeName: l.native, tuned: code === 'en' || code === 'si' }));
+    .map(([code, l]) => ({ code, name: l.name, nativeName: l.native, tuned: code === 'en' }));
 
   const WHY = { browser: 'matched to your browser', saved: 'your choice', url: '', default: '' };
 
