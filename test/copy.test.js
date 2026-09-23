@@ -285,6 +285,13 @@ console.log('the site tells the truth about languages, however it presents them:
     }
     ok('docs/index.html: an "Add to Chrome" link goes to the Chrome Web Store', chromeLinksHonest(site), chromeLinksHonest.bad);
 
+    // The demo uses the extension's picker. docs/lang-picker.js is a copy, because
+    // the site cannot reach into lib/; if the two drift, the site is demonstrating
+    // something the extension no longer does.
+    ok('the site\'s language picker is the extension\'s, byte for byte',
+       read('docs/lang-picker.js') === read('lib/lang-picker.js'));
+    ok('and the demo loads it', /<script src="lang-picker\.js"><\/script>/.test(site));
+
     // Clarity built its URL at runtime, which the subresource scan cannot see,
     // so look for the host and the loader by name.
     const all = ['index.html', ...pages].map((f) => [f, read(`docs/${f}`)]);

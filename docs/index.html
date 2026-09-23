@@ -810,6 +810,34 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
   .toc a[aria-current="true"] { background: var(--ground); }
 }
 @media (prefers-reduced-motion: reduce) { .toc .tl, .toc ul, .toc .tick { transition: none; } }
+
+/* The demo's language picker: the extension's own component, so the list it
+   opens is a listbox. Float it, or it would push this compact row apart. */
+.lang-box { position: relative; display: inline-flex; align-items: center; gap: 8px; }
+#lang-search { min-width: 152px; padding: 5px 11px; border: 1px solid var(--rule); border-radius: 999px;
+  background: var(--paper); color: var(--ink); font: 600 14px/1.4 var(--sans); }
+#lang-search::placeholder { color: var(--mute); font-weight: 400; }
+#lang-search:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* Opaque, always: it covers this page's own text while it is open. */
+.lang-box select[size] { position: absolute; top: calc(100% + 6px); inset-inline-start: 0; z-index: 30;
+  min-width: 250px; max-width: 340px; border: 1px solid var(--rule); border-radius: 13px; padding: 5px;
+  box-shadow: 0 1px 2px rgba(17,24,39,.06), 0 21px 34px -21px rgba(17,24,39,.45);
+  font: 400 14.5px/1.5 var(--sans); }
+.lang-box select[size] optgroup { font: 700 11.5px/1.6 var(--sans); letter-spacing: .08em; text-transform: uppercase; }
+.lang-box select[size] option { padding: 4px 8px; border-radius: 7px; }
+.lang-box select[size] option:checked {
+  background: linear-gradient(0deg, var(--desk), var(--desk)); color: var(--ink); font-weight: 600; }
+/* Chrome paints a listbox's selected row itself and ignores CSS for it, so on a dark
+   page it came out as a white bar. The panel therefore stays light in both schemes —
+   the same choice the bubble makes over dark pages — and the native highlight sits on
+   a light ground where it belongs. */
+.lang-box select[size] { color-scheme: light; background: #fbfbfc; color: #111827; border-color: #d9dde3; }
+.lang-box select[size] optgroup { background: #fbfbfc; color: #5b6472; }
+.lang-box select[size] option { background: #fbfbfc; color: #111827; }
+.lang-box select[size] option:checked { background: linear-gradient(0deg, #e3e6eb, #e3e6eb); color: #111827; font-weight: 600; }
+.lang-count { font-size: 13px; color: var(--mute); }
+.lang-count:empty { display: none; }
+@media (max-width: 620px) { #lang-search { min-width: 140px; } }
 </style>
 </head>
 <body>
@@ -833,6 +861,7 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
      the browser. Microsoft Clarity was tried for a day (21–22 Sep) behind a consent
      card and removed at Ian's request; it is not cookieless, so do not re-add it without consent. GoatCounter was considered and dropped (Ian, 17 Sep). Google Analytics is deferred. Search Console verification goes in the head at port
      time — see port-head.html. -->
+<script src="lang-picker.js"></script>
 <script defer src="https://cloud.umami.is/script.js" data-website-id="583c9618-5c32-40a5-b0dd-33b2d8f7048d"></script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "ceec88afaf1f47a289d50d0a20bff3bb"}'></script>
 
@@ -936,8 +965,12 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
 
         <div class="under">
           <p class="chapter">
-            <label for="lang-pick">Explained in</label>
-            <select id="lang-pick"></select>
+            <label for="lang-search">Explained in</label>
+            <span class="lang-box">
+              <input id="lang-search" type="search" placeholder="Search languages" autocomplete="off" spellcheck="false" aria-label="Search languages">
+              <select id="lang-pick" aria-label="Demo language"></select>
+              <span class="lang-count" id="lang-count"></span>
+            </span>
             <span id="en-note" hidden>in simpler words</span>
             <span class="lang-why" id="why"></span>
             <span class="hint" id="hint">· scroll for more ↓</span>
@@ -952,7 +985,7 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
             </ul>
           </div>
         </div>
-        <p class="source">Real answers, unedited, captured with the extension on <code>gemini-3.1-flash-lite</code>.</p>
+        <p class="source">Real answers, unedited, captured with the extension on <code>gemini-3.1-flash-lite</code>. 25 languages are shown here, the ones with captured answers; the extension offers 110.</p>
       </div>
     </div>
     <div class="runway" id="runway" aria-hidden="true"></div>
@@ -969,7 +1002,7 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
       <span class="sep" aria-hidden="true"></span>
       <button class="llm-act" type="button" data-md="view" data-umami-event="view-markdown"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="3.5" width="13" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M4 10.5v-5l2 2.4 2-2.4v5M11 5.5v3.6m0 0 1.4-1.5M11 9.1 9.6 7.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>View as Markdown</span></button>
     </div>
-    <p class="source">Real answers, unedited, captured with the extension on <code>gemini-3.1-flash-lite</code>.</p>
+    <p class="source">Real answers, unedited, captured with the extension on <code>gemini-3.1-flash-lite</code>. 25 languages are shown here, the ones with captured answers; the extension offers 110.</p>
   </div>
 
   <section class="why" id="sec-why" aria-labelledby="why-h">
@@ -1394,20 +1427,12 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
     }
     return null;
   }
-  const es = 'Mexico_City Monterrey Tijuana Cancun Bogota Lima Santiago Buenos_Aires Argentina/Buenos_Aires Caracas Guayaquil La_Paz Asuncion Montevideo Guatemala Costa_Rica Panama El_Salvador Tegucigalpa Managua Havana Santo_Domingo'.split(' ').map((z) => 'America/' + z);
-  const TZ = Object.assign(
-    Object.fromEntries(es.map((z) => [z, 'es'])),
-    Object.fromEntries('Riyadh Dubai Qatar Kuwait Bahrain Muscat Baghdad Amman Beirut Damascus'.split(' ').map((z) => ['Asia/' + z, 'ar'])),
-    Object.fromEntries('Cairo Algiers Tunis Tripoli Khartoum'.split(' ').map((z) => ['Africa/' + z, 'ar'])),
-    Object.fromEntries('Sao_Paulo Fortaleza Recife Manaus Bahia Belem'.split(' ').map((z) => ['America/' + z, 'pt'])),
-    {
-      'Asia/Kolkata': 'hi', 'Asia/Calcutta': 'hi', 'Asia/Dhaka': 'bn', 'Asia/Karachi': 'ur', 'Asia/Colombo': 'si',
-      'Asia/Jakarta': 'id', 'Asia/Makassar': 'id', 'Asia/Jayapura': 'id', 'Asia/Manila': 'fil',
-      'Asia/Ho_Chi_Minh': 'vi', 'Asia/Saigon': 'vi', 'Asia/Bangkok': 'th', 'Asia/Tokyo': 'ja', 'Asia/Seoul': 'ko',
-      'Asia/Shanghai': 'zh', 'Asia/Taipei': 'zh-TW', 'Asia/Hong_Kong': 'zh-TW', 'Asia/Tehran': 'fa',
-      'Europe/Istanbul': 'tr', 'Europe/Moscow': 'ru', 'Europe/Madrid': 'es', 'Europe/Paris': 'fr',
-      'Europe/Berlin': 'de', 'Europe/Vienna': 'de', 'Europe/Rome': 'it', 'Europe/Lisbon': 'pt',
-    });
+  // No time-zone guess. It guessed a PLACE when what matters is the language
+  // someone reads: a reader in Colombo who reads English got Sinhala, and a VPN
+  // changes the IP but never the clock, so the guess could not be corrected
+  // (Ian found it, 23 Sep). IP-based detection would mean calling a third party,
+  // which this site does not do. So: the address, then the saved choice, then
+  // the browser's own languages, then English.
   const SAVE_KEY = 'cr-demo-lang';
   function pickLang() {
     const q = norm(new URLSearchParams(location.search).get('lang'));
@@ -1415,9 +1440,6 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
     try { const s = norm(localStorage.getItem(SAVE_KEY)); if (s) return { code: s, why: 'saved' }; } catch (e) {}
     const tags = (navigator.languages && navigator.languages.length) ? navigator.languages : [navigator.language];
     for (const t of tags) { const c = norm(t); if (c && c !== 'en') return { code: c, why: 'browser' }; }
-    let tz = '';
-    try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
-    if (TZ[tz] && DATA.langs[TZ[tz]]) return { code: TZ[tz], why: 'timezone' };
     return { code: 'en', why: 'default' };
   }
 
@@ -1438,17 +1460,26 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
   const enNote = document.getElementById('en-note');
   scenes.forEach((sc) => { sc.querySelector('.trig').innerHTML = ICON.mark; });
 
-  // English first, then by English name.
-  Object.entries(DATA.langs)
+  // The demo uses the extension's own picker (docs/lang-picker.js is a copy of
+  // lib/lang-picker.js; test/copy.test.js fails if they drift): the same search,
+  // the same Tuned/Community grouping, the same labels. It lists the 25 languages
+  // this page has REAL captured answers for — the extension offers 110, and no
+  // answer is shown here that was not captured from it.
+  // English first, then tuned, then by English name — the picker groups them.
+  const DEMO_LANGS = Object.entries(DATA.langs)
     .sort(([a, x], [b, y]) => (a === 'en' ? -1 : b === 'en' ? 1 : x.name.localeCompare(y.name)))
-    .forEach(([code, l]) => {
-      const o = document.createElement('option');
-      o.value = code; o.lang = code;
-      o.textContent = code === 'en' ? 'English' : `${l.native} · ${l.name}`;
-      pick.append(o);
-    });
+    .map(([code, l]) => ({ code, name: l.name, nativeName: l.native, tuned: code === 'en' || code === 'si' }));
 
-  const WHY = { browser: 'matched to your browser', timezone: 'guessed from your timezone', saved: 'your choice', url: '', default: '' };
+  const WHY = { browser: 'matched to your browser', saved: 'your choice', url: '', default: '' };
+
+  // Attached after the first applyLang() below, so the select already holds a value.
+  function attachPicker(current) {
+    const input = document.getElementById('lang-search');
+    if (!input || !window.CRLangPicker) return null;   // no script, no JS: the select still works
+    const api = CRLangPicker.attach({ select: pick, input, status: document.getElementById('lang-count'),
+                                      languages: DEMO_LANGS, current });
+    return api;
+  }
   function applyLang(code, why) {
     const l = DATA.langs[code];
     // Family names only: a script font is used if the device has it, never downloaded.
@@ -1486,6 +1517,7 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
     enNote.hidden = code !== 'en';
   }
   const chosen = pickLang();
+  attachPicker(chosen.code);        // fills the select, so applyLang has something to select
   applyLang(chosen.code, chosen.why);
   let shownLang = chosen.code;
   pick.addEventListener('change', () => {
