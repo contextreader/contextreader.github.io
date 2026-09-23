@@ -283,14 +283,39 @@ h1 {
 
 .after-story { padding-block: 89px; color: var(--mute); font-size: 15px; border-top: 1px solid var(--rule); }
 
-@media (max-width: 980px) {
-  /* The pin dissolves: the headline scrolls away and only the stage holds. */
+/* A short window: the pinned hero needs about 830px of height, and a sticky box
+   taller than its scrollport slides up as you scroll — which hid the headline's
+   first line and the top of the card behind the masthead (Ian, 23 Sep, Firefox in
+   a window about 830px tall). The hero is trimmed in two steps so it fits instead
+   of being cropped, and only below 720px does the phone's one-column layout take
+   over: a wide window is still wide, and one column in it looks empty. */
+@media (max-height: 900px) and (min-width: 981px) {
+  .pin { top: 68px; padding-block: 13px; }
+  h1 { font-size: clamp(2.1rem, 3.7vw, 3.1rem); }
+  .lede { margin-top: 16px; font-size: 1.08rem; max-width: 25em; }
+  .cta { margin-top: 21px; }
+  .fine { margin-top: 10px; font-size: 13.5px; }
+}
+@media (max-height: 840px) and (min-width: 981px) {
+  .pin { top: 64px; padding-block: 8px; }
+  h1 { font-size: clamp(1.9rem, 3.1vw, 2.5rem); }
+  .lede { margin-top: 13px; font-size: 1rem; max-width: 24em; }
+  .cta { margin-top: 16px; }
+  /* The key line moves to the "Get started" block further down, which repeats it. */
+  .pin .fine { display: none; }
+}
+
+@media (max-width: 980px), (max-height: 780px) {
+  /* The pin dissolves: the headline scrolls away and only the stage holds.
+     Also used for a window under 780px tall, where the two columns cannot fit. */
   .story { display: flex; flex-direction: column; }
   .pin { display: contents; }
   .copy, .stage-wrap { align-self: stretch; }   /* the grid's end/center would shrink-wrap them in a flex column */
   .copy { padding-block: 13px 21px; }
   .pin > .get { display: none; }
-  .stage-wrap { position: sticky; top: 72px; z-index: 1; background: var(--ground); padding-block: 8px; }
+  /* 64px is the masthead: any more and the card slides under it when the column
+     (card + chips + caption) is taller than the space left. */
+  .stage-wrap { position: sticky; top: 64px; z-index: 1; background: var(--ground); padding-block: 4px 8px; }
   .get-m { display: block; padding-block: 34px 0; }
   .get-m .source { display: block; }
   .get-m .cta { margin-top: 0; }
