@@ -182,6 +182,25 @@ document.addEventListener('DOMContentLoaded', () => {
         await loadKeyState();
     });
 
+    // Save a key the check could not verify. Same storage path as a verified save;
+    // the only difference is that nothing has proved the key works yet.
+    on('opt-save-anyway', 'click', async () => {
+        const inp = $('opt-api-key');
+        const key = inp ? inp.value.trim() : '';
+        if (!key) { setKeyStatus('Paste a key first.', 'bad'); return; }
+        const res = await send({ action: 'saveApiKey', key });
+        if (!res || !res.ok) {
+            setKeyStatus(res && res.error === 'passphrase_required'
+                ? 'Unlock first — the stored key is encrypted.' : 'Could not save.', 'bad');
+            return;
+        }
+        inp.value = '';
+        const box = $('opt-key-unverified');
+        if (box) box.hidden = true;
+        setKeyStatus('Saved, but not checked. Try a lookup; if the key is wrong the bubble will say so.', 'ok');
+        await loadKeyState();
+    });
+
     on('opt-save-key', 'click', async () => {
         const inp = $('opt-api-key');
         if (!inp) return;
@@ -193,9 +212,17 @@ document.addEventListener('DOMContentLoaded', () => {
         setKeyStatus('Checking\u2026');
         const check = await send({ action: 'listModels', apiKey: key });
         if (!check || !check.ok) {
-            setKeyStatus((check && check.message) || 'Could not reach Gemini.', 'bad');
+            // A refused key and an unreachable check are different problems. Google
+            // names a bad key; anything else (offline, blocked network, quota, the
+            // Generative Language API not enabled on the project) leaves the key
+            // unproven — so offer to store it rather than make the field look dead.
+            const msg = (check && check.message) || 'Could not reach Gemini.';
+            setKeyStatus(msg, 'bad');
+            const box = $('opt-key-unverified');
+            if (box) box.hidden = /not valid|API_KEY_INVALID|API key not valid/i.test(msg);
             return;
         }
+        { const box = $('opt-key-unverified'); if (box) box.hidden = true; }
 
         const saveRes = await send({ action: 'saveApiKey', key });
         if (!saveRes || !saveRes.ok) {

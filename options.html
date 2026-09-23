@@ -469,6 +469,13 @@
                 </div>
             </div>
             <div id="opt-key-status"></div>
+            <!-- Shown only when the check itself could not run (offline, blocked network,
+                 rate-limited key, Generative Language API not enabled). Without this the
+                 key could not be saved at all, which reads as a broken field. -->
+            <div id="opt-key-unverified" hidden style="margin-top:var(--space-md)">
+                <button id="opt-save-anyway" class="btn btn-sm">Save without checking</button>
+                <span class="hint" style="margin-top:var(--space-xs)">The key is stored on this device either way. If it is wrong, a lookup will say so.</span>
+            </div>
 
             <div id="opt-lock-box" style="margin-top:var(--space-xl);
                  border-top:1px solid rgba(17,24,39,0.07); padding-top:var(--space-lg)" hidden>

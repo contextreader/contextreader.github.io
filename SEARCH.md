@@ -50,6 +50,36 @@ language-neutral; see LANDING.md.
 
 ---
 
+## Google autocomplete, 22 Sep — what people actually type
+
+Pulled from Google's suggest endpoint for 22 seed phrases (a suggestion only appears when
+enough people type it; no volumes). Article topics it supports, strongest first:
+
+1. **Why Google Translate gets words wrong** — *why is google translate wrong / so inaccurate /
+   always wrong / how often is google translate wrong*. Six variants of one frustration, and the
+   answer is the product: a translator picks a sense without reading the sentence.
+2. **How to read a medical paper** — *how to read a medical paper / medical journal article /
+   medical journals for free*. Confirms page 3 below; add the second-language angle.
+3. **How to find a word's meaning from context** — *how to find word meaning in context /
+   using context clues / word meaning in context examples*. Explainer first, tool last.
+4. **Best dictionary extensions for Chrome** — *best dictionary extension for chrome / chrome
+   extension for word meaning / ai dictionary chrome extension*. Honest roundup that names
+   itself as ours; roundups are what LLMs cite.
+5. **Medical terms explained** — *what do these medical terms mean / how to read medical terms /
+   how to understand medical terminology*. Pairs with 2.
+6. **Reverso alternatives** — *reverso alternatives / reverso context alternative*: already
+   `/vs-reverso`; link it from the others.
+
+Skip: "context clues anchor chart 3rd grade", worksheets — primary-school teachers, not our
+reader. Raw suggestions: re-pull with
+`https://suggestqueries.google.com/complete/search?client=firefox&hl=en&q=<phrase>`.
+
+Other sources, in order of value once traffic exists: Search Console → Queries (weekly);
+Bing Webmaster Tools → Keyword Research (free volumes, site already verified); Reddit and
+Quora questions in r/languagelearning, r/EnglishLearning, r/medicalschool.
+
+---
+
 ## The pages, in the order worth writing them
 
 Each page answers one question, in the searcher's words, in its first two sentences — search

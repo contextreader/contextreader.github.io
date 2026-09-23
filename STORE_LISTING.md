@@ -195,3 +195,42 @@ Suggested screenshots, in order:
 2. Settings, showing the language picker with the tuned / community labels
 3. Settings, showing the model picker and the per-model speed table
 4. The prompt editor with its version history and diff
+
+---
+
+## Review rejection, 23 Sep 2026 — and what to send back
+
+**Rejected:** 1.0.1, "Inaccurate Description – Non functional", reference *Red Potassium*:
+"Api key fill in optional page" could not be reproduced. 1.0.0 stayed live; users were
+unaffected.
+
+**Cause (found by running the build in Chromium):** Settings verified a key with a live
+`listModels` call and **refused to save it unless that call succeeded** (`options.js`). A
+reviewer whose network blocks generativelanguage.googleapis.com, whose key is rate-limited,
+or whose project has the Generative Language API switched off would paste a key, see an
+error and have nothing saved — a field that looks broken. A key Google actively refuses
+returns "API key not valid"; every other failure was indistinguishable from it.
+
+**Fixed in 1.0.2:** when the check cannot run, Settings now offers **Save without checking**
+and stores the key, saying it was not verified. A key Google refuses does not get the offer.
+Covered by `test/settings-ui.test.js`.
+
+**Testing instructions** (Privacy practices tab → *Testing instructions*, so the reviewer is
+not blocked again). Create a throwaway key at aistudio.google.com/apikey, paste it below, and
+delete it once the review passes:
+
+```
+The extension needs a free Google Gemini API key (no card, no account on our side). To test:
+1. Right-click the extension icon > Options (or the welcome page's "Open Settings").
+2. Paste this test key into "Gemini API Key" and click Save: <PASTE TEMP KEY>
+   It is verified with a models.list call; if your network cannot reach
+   generativelanguage.googleapis.com, click "Save without checking" and continue.
+3. Open any article, select a word (for example "significant" in a medical article) and click
+   the small amber mark that appears. The bubble explains that word in the chosen language.
+4. More / General / Simple in the bubble give further explanations. EN answers once in English.
+Settings also lets you change the language (110), the model, and the prompts.
+```
+
+**Then:** upload `dist/contextreader-chrome-1.0.2.zip` and submit. Appeal only if it is
+rejected again with the same reference, quoting this section.
+

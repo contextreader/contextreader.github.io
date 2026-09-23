@@ -36,6 +36,8 @@ S.setResponder((msg) => {
   }
 });
 
+const fs = require('fs');
+const path = require('path');
 (async () => {
   await S.run();
   await S.flush(); await S.flush(); await S.flush();
@@ -156,6 +158,23 @@ S.setResponder((msg) => {
      S.els['opt-prompt-copy-status'].textContent);
   ok('nothing was copied', S.clipboard.length === before);
   S.setClipboardFails(false);
+
+  // A key that cannot be checked must still be storable. Chrome Web Store review
+  // rejected 1.0.1 because the key field looked dead when the check could not run
+  // (blocked network, rate limit, Generative Language API off). A key Google
+  // actively refuses is a different case and must NOT get the offer.
+  console.log('a key the check could not verify:');
+  {
+    const html = fs.readFileSync(path.join(__dirname, '..', 'options.html'), 'utf8');
+    const js = fs.readFileSync(path.join(__dirname, '..', 'options.js'), 'utf8');
+    ok('Settings has the save-anyway offer, hidden by default', /id="opt-key-unverified" hidden/.test(html)
+       && /id="opt-save-anyway"/.test(html));
+    ok('it is shown only when the key was not actively refused',
+       /box\.hidden = \/not valid\|API_KEY_INVALID\|API key not valid\/i\.test\(msg\)/.test(js));
+    ok('the offer saves through the same path as a verified save',
+       /on\('opt-save-anyway', 'click'[\s\S]{0,400}action: 'saveApiKey', key/.test(js));
+    ok('and says the key was not checked', /Saved, but not checked/.test(js));
+  }
 
   console.log(`\n${pass} passed, ${fail} failed`);
   process.exit(fail ? 1 : 0);

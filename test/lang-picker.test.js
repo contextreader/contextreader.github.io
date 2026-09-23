@@ -152,12 +152,29 @@ console.log('attach — click in the list:');
     const { select, input, saved } = setup('si');
     type(input, 'jap');
     select.value = 'ja';
-    select.dispatchEvent({ type: 'change' });   // what the browser fires on a click
+    select.dispatchEvent({ type: 'change' });   // what the browser fires when the value changed
+    select.dispatchEvent({ type: 'click' });    // ...and the click that follows it
     ok('click saves exactly once (no second change fired)', saved.join() === 'ja', saved);
     ok('click collapses and keeps the choice', !('size' in select.attrs) && select.value === 'ja', select.value);
     ok('click clears the search', input.value === '');
     type(input, 'x'); key(input, 'Escape');
     ok('Escape afterwards returns to the clicked language, not the original', select.value === 'ja', select.value);
+}
+
+console.log('attach — clicking the row that is already highlighted:');
+{
+    // A select fires `change` only when the value changes, and list() highlights
+    // the first match as you type. Clicking that row is therefore a click with no
+    // change event — before 23 Sep it saved nothing and Enter was the only way.
+    const { select, input, saved } = setup('en');
+    type(input, 'spanish');
+    select.dispatchEvent({ type: 'click' });
+    ok('the click alone saves it', saved.join() === 'es', saved);
+    ok('the search field is cleared', input.value === '');
+    ok('and the list collapsed back to a dropdown', !('size' in select.attrs));
+    const before = saved.length;
+    select.dispatchEvent({ type: 'click' });
+    ok('a click when not listing saves nothing more', saved.length === before, saved);
 }
 
 console.log('attach — plain dropdown change:');
