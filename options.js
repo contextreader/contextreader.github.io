@@ -27,6 +27,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const CUSTOM_MODEL = '__custom__';
 
+    // ---- the fallback in force, if any ----
+    const WHY_TEXT = {
+        quota: 'its quota was used up',
+        model: 'it is not available on your key (Google renames and retires models)',
+        server: 'Google\u2019s side was not responding',
+    };
+    const ago = (ts) => {
+        if (!ts) return 'never';
+        const m = Math.round((Date.now() - ts) / 60000);
+        if (m < 1) return 'just now';
+        if (m < 60) return `${m} min ago`;
+        return `${Math.round(m / 60)} h ago`;
+    };
+    async function showFallback() {
+        const box = $('opt-fallback');
+        if (!box) return;
+        const info = await send({ action: 'getActiveModel' });
+        const s = info && info.sticky;
+        box.hidden = !s;
+        if (!s) return;
+        const until = new Date(s.until).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        setText('opt-fallback-what',
+            `${s.id} — because ${WHY_TEXT[s.reason] || 'it failed'}. Your model (${s.from}) is tried again after ${until}. `
+            + `Model list checked ${ago(info.listedAt)}.`);
+    }
+    showFallback();
+    on('opt-fallback-recheck', 'click', async () => {
+        status('opt-fallback-status', 'Checking\u2026');
+        const r = await send({ action: 'recheckModel' });
+        if (!r || !r.ok) { status('opt-fallback-status', (r && r.reason) || 'Could not reach Gemini.', 'bad'); return; }
+        if (r.healthy) status('opt-fallback-status', 'Your model is available again — using it from now on.', 'ok');
+        else if (r.renamedTo) status('opt-fallback-status', `Still missing. Google now lists ${r.renamedTo}; pick it above to make it permanent.`, 'bad');
+        else status('opt-fallback-status', 'Still missing on this key.', 'bad');
+        await showFallback();
+    });
+    on('opt-fallback-clear', 'click', async () => {
+        await chrome.storage.local.remove('activeModel');
+        status('opt-fallback-status', 'Cleared. The next lookup tries your model first.', 'ok');
+        await showFallback();
+    });
+
     // ---- Host access (Firefox can switch it off after install) ----
     const GEMINI_ORIGINS = ['https://generativelanguage.googleapis.com/*'];
     const checkAccess = () => {

@@ -54,7 +54,9 @@ out('model.mjs', LANG_IMPORT + head + key + model +
   '\nexport { getApiKey, getKeyState, getModelConfig, modelAcceptsThinking, requestGemini, listModels, isLookupModel, DEFAULT_MODEL, CUSTOM_MODEL };\n');
 
 out('fallback.mjs', head + fallback + attach +
-  '\nexport { buildFallbackChain, isQuotaError, cooldownFrom, noteCooldown, attachMeta, DEFAULT_COOLDOWN_MS, MAX_COOLDOWN_MS };\n');
+  '\nexport { buildFallbackChain, isQuotaError, classifyError, shouldFallOver, resolveModelId,'
+  + ' getSticky, setSticky, clearSticky, cooldownFrom, noteCooldown, attachMeta,'
+  + ' DEFAULT_COOLDOWN_MS, MAX_COOLDOWN_MS, MISSING_COOLDOWN_MS, STICKY_MS };\n');
 
 out('latency.mjs', latency +
   '\nexport { utcDay, pruneLatencyDaily, recordLatency, LATENCY_RETENTION_DAYS };\n');

@@ -17,6 +17,16 @@ ok('names the answering model', n.includes('2.5-flash-lite'));
 ok('uses the sr-fallback-note class', n.includes('class="sr-fallback-note"'));
 ok('has the turnstile arrow', n.includes('↳'), JSON.stringify(n.slice(0,40)));
 
+console.log('the note says why it fell back:');
+{
+    const note = (reason) => M.fallbackNoteHTML({ from: 'gemini-3.1-flash-lite', model: 'gemini-2.5-flash-lite', reason });
+    ok('quota reads as a rate limit', /quota reached/.test(note('quota')), note('quota'));
+    ok('a missing model says so, not "quota"', /unavailable on your key/.test(note('model')) && !/quota/.test(note('model')), note('model'));
+    ok('a server fault says so', /not responding/.test(note('server')), note('server'));
+    ok('an unknown reason still renders something true', /unavailable/.test(note('weird')), note('weird'));
+    ok('and always names both models', ['quota','model','server'].every((r) => /3\.1-flash-lite/.test(note(r)) && /2\.5-flash-lite/.test(note(r))));
+}
+
 console.log('escaping (model id is data from an API response):');
 const eviln = M.fallbackNoteHTML({from:'<img src=x onerror=alert(1)>', model:'b'});
 ok('html in a model id is escaped', !eviln.includes('<img'), eviln);

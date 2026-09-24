@@ -2,7 +2,8 @@ let store = {};
 globalThis.chrome = { storage: { local: {
   get: async (k) => { if (typeof k === 'string') return { [k]: store[k] };
     const o={}; for (const [key,d] of Object.entries(k)) o[key]=store[key]??d; return o; },
-  set: async (o) => Object.assign(store, o) } } };
+  set: async (o) => Object.assign(store, o),
+  remove: async (k) => { for (const key of [].concat(k)) delete store[key]; } } } };
 const M = await import('./.generated/fallback.mjs');
 let pass=0, fail=0;
 const eq=(l,g,w)=>{const ok=JSON.stringify(g)===JSON.stringify(w); ok?pass++:fail++;
@@ -72,6 +73,64 @@ eq('HTML error card passes through', M.attachMeta('<div>err</div>', {fellBackFro
 eq('unparseable passes through', M.attachMeta('not json', {fellBackFrom:'x'}), 'not json');
 eq('JSON array passes through', M.attachMeta('[1,2]', {fellBackFrom:'x'}), '[1,2]');
 eq('null meta', M.attachMeta('{"t":"a"}', null), '{"t":"a"}');
+
+console.log('what kind of failure was it (25 Sep: everything but 429 used to read as a bad key):');
+{
+  const err = (status, code, message) => ({ status: code, data: { error: { status, code, message } } });
+  eq('429 is quota', M.classifyError({ status: 429, data: {} }), 'quota');
+  eq('RESOURCE_EXHAUSTED is quota', M.classifyError(err('RESOURCE_EXHAUSTED', 429, 'out')), 'quota');
+  eq('404 NOT_FOUND is the model, not the key',
+     M.classifyError(err('NOT_FOUND', 404, 'models/gemini-3.1-flash-lite is not found for API version v1beta')), 'model');
+  eq('INVALID_ARGUMENT about a model is the model',
+     M.classifyError(err('INVALID_ARGUMENT', 400, 'Model not supported for generateContent')), 'model');
+  eq('PERMISSION_DENIED on a model is the model', M.classifyError(err('PERMISSION_DENIED', 403, 'model is not accessible')), 'model');
+  eq('API_KEY_INVALID is the key', M.classifyError(err('INVALID_ARGUMENT', 400, 'API key not valid. Please pass a valid API key.')), 'key');
+  eq('UNAUTHENTICATED is the key', M.classifyError(err('UNAUTHENTICATED', 401, 'missing credentials')), 'key');
+  eq('PERMISSION_DENIED about the key is the key', M.classifyError(err('PERMISSION_DENIED', 403, 'API key does not have permission')), 'key');
+  eq('503 is the server', M.classifyError(err('UNAVAILABLE', 503, 'overloaded')), 'server');
+  eq('an answer is ok', M.classifyError({ status: 200, ok: true, data: { candidates: [{}] } }), 'ok');
+  eq('no response at all is the network', M.classifyError(null), 'network');
+
+  eq('quota falls over', M.shouldFallOver('quota'), true);
+  eq('a missing model falls over — this is the bug Ian hit', M.shouldFallOver('model'), true);
+  eq('a server fault falls over', M.shouldFallOver('server'), true);
+  eq('a bad key does NOT fall over: no other model would help', M.shouldFallOver('key'), false);
+  eq('an answer does not fall over', M.shouldFallOver('ok'), false);
+}
+
+console.log('Google renames models; the id is resolved against the live list:');
+{
+  const avail = ['gemini-3.2-flash-lite', 'gemini-2.5-flash-lite', 'gemini-2.5-flash', 'gemini-2.5-pro'];
+  eq('an id that exists is left alone', M.resolveModelId('gemini-2.5-flash-lite', avail), { id: 'gemini-2.5-flash-lite', renamed: false });
+  eq('a renamed id lands on the newest of its own family',
+     M.resolveModelId('gemini-3.1-flash-lite', avail), { id: 'gemini-3.2-flash-lite', renamed: true, from: 'gemini-3.1-flash-lite' });
+  eq('flash stays flash, never lite', M.resolveModelId('gemini-3.1-flash', avail).id, 'gemini-2.5-flash');
+  eq('no list, no guessing', M.resolveModelId('gemini-3.1-flash-lite', []), { id: 'gemini-3.1-flash-lite', renamed: false });
+  // A pro id is only ever resolved when the reader chose one deliberately, so it
+  // resolves within its own family. The CHAIN is what must never add a pro model.
+  eq('a chosen pro resolves to the newest pro', M.resolveModelId('gemini-9-pro', avail).id, 'gemini-2.5-pro');
+  eq('but a renamed lite never becomes pro', M.resolveModelId('gemini-9-flash-lite', avail).id, 'gemini-3.2-flash-lite');
+}
+
+console.log('a fallback that worked is kept for a few hours, then lets go:');
+{
+  store = { modelListCache: { models: [{ id: 'gemini-3.1-flash-lite' }, { id: 'gemini-2.5-flash-lite' }, { id: 'gemini-2.5-flash' }] } };
+  eq('nothing remembered at first', await M.getSticky(), null);
+  await M.setSticky('gemini-2.5-flash-lite', 'gemini-3.1-flash-lite', 'model', 'not found for API version v1beta');
+  const s1 = await M.getSticky();
+  eq('it remembers which model answered', s1.id, 'gemini-2.5-flash-lite');
+  eq('and what it replaced, and why', [s1.from, s1.reason], ['gemini-3.1-flash-lite', 'model']);
+  eq('for about three hours', Math.round((s1.until - s1.since) / 3600000), 3);
+  const chain = await M.buildFallbackChain('gemini-3.1-flash-lite', s1);
+  eq('the working model leads the next lookup, the configured one still follows', chain.slice(0, 2),
+     ['gemini-2.5-flash-lite', 'gemini-3.1-flash-lite']);
+  store.activeModel = Object.assign({}, s1, { until: Date.now() - 1 });
+  eq('once it expires it is ignored, so the default is tried again', await M.getSticky(), null);
+  await M.setSticky('gemini-2.5-flash-lite', 'gemini-3.1-flash-lite', 'model', '');
+  await M.clearSticky();
+  eq('and the default answering clears it', await M.getSticky(), null);
+  eq('a missing model rests for hours, not the quota minute', M.MISSING_COOLDOWN_MS > M.MAX_COOLDOWN_MS, true);
+}
 
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail?1:0);

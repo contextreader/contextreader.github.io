@@ -296,16 +296,107 @@ async function requestGemini(model, payload, apiKey) {
     return res;
 }
 
+// The error cards below are HTML, and now carry a model id and a status string
+// that came back from the API. Neither is ours to trust.
+function escapeForCard(v) {
+    return String(v == null ? '' : v).replace(/[&<>"']/g, (c) =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
 // ============================================
 // ↩️ QUOTA FALLBACK
 // ============================================
 
 const DEFAULT_COOLDOWN_MS = 60000;
 const MAX_COOLDOWN_MS = 3600000;
+// A model that does not exist for this key will not exist again in a minute, so
+// it gets a long rest instead of the quota cooldown. Also how long a working
+// fallback stays chosen before the configured model is tried again.
+const MISSING_COOLDOWN_MS = 6 * 3600000;
+const STICKY_MS = 3 * 3600000;
+
+// Why a request failed, in the only terms the caller has to act on. Split out
+// on 25 Sep: everything that was not a 429 used to end the lookup with "check
+// your API key", so a default model the key cannot reach — Google renames these
+// — looked like a broken key and the fallback chain was never walked.
+function classifyError(res) {
+    if (!res) return 'network';
+    const err = (res.data && res.data.error) || {};
+    const st = String(err.status || '');
+    const msg = String(err.message || '');
+    const code = res.status || err.code || 0;
+
+    if (code === 429 || st === 'RESOURCE_EXHAUSTED') return 'quota';
+    // The key itself: only when Google says so. PERMISSION_DENIED about a model
+    // is not a bad key, it is a model this key may not use — which is a fallback.
+    if (/API_KEY_INVALID|API key not valid|API key expired/i.test(msg + st)) return 'key';
+    if (code === 401 || st === 'UNAUTHENTICATED') return 'key';
+    if (st === 'PERMISSION_DENIED' && /api key|credential/i.test(msg)) return 'key';
+    // The model: gone, renamed, or not available to this key.
+    if (code === 404 || st === 'NOT_FOUND') return 'model';
+    if (st === 'PERMISSION_DENIED') return 'model';
+    if (st === 'INVALID_ARGUMENT' && /model|not supported|not found/i.test(msg)) return 'model';
+    if (code >= 500 || st === 'UNAVAILABLE' || st === 'INTERNAL' || st === 'DEADLINE_EXCEEDED') return 'server';
+    if (res.ok || (res.data && res.data.candidates)) return 'ok';
+    if (err.status || err.code || err.message) return 'other';
+    return 'ok';
+}
+
+// Kept for the existing callers and tests; classifyError is the whole story.
+function isQuotaError(res) { return classifyError(res) === 'quota'; }
+
+// Try the next model for anything that is not about the key or the request
+// itself. A 'model' or 'server' failure is exactly what a fallback is for.
+function shouldFallOver(kind) { return kind === 'quota' || kind === 'model' || kind === 'server'; }
+
+// Google renames models (3.0-flash-lite, 3.1-flash-lite, …). When the wanted id
+// is not in the live list, take the newest id of the same family rather than
+// failing: "flash-lite" stays "flash-lite", and 3.1 loses to 3.2, not to 2.5.
+function familyOf(id) {
+    const s = String(id || '');
+    if (/flash-lite/.test(s)) return 'flash-lite';
+    if (/flash/.test(s)) return 'flash';
+    if (/pro/.test(s)) return 'pro';
+    return 'other';
+}
+function versionOf(id) {
+    const m = String(id || '').match(/(\d+(?:\.\d+)?)/);
+    return m ? parseFloat(m[1]) : 0;
+}
+function resolveModelId(wanted, available) {
+    const avail = (available || []).filter(Boolean);
+    if (!avail.length) return { id: wanted, renamed: false };
+    if (avail.includes(wanted)) return { id: wanted, renamed: false };
+    const fam = familyOf(wanted);
+    const sameFamily = avail.filter((id) => familyOf(id) === fam && isLookupModel(id));
+    const pick = (list) => list.slice().sort((a, b) => versionOf(b) - versionOf(a))[0];
+    const chosen = pick(sameFamily)
+        || pick(avail.filter((id) => familyOf(id) === 'flash-lite' && isLookupModel(id)))
+        || pick(avail.filter((id) => familyOf(id) === 'flash' && isLookupModel(id)));
+    return chosen ? { id: chosen, renamed: true, from: wanted } : { id: wanted, renamed: false };
+}
+
+// A fallback that worked is remembered for STICKY_MS, so the next lookup does not
+// pay the same failure again (Ian, 25 Sep: "stick with it for a few hours"). When
+// it expires the configured model is tried first again, which is how the
+// extension returns to the default by itself once Google's side is healthy.
+async function getSticky() {
+    const { activeModel } = await chrome.storage.local.get({ activeModel: null });
+    if (!activeModel || !activeModel.id) return null;
+    if (!(activeModel.until > Date.now())) return null;
+    return activeModel;
+}
+async function setSticky(id, from, reason, detail) {
+    await chrome.storage.local.set({ activeModel: {
+        id, from, reason, detail: String(detail || '').slice(0, 200),
+        since: Date.now(), until: Date.now() + STICKY_MS,
+    } });
+}
+async function clearSticky() { await chrome.storage.local.remove('activeModel'); }
 
 // Only the light models. A fallback that lands on a pro model could cost a
 // tester real money on a key they told us is free — worse than a failed lookup.
-async function buildFallbackChain(primary) {
+async function buildFallbackChain(primary, sticky) {
     const { modelListCache } = await chrome.storage.local.get('modelListCache');
     // Filtered again here: a cache written before isLookupModel existed can
     // still hold image and speech models.
@@ -313,16 +404,31 @@ async function buildFallbackChain(primary) {
         .map(m => m && m.id).filter(isLookupModel);
     const lite  = avail.filter(id => id.includes('flash-lite'));
     const flash = avail.filter(id => id.includes('flash') && !id.includes('flash-lite'));
-    const chain = [primary];
+    // The configured model always leads: a cached list can be stale or partial,
+    // and silently answering with something the reader did not choose is worse
+    // than one failed request. A rename candidate goes directly behind it.
+    const renamed = resolveModelId(primary, avail);
+    const chain = sticky && sticky.id && sticky.id !== primary ? [sticky.id, primary] : [primary];
+    if (renamed.renamed && !chain.includes(renamed.id)) chain.push(renamed.id);
     for (const id of lite.concat(flash)) if (!chain.includes(id)) chain.push(id);
     return chain;
 }
 
-function isQuotaError(res) {
-    if (!res) return false;
-    if (res.status === 429) return true;
-    const st = res.data && res.data.error && res.data.error.status;
-    return st === "RESOURCE_EXHAUSTED";
+// Refreshes the model list with a models.list call — no generateContent quota
+// spent — and uses it to answer the question the sticky window cannot: is the
+// configured model back, or was it renamed? Called when a 'model' error happens
+// and when the worker starts, never on a timer (no alarms permission, which
+// would change what the store listing has to declare).
+async function probeModels(apiKey) {
+    const list = await listModels(apiKey);
+    if (!list || !list.ok) return { ok: false, reason: list && list.message };
+    const ids = (list.models || []).map((m) => m && m.id).filter(Boolean);
+    await chrome.storage.local.set({ modelListCache: { ts: Date.now(), models: list.models } });
+    const { model: configured } = await getModelConfig();
+    const resolved = resolveModelId(configured, ids);
+    const healthy = ids.includes(configured);
+    if (healthy) await clearSticky();          // the default works again: go back to it
+    return { ok: true, ids, configured, healthy, renamedTo: resolved.renamed ? resolved.id : null };
 }
 
 // Google may name its own retry delay in the error details. Prefer it over a
@@ -593,6 +699,22 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             sendResponse({ model, paidPlan, pref, defaultModel: DEFAULT_MODEL }));
         return true;
     }
+    // What the extension is answering with right now, and why — Settings shows
+    // this so a fallback is visible instead of being a silent downgrade.
+    if (request.action === "getActiveModel") {
+        Promise.all([getSticky(), getModelConfig(), chrome.storage.local.get({ modelListCache: null })])
+            .then(([sticky, cfg, { modelListCache }]) => sendResponse({
+                sticky, configured: cfg.model, paidPlan: cfg.paidPlan,
+                listedAt: modelListCache && modelListCache.ts || 0,
+            }));
+        return true;
+    }
+    // Re-check now: a models.list call, which costs no lookup quota. Clears the
+    // fallback if the configured model is back, and reports a rename.
+    if (request.action === "recheckModel") {
+        probeModels().then((r) => sendResponse(r)).catch((e) => sendResponse({ ok: false, reason: String(e && e.message || e) }));
+        return true;
+    }
     if (request.action === "setModelConfig") {
         const pref = Object.assign({}, MODEL_PREF_DEFAULTS, request.pref || {});
         chrome.storage.local.set({ modelPref: pref }, () => sendResponse({ ok: true, pref }));
@@ -614,6 +736,12 @@ chrome.runtime.onInstalled.addListener((details) => {
         chrome.storage.local.set({
             targetLanguage: CRLanguages.detectDefault(chrome.i18n.getUILanguage())
         });
+
+// A models.list call on start-up: it costs no lookup quota and answers the two
+// questions the extension cannot otherwise ask — is the configured model back,
+// and has it been renamed? (Ian, 25 Sep.) Failure here is silent on purpose: it
+// is a background check, not something the reader asked for.
+chrome.runtime.onStartup.addListener(() => { probeModels().catch(() => {}); });
         chrome.tabs.create({ url: chrome.runtime.getURL("welcome.html") });
     }
     // No context menus in 1.0, so the contextMenus permission is gone from the
@@ -1709,11 +1837,14 @@ async function callGemini(prompt, word = "", context = "", url = "", generationC
         // Walk a chain of free-tier models so a quota wall does not end the
         // lookup. A tester on a paid key opted out of this: they picked a model
         // deliberately and a silent downgrade would corrupt their comparison.
-        const chain = paidPlan ? [model] : await buildFallbackChain(model);
+        // A fallback that worked recently leads the chain, so a broken default is
+        // not re-tried on every lookup for the next few hours.
+        const sticky = paidPlan ? null : await getSticky();
+        const chain = paidPlan ? [model] : await buildFallbackChain(model, sticky);
         const cooldowns = paidPlan ? {} : (await chrome.storage.local.get({ modelCooldowns: {} })).modelCooldowns || {};
         const nowTs = Date.now();
 
-        let res = null, usedModel = model;
+        let res = null, usedModel = model, failKind = 'ok', failDetail = '';
         for (let i = 0; i < chain.length; i++) {
             const candidate = chain[i];
             const isLast = i === chain.length - 1;
@@ -1727,10 +1858,32 @@ async function callGemini(prompt, word = "", context = "", url = "", generationC
             res = await requestGemini(candidate, Object.assign({}, payload, { generationConfig: cfg }), apiKey);
             usedModel = candidate;
 
-            if (!isQuotaError(res)) break;
-            await noteCooldown(candidate, cooldownFrom(res));
-            console.warn(`⏳ ${candidate} quota reached`);
+            const kind = classifyError(res);
+            if (!shouldFallOver(kind)) break;          // answered, or the key is the problem
+            failKind = kind;
+            failDetail = (res && res.data && res.data.error && res.data.error.message) || '';
+            if (kind === 'quota') {
+                await noteCooldown(candidate, cooldownFrom(res));
+                console.warn(`⏳ ${candidate} quota reached`);
+            } else if (kind === 'model') {
+                // Not a minute's problem: this id is gone, renamed, or not for this
+                // key. Rest it for hours and ask Google what the list holds now.
+                await noteCooldown(candidate, MISSING_COOLDOWN_MS);
+                console.warn(`🚫 ${candidate} unavailable — ${failDetail.slice(0, 120)}`);
+                if (candidate === model) probeModels(apiKey).catch(() => {});
+            } else {
+                await noteCooldown(candidate, DEFAULT_COOLDOWN_MS);
+                console.warn(`⚠️ ${candidate} server error — ${failDetail.slice(0, 120)}`);
+            }
             if (isLast) break;
+        }
+
+        // Remember a working fallback, and let go of it the moment the configured
+        // model answers again.
+        if (!paidPlan) {
+            const answered = classifyError(res) === 'ok';
+            if (answered && usedModel !== model) await setSticky(usedModel, model, failKind, failDetail);
+            else if (answered && usedModel === model && sticky) await clearSticky();
         }
 
         if (metaOut) {
@@ -1740,7 +1893,7 @@ async function callGemini(prompt, word = "", context = "", url = "", generationC
             // skipped outright because a previous call had already cooled it.
             if (usedModel !== model) {
                 metaOut.fellBackFrom = model;
-                metaOut.reason = 'quota';
+                metaOut.reason = failKind === 'ok' ? 'quota' : failKind;
             }
         }
 
@@ -1765,10 +1918,29 @@ async function callGemini(prompt, word = "", context = "", url = "", generationC
                     <p style="font-size:13px; color:#78716c; line-height:1.5;">Free tier allows 20 requests per minute.<br>Wait a moment and try again.</p>
                 </div>`;
             }
+            // Say what actually failed. Until 25 Sep every non-quota error ended
+            // here as "check your API key", so a model this key cannot reach —
+            // Google renames them — read as a broken key, and the reader changed
+            // the wrong thing.
+            const kind = classifyError(res);
+            if (kind === 'model') {
+                return `<div style="text-align:center; padding:20px;">
+                    <div style="font-size:24px; margin-bottom:10px;">🚫</div>
+                    <div style="font-weight:700; color:#92400e; margin-bottom:8px;">That model isn't available</div>
+                    <p style="font-size:13px; color:#78716c; line-height:1.5;"><code>${escapeForCard(usedModel)}</code> is not available on your key — Google renames and retires models.<br>Open Settings and pick another model; the list there is what your key can actually reach.</p>
+                </div>`;
+            }
+            if (kind === 'server') {
+                return `<div style="text-align:center; padding:20px;">
+                    <div style="font-size:24px; margin-bottom:10px;">☁️</div>
+                    <div style="font-weight:700; color:#92400e; margin-bottom:8px;">Gemini is not responding</div>
+                    <p style="font-size:13px; color:#78716c; line-height:1.5;">Google's side returned ${escapeForCard(st || data.error.code || 'an error')}. This is usually brief — try the word again in a moment.</p>
+                </div>`;
+            }
             return `<div style="text-align:center; padding:20px;">
                 <div style="font-size:24px; margin-bottom:10px;">⚠️</div>
                 <div style="font-weight:700; color:#991b1b; margin-bottom:8px;">Gemini error</div>
-                <p style="font-size:13px; color:#78716c; line-height:1.5;">${st || data.error.code || "Unknown"}<br>Check your API key in Settings.</p>
+                <p style="font-size:13px; color:#78716c; line-height:1.5;">${escapeForCard(st || data.error.code || "Unknown")}<br>${kind === 'key' ? 'Check your API key in Settings.' : 'Try again; if it keeps happening, check Settings.'}</p>
             </div>`;
         }
 

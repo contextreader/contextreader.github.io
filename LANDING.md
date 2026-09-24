@@ -120,9 +120,16 @@ building every section.
    - False: "it can only contact one host" / "Chrome enforces that it talks to one server".
      Fonts are page-context requests the permission doesn't govern. This was corrected on
      15 Sep in three documents; don't reintroduce it.
-5. **The site itself makes no third-party requests.** No Google Fonts, no CDN, no analytics,
-   no embedded video. Inter is self-hosted in `docs/fonts/`. A privacy product whose website
-   phones Google would contradict itself. `test/copy.test.js` fails on a Google Fonts URL.
+5. **The site loads exactly two third-party scripts, and nothing else.** Cloudflare Web
+   Analytics (17 Sep) counts visits; Umami (21 Sep) counts visits and the clicks tagged
+   `data-umami-event`. Both are cookieless, both are named in the page's own prose, and
+   `test/copy.test.js` enforces both halves: an unlisted host fails, and so does an allowed
+   one the page does not name. Everything else still holds — no Google Fonts, no CDN, no
+   embedded video, Inter self-hosted in `docs/fonts/` — and **the extension takes neither**:
+   its "no tracking" is absolute. Microsoft Clarity was tried on 21 Sep behind a consent card
+   and removed on 22 Sep; do not re-add anything that is not cookieless.
+   *(This rule said "no analytics" until 24 Sep, which stopped being true on the 17th — the
+   video session caught it. Say what the site does, not what it used to.)*
 6. **Say which languages are tuned.** 110 languages; only English and Sinhala carry
    speaker-checked examples. Presenting them as equal would be false. Never imply more tuned
    languages than there are.

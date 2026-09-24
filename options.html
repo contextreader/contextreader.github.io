@@ -533,6 +533,17 @@
                     <button id="opt-model-refresh" class="btn btn-sm">Refresh list</button>
                     <span id="opt-model-status" class="hint" style="margin-top:0"></span>
                 </div>
+                <!-- Shown only while a fallback is in force, so a silent downgrade
+                     cannot happen quietly. -->
+                <div id="opt-fallback" hidden style="margin-top:var(--space-lg); border-top:1px solid rgba(17,24,39,0.07); padding-top:var(--space-lg)">
+                    <div class="field-label" style="margin-bottom:2px">Answering with</div>
+                    <div id="opt-fallback-what" style="font-size:12px; color:var(--ink-soft)"></div>
+                    <div class="row row-wrap" style="margin-top:var(--space-md)">
+                        <button id="opt-fallback-recheck" class="btn btn-sm">Check now</button>
+                        <button id="opt-fallback-clear" class="btn btn-sm">Use my model again</button>
+                        <span id="opt-fallback-status" class="hint" style="margin-top:0"></span>
+                    </div>
+                </div>
                 <label class="check">
                     <input id="opt-paid-plan" type="checkbox">
                     <span class="check-text">

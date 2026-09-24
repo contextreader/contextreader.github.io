@@ -1242,8 +1242,17 @@ function buildLookupHTML(word, json) {
 function fallbackNoteHTML(m) {
     if (!m || !m.from || !m.model) return '';
     const short = (id) => String(id).replace(/^models\//, '').replace(/^gemini-/, '');
+    // Say WHY, not just that it happened: a model that is gone needs a different
+    // action from one that is rate-limited, and the reader deserves to know which
+    // answer they are reading (Ian, 25 Sep).
+    const WHY = {
+        quota: 'quota reached',
+        model: 'unavailable on your key',
+        server: 'not responding',
+    };
+    const why = WHY[m.reason] || 'unavailable';
     return `<div class="sr-fallback-note">\u21b3 <span><code>${escapeHTML(short(m.from))}</code> `
-         + `quota reached &middot; answered by <code>${escapeHTML(short(m.model))}</code></span></div>`;
+         + `${why} &middot; answered by <code>${escapeHTML(short(m.model))}</code></span></div>`;
 }
 // ============================================
 // LANGUAGE
