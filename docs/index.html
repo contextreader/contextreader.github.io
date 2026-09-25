@@ -921,7 +921,7 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
           <a class="btn primary js-install" data-umami-event="install-click" data-umami-event-place="hero" href="https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck" data-long="1">Add to Chrome, free</a>
           <a class="btn" href="https://aistudio.google.com/apikey" data-umami-event="get-key-click" data-umami-event-place="hero">Get a Gemini key</a>
         </div>
-        <p class="fine">No account, no tracking. It runs on your own free Gemini key, which takes about a minute to get. It works in Chrome, Brave, Edge and other Chromium browsers.</p>
+        <p class="fine">No account, no tracking. It runs on your own free Gemini key, which takes about a minute to get. It works in Chrome, Brave, Edge and Firefox.</p>
         <div class="llm-row">
           <button class="llm-act" type="button" data-md="copy" data-umami-event="copy-for-llm"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="2.5" width="8" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 13.5v.5a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span>Copy for LLM</span></button>
           <span class="sep" aria-hidden="true"></span>
@@ -2388,8 +2388,8 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
  * The markup ships "Add to Chrome" pointing at the Chrome Web Store (live 22
  * Sep), so with no JavaScript the button is still true. This only renames it
  * for a browser whose store is filled in below: "Add to Brave" is the same
- * listing with a different word. A browser with no listing (Firefox until its
- * add-on ships, Safari, Opera) keeps "Add to Chrome", which stays honest.
+ * listing with a different word. A browser with no listing of its own
+ * (Safari, Opera) keeps "Add to Chrome", which stays honest.
  * test/copy.test.js checks that each URL points at that browser's own store.
  */
 (function () {
@@ -2399,7 +2399,7 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
     edge:    'https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck',   /* Edge installs from the Chrome Web Store too */
     opera:   '',   /* Opera needs a helper add-on for the Chrome Web Store: the button stays "Add to Chrome" */
     vivaldi: 'https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck',
-    firefox: ''    /* https://addons.mozilla.org/firefox/addon/<slug> — not built yet */
+    firefox: 'https://addons.mozilla.org/firefox/addon/contextreader/'   /* listed 25 Sep */
   };
   var NAMES = { chrome: 'Chrome', brave: 'Brave', edge: 'Edge', opera: 'Opera',
                 vivaldi: 'Vivaldi', firefox: 'Firefox', safari: 'Safari' };

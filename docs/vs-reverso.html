@@ -182,7 +182,7 @@ footer .tm { flex-basis: 100%; margin: 0; font-size: 13.5px; color: var(--mute);
       </div>
       <div class="card">
         <h3>Films, phones and desktops</h3>
-        <p>Reverso’s <a href="https://www.reverso.net/download-browser-extension">extension</a> translates Netflix and YouTube subtitles on hover, and Reverso runs as a website, an iOS and Android app, and a Mac and Windows app. Context Reader is a desktop browser extension only: Chrome, Brave and Edge.</p>
+        <p>Reverso’s <a href="https://www.reverso.net/download-browser-extension">extension</a> translates Netflix and YouTube subtitles on hover, and Reverso runs as a website, an iOS and Android app, and a Mac and Windows app. Context Reader is a desktop browser extension only: Chrome, Brave, Edge and Firefox.</p>
       </div>
       <div class="card">
         <h3>Nothing to set up</h3>
@@ -224,7 +224,7 @@ footer .tm { flex-basis: 100%; margin: 0; font-size: 13.5px; color: var(--mute);
         <tr><th scope="row">Languages</th><td data-col="Reverso Context">28 (extension page)</td><td data-col="Context Reader">110; English and Sinhala tuned, 108 untuned</td></tr>
         <tr><th scope="row">Same-language help</th><td data-col="Reverso Context">English definitions</td><td data-col="Context Reader">Plainer words for the sense this sentence uses</td></tr>
         <tr><th scope="row">Learning tools</th><td data-col="Reverso Context"><strong>Stronger</strong> — history, favourites, flashcards, quizzes, pronunciation</td><td data-col="Context Reader">None; a Search button to pronounce or look the word up</td></tr>
-        <tr><th scope="row">Where it runs</th><td data-col="Reverso Context">Web, iOS, Android, Mac, Windows, browser extension, video subtitles</td><td data-col="Context Reader">Chrome, Brave and Edge on desktop</td></tr>
+        <tr><th scope="row">Where it runs</th><td data-col="Reverso Context">Web, iOS, Android, Mac, Windows, browser extension, video subtitles</td><td data-col="Context Reader">Chrome, Brave, Edge and Firefox on desktop</td></tr>
         <tr><th scope="row">Price</th><td data-col="Reverso Context">Free with ads; Premium $9.99/month or $77.88/year</td><td data-col="Context Reader">Free, no paid tier, no ads</td></tr>
         <tr><th scope="row">Setup</th><td data-col="Reverso Context">Install and go; account optional, for sync</td><td data-col="Context Reader">A free Gemini key, about a minute; no account</td></tr>
         <tr><th scope="row">Source code</th><td data-col="Reverso Context">Proprietary</td><td data-col="Context Reader">Open, MIT</td></tr>
@@ -265,7 +265,7 @@ footer .tm { flex-basis: 100%; margin: 0; font-size: 13.5px; color: var(--mute);
       <a class="primary js-install" data-umami-event="install-click" data-umami-event-place="vs-reverso-end" href="https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck">Add to Chrome</a>
       <a href="/">See it working</a>
     </div>
-    <p class="fine" id="install-fine">Free, from the Chrome Web Store. Works in Chrome, Brave and Edge.</p>
+    <p class="fine" id="install-fine">Free. Chrome, Brave and Edge install from the Chrome Web Store; Firefox from addons.mozilla.org.</p>
   </main>
 </div>
 
@@ -289,8 +289,8 @@ footer .tm { flex-basis: 100%; margin: 0; font-size: 13.5px; color: var(--mute);
  * The markup ships "Add to Chrome" pointing at the Chrome Web Store (live 22
  * Sep), so with no JavaScript the button is still true. This only renames it
  * for a browser whose store is filled in below: "Add to Brave" is the same
- * listing with a different word. A browser with no listing (Firefox until its
- * add-on ships, Safari, Opera) keeps "Add to Chrome", which stays honest.
+ * listing with a different word. A browser with no listing of its own
+ * (Safari, Opera) keeps "Add to Chrome", which stays honest.
  * test/copy.test.js checks that each URL points at that browser's own store.
  */
 (function () {
@@ -300,7 +300,7 @@ footer .tm { flex-basis: 100%; margin: 0; font-size: 13.5px; color: var(--mute);
     edge:    'https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck',   /* Edge installs from the Chrome Web Store too */
     opera:   '',   /* Opera needs a helper add-on for the Chrome Web Store: the button stays "Add to Chrome" */
     vivaldi: 'https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck',
-    firefox: ''    /* https://addons.mozilla.org/firefox/addon/<slug> — not built yet */
+    firefox: 'https://addons.mozilla.org/firefox/addon/contextreader/'   /* listed 25 Sep */
   };
   var NAMES = { chrome: 'Chrome', brave: 'Brave', edge: 'Edge', opera: 'Opera',
                 vivaldi: 'Vivaldi', firefox: 'Firefox', safari: 'Safari' };

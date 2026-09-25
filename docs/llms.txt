@@ -5,8 +5,8 @@
 > user's browser with the user's own API key. There is no backend server, no analytics and
 > no account.
 
-Install: https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck
-(Chrome, Brave, Edge and other Chromium browsers.)
+Install (Chrome, Brave, Edge and other Chromium browsers): https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck
+Install (Firefox 140+): https://addons.mozilla.org/firefox/addon/contextreader/
 
 ## What it does
 

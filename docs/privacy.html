@@ -215,8 +215,8 @@ footer .spacer { margin-inline-start: auto; }
  * The markup ships "Add to Chrome" pointing at the Chrome Web Store (live 22
  * Sep), so with no JavaScript the button is still true. This only renames it
  * for a browser whose store is filled in below: "Add to Brave" is the same
- * listing with a different word. A browser with no listing (Firefox until its
- * add-on ships, Safari, Opera) keeps "Add to Chrome", which stays honest.
+ * listing with a different word. A browser with no listing of its own
+ * (Safari, Opera) keeps "Add to Chrome", which stays honest.
  * test/copy.test.js checks that each URL points at that browser's own store.
  */
 (function () {
@@ -226,7 +226,7 @@ footer .spacer { margin-inline-start: auto; }
     edge:    'https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck',   /* Edge installs from the Chrome Web Store too */
     opera:   '',   /* Opera needs a helper add-on for the Chrome Web Store: the button stays "Add to Chrome" */
     vivaldi: 'https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck',
-    firefox: ''    /* https://addons.mozilla.org/firefox/addon/<slug> — not built yet */
+    firefox: 'https://addons.mozilla.org/firefox/addon/contextreader/'   /* listed 25 Sep */
   };
   var NAMES = { chrome: 'Chrome', brave: 'Brave', edge: 'Edge', opera: 'Opera',
                 vivaldi: 'Vivaldi', firefox: 'Firefox', safari: 'Safari' };

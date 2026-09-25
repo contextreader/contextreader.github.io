@@ -25,7 +25,8 @@ Submit at https://addons.mozilla.org/developers/addon/submit/distribution → **
 
 ## Add-on URL (slug)
 
-`context-reader` → https://addons.mozilla.org/firefox/addon/context-reader/
+**Live since 25 Sep 2026** (approved within the hour, version 1.0.3): the slug is
+`contextreader`, not `context-reader` — https://addons.mozilla.org/firefox/addon/contextreader/
 When it is live, that URL goes into `STORES.firefox` in all four `docs/*.html` pages; the
 site test only accepts an addons.mozilla.org address there.
 

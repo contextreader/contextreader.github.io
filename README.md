@@ -1,7 +1,7 @@
 # Context Reader
 
-A Chrome extension that explains the word you're stuck on, in your language, using the
-sentence around it.
+A browser extension that explains the word you're stuck on, in your language, using the
+sentence around it. Chrome, Brave, Edge and Firefox.
 
 Not a dictionary. A dictionary gives you every meaning of *culture*; Context Reader reads
 the sentence, works out that you're looking at a lab report, and gives you the one that
@@ -9,7 +9,7 @@ fits.
 
 **Free. Open source. No server. No tracking. No account.**
 
-[Add to Chrome](https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck) · [contextreader site](https://contextreader.github.io/) · [Privacy](PRIVACY_POLICY.md) · [Contributing](CONTRIBUTING.md)
+[Add to Chrome](https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck) · [Add to Firefox](https://addons.mozilla.org/firefox/addon/contextreader/) · [contextreader site](https://contextreader.github.io/) · [Privacy](PRIVACY_POLICY.md) · [Contributing](CONTRIBUTING.md)
 
 ---
 
@@ -29,8 +29,8 @@ and it's free.
 ## Install
 
 1. Get a free Gemini API key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey)
-2. Add the extension from the [Chrome Web Store](https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck); it works in Chrome, Brave, Edge
-   and other Chromium browsers
+2. Add the extension: [Chrome Web Store](https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck) for Chrome, Brave, Edge and other
+   Chromium browsers, or [addons.mozilla.org](https://addons.mozilla.org/firefox/addon/contextreader/) for Firefox 140+
 3. Pick your language and paste the key when the welcome page opens
 
 **From source:** clone this repo, open `chrome://extensions`, turn on Developer mode,

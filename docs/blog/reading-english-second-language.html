@@ -272,7 +272,7 @@ figcaption { margin-top: 10px; font-size: 14px; line-height: 1.55; color: var(--
       <a class="primary js-install" data-umami-event="install-click" data-umami-event-place="esl-end" href="https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck">Add to Chrome</a>
       <a href="/">See it working</a>
     </div>
-    <p class="fine" id="install-fine">Free, from the Chrome Web Store. Works in Chrome, Brave and Edge. It needs your own free Gemini API key, which takes about a minute to get.</p>
+    <p class="fine" id="install-fine">Free. Chrome, Brave and Edge install from the Chrome Web Store; Firefox from addons.mozilla.org. It needs your own free Gemini API key, which takes about a minute to get.</p>
   </main>
 </div>
 
@@ -295,8 +295,8 @@ figcaption { margin-top: 10px; font-size: 14px; line-height: 1.55; color: var(--
  * The markup ships "Add to Chrome" pointing at the Chrome Web Store (live 22
  * Sep), so with no JavaScript the button is still true. This only renames it
  * for a browser whose store is filled in below: "Add to Brave" is the same
- * listing with a different word. A browser with no listing (Firefox until its
- * add-on ships, Safari, Opera) keeps "Add to Chrome", which stays honest.
+ * listing with a different word. A browser with no listing of its own
+ * (Safari, Opera) keeps "Add to Chrome", which stays honest.
  * test/copy.test.js checks that each URL points at that browser's own store.
  */
 (function () {
@@ -306,7 +306,7 @@ figcaption { margin-top: 10px; font-size: 14px; line-height: 1.55; color: var(--
     edge:    'https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck',   /* Edge installs from the Chrome Web Store too */
     opera:   '',   /* Opera needs a helper add-on for the Chrome Web Store: the button stays "Add to Chrome" */
     vivaldi: 'https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck',
-    firefox: ''    /* https://addons.mozilla.org/firefox/addon/<slug> — not built yet */
+    firefox: 'https://addons.mozilla.org/firefox/addon/contextreader/'   /* listed 25 Sep */
   };
   var NAMES = { chrome: 'Chrome', brave: 'Brave', edge: 'Edge', opera: 'Opera',
                 vivaldi: 'Vivaldi', firefox: 'Firefox', safari: 'Safari' };
