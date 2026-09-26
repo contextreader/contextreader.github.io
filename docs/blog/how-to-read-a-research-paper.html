@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How to read a research paper (and how long it actually takes)</title>
+<meta name="description" content="Not front to back. Three passes — ten minutes, an hour, then hours — what to read in each, and the ordinary English words that mean something else in a paper.">
+<link rel="canonical" href="https://contextreader.github.io/blog/how-to-read-a-research-paper">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<link rel="icon" href="../icon128.png" sizes="128x128" type="image/png">
+<link rel="apple-touch-icon" href="../icon128.png">
+<meta name="theme-color" content="#eef0f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#101317" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Context Reader">
+<meta property="og:title" content="How to read a research paper (and how long it actually takes)">
+<meta property="og:description" content="Three passes — ten minutes, an hour, then hours. What to read in each, and the ordinary words that mean something else in a paper.">
+<meta property="og:url" content="https://contextreader.github.io/blog/how-to-read-a-research-paper">
+<meta property="og:image" content="https://contextreader.github.io/share.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="Context Reader: the word you're stuck on, in your language. The word culture explained two ways, in a lab report and in a job review.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://contextreader.github.io/share.png">
+<!-- Beyond the visit counter named at the foot of this page, it makes no third-party requests.
+     The three passes and every timing here come from Keshav's paper, linked at the end and read
+     on 26 Sep 2026; nothing is estimated. Paths are ../ because this page sits in /blog/. -->
+<link rel="preload" href="../fonts/inter-latin-800.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/inter-latin-400.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 600; font-display: swap; src: url("../fonts/inter-latin-600.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 800; font-display: swap; src: url("../fonts/inter-latin-800.woff2") format("woff2"); }
+
+:root {
+  --ground: #eef0f3; --ground-a: rgba(238,240,243,.86); --paper: #fbfbfc; --rule: #d9dde3;
+  --ink: #111827; --ink-soft: #374151; --mute: #5b6472; --accent: #a84e08; --glow: #fbbf24;
+  --lit-ink: #111827; --green-tag: #166534;
+  --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --serif: "Iowan Old Style", "Charter", "Georgia", "Cambria", serif;
+  --mono: ui-monospace, "SF Mono", "Menlo", "Consolas", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #101317; --ground-a: rgba(16,19,23,.86); --paper: #1a1f26; --rule: #2a3039;
+    --ink: #eef0f3; --ink-soft: #c9ced6; --mute: #9aa3af; --accent: #fbbf24; --green-tag: #4ade80;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #101317; --ground-a: rgba(16,19,23,.86); --paper: #1a1f26; --rule: #2a3039;
+  --ink: #eef0f3; --ink-soft: #c9ced6; --mute: #9aa3af; --accent: #fbbf24; --green-tag: #4ade80;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--ground); color: var(--ink); font: 400 17px/1.7 var(--sans); -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 800px; margin: 0 auto; padding-inline: 21px; }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+
+.mast { position: sticky; top: 0; z-index: 20; background: var(--ground-a); -webkit-backdrop-filter: blur(13px) saturate(120%); backdrop-filter: blur(13px) saturate(120%); }
+.mast .wrap { max-width: 1180px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 13px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: -.01em; color: var(--ink); text-decoration: none; font-size: 16px; }
+.brand img { width: 28px; height: 28px; display: block; }
+.mast nav { display: flex; align-items: center; gap: 21px; font-size: 15px; }
+.mast nav a:not(.btn) { color: var(--ink-soft); text-decoration: none; }
+.mast nav a:not(.btn):hover { color: var(--ink); }
+.btn { display: inline-flex; align-items: center; min-height: 38px; padding: 0 16px; border-radius: 999px; font: 600 14px/1 var(--sans); text-decoration: none; background: var(--ink); color: var(--ground); border: 1px solid var(--ink); }
+
+header.page { padding-block: 55px 0; }
+.kicker { font: 600 12px/1 var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--mute); margin: 0 0 13px; }
+h1 { margin: 0; font: 800 clamp(2.1rem, 5vw, 3.1rem)/1.05 var(--sans); letter-spacing: -.035em; color: var(--ink); text-wrap: balance; }
+.lede { margin-top: 21px; font-size: 1.14rem; line-height: 1.6; color: var(--ink-soft); max-width: 40em; }
+.checked { margin-top: 13px; font-size: 14px; color: var(--mute); }
+
+main { padding-block: 21px 89px; }
+h2 { margin: 55px 0 16px; font: 800 clamp(1.4rem, 2.6vw, 1.85rem)/1.2 var(--sans); letter-spacing: -.025em; color: var(--ink); text-wrap: balance; }
+h3 { margin: 0 0 6px; font: 700 1.05rem/1.3 var(--sans); color: var(--ink); }
+p { margin: 0 0 16px; color: var(--ink-soft); }
+p strong, li strong, td strong { color: var(--ink); font-weight: 700; }
+
+/* The one bold element: the lit word, as the logo draws it. */
+.lit { background: var(--glow); color: var(--lit-ink); border-radius: .26em; padding: 0 .14em; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+
+.specimen { margin: 21px 0; background: var(--paper); border: 1px solid var(--rule); border-radius: 17px; padding: 21px 24px; }
+.specimen q { display: block; font: 400 1.2rem/1.55 var(--serif); color: var(--ink); quotes: none; }
+.specimen .two { display: grid; grid-template-columns: 1fr 1fr; gap: 21px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--rule); }
+.specimen .two p { margin: 0; font-size: 15.5px; }
+.specimen .who { display: block; font: 600 12px/1 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--mute); margin-bottom: 8px; }
+
+.cards { display: grid; gap: 13px; margin-top: 21px; }
+.card { background: var(--paper); border: 1px solid var(--rule); border-radius: 17px; padding: 18px 21px; }
+.card p { margin: 0; font-size: 15.5px; }
+.card p + p { margin-top: 10px; }
+
+table.cmp { width: 100%; border-collapse: collapse; margin-top: 21px; font-size: 15px; line-height: 1.5; }
+.cmp th, .cmp td { text-align: start; vertical-align: top; padding: 12px 13px; border-bottom: 1px solid var(--rule); }
+.cmp thead th { font: 700 13px/1.3 var(--sans); letter-spacing: .04em; color: var(--mute); border-bottom-color: var(--ink-soft); }
+.cmp tbody th { font-weight: 700; color: var(--ink); width: 22%; }
+.cmp td { color: var(--ink-soft); width: 39%; }
+.cmp tbody th, .cmp td:first-of-type { padding-inline-start: 0; }
+.cmp tbody th + td { padding-inline-start: 13px; }
+
+.pick { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; margin-top: 21px; }
+.pick .card h3 { margin-bottom: 8px; }
+.pick ul { margin: 0; padding-inline-start: 1.1em; color: var(--ink-soft); font-size: 15.5px; }
+.pick li + li { margin-top: 6px; }
+
+.faq { border-top: 1px solid var(--rule); margin-top: 21px; }
+.faq div { padding-block: 16px; border-bottom: 1px solid var(--rule); }
+.faq p { margin: 0; font-size: 15.5px; }
+.cta { margin-top: 21px; display: flex; flex-wrap: wrap; gap: 13px; }
+.cta a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; text-decoration: none; font: 600 15px/1 var(--sans); border: 1px solid var(--rule); color: var(--ink); background: var(--paper); }
+.cta a.primary { background: var(--ink); color: var(--ground); border-color: var(--ink); }
+.fine { font-size: 14px; color: var(--mute); margin-top: 13px; }
+
+footer { border-top: 1px solid var(--rule); padding-block: 34px 55px; font-size: 14.5px; color: var(--mute); }
+footer .wrap { max-width: 1180px; display: flex; flex-wrap: wrap; gap: 13px 26px; align-items: center; }
+footer a { color: var(--ink-soft); text-decoration: none; border-bottom: 1px solid transparent; }
+footer a:hover { color: var(--ink); border-bottom-color: var(--rule); }
+footer .spacer { margin-inline-start: auto; }
+footer .tm { flex-basis: 100%; margin: 0; font-size: 13.5px; color: var(--mute); }
+@media (max-width: 620px) {
+  .mast nav a.hide-sm { display: none; }
+  footer .spacer { margin-inline-start: 0; }
+  .specimen .two, .pick { grid-template-columns: 1fr; }
+  /* The table becomes one block per row, each cell labelled by its column. */
+  .cmp thead { display: none; }
+  .cmp tr { display: block; padding-block: 13px; border-bottom: 1px solid var(--rule); }
+  .cmp th, .cmp td { display: block; width: auto; border: 0; padding: 0; }
+  .cmp tbody th { margin-bottom: 6px; width: auto; }
+  .cmp tbody th + td { padding-inline-start: 0; }
+  .cmp td + td { margin-top: 6px; }
+  .cmp td::before { content: attr(data-col); display: block; font: 700 12px/1.4 var(--sans); letter-spacing: .04em; color: var(--mute); }
+}
+</style>
+<style>
+figure { margin: 21px 0; }
+figure img { display: block; margin-inline: auto; max-width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 17px; background: var(--paper); }
+figcaption { margin-top: 10px; font-size: 14px; line-height: 1.55; color: var(--mute); }
+</style>
+<style>
+.chart { display: block; width: 100%; height: auto; max-width: 640px; margin-inline: auto; }
+.c-head { font: 700 13px/1 var(--sans); letter-spacing: .04em; text-transform: uppercase; fill: var(--mute); }
+.c-lab { font: 600 14.5px/1 var(--sans); fill: var(--ink); }
+.c-val { font: 600 13.5px/1 var(--sans); fill: var(--mute); }
+.c-track { fill: var(--rule); opacity: .5; }
+.c-bar { fill: var(--accent); }
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 13px; margin: 21px 0; }
+.step { background: var(--paper); border: 1px solid var(--rule); border-radius: 17px; padding: 16px 18px; }
+.step b { display: block; font: 700 12px/1 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--mute); margin-bottom: 8px; }
+.step p { margin: 0; font-size: 15px; }
+.step .word { font: 600 1.05rem/1.4 var(--serif); color: var(--ink); }
+@media (max-width: 620px) { .steps { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <div class="wrap">
+    <a class="brand" href="/"><img src="../icon.svg" alt="" width="28" height="28">Context Reader</a>
+    <nav aria-label="Site">
+      <a href="/blog/" class="hide-sm">Writing</a>
+      <a href="/vs-reverso" class="hide-sm">vs Reverso</a>
+      <a class="btn js-install" data-umami-event="install-click" data-umami-event-place="paper-masthead" href="https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck">Add to Chrome</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <header class="page">
+    <p class="kicker">Reading in another language</p>
+    <h1>How to read a research paper</h1>
+    <p class="lede">Not from the first line to the last. Read it three times, each time for a different reason: ten minutes to find out whether it is worth your evening, up to an hour to learn what it actually found, and only then — if you really need it — the hours that understanding it properly takes. Most papers deserve the first pass and nothing more, and knowing that is most of the skill.</p>
+    <p class="checked">Written on 26 September 2026. The three passes are not mine: they come from S. Keshav's <em>How to Read a Paper</em>, linked at the end. I build Context Reader, a free extension for reading in a second language, and it appears once, near the end.</p>
+  </header>
+
+  <main>
+    <h2>The three passes</h2>
+    <div class="steps">
+      <div class="step"><b>Pass 1 · 5–10 min</b><p class="word">Is this for me?</p><p>Title, abstract, introduction, the section headings, the conclusion, and a glance at the references for names you know.</p></div>
+      <div class="step"><b>Pass 2 · up to an hour</b><p class="word">What did they find?</p><p>The figures and tables closely — axes, labels, error bars — skipping proofs. Mark references you will want later.</p></div>
+      <div class="step"><b>Pass 3 · hours</b><p class="word">Is it right?</p><p>Rebuild the paper in your head: make the same assumptions and see whether you reach the same place. This is reviewer-level reading.</p></div>
+    </div>
+    <p>After the first pass you should be able to say what kind of paper it is, what it builds on, whether the assumptions look sound, what it claims, and whether it is well written. Keshav calls these the five Cs. If you cannot answer them in ten minutes, that is information too: either the paper is badly written or it is further from your field than you thought.</p>
+    <svg viewBox="0 0 640 180" role="img" width="640" height="180" aria-labelledby="t-title t-desc" class="chart">
+<title id="t-title">How long each pass takes</title>
+<desc id="t-desc">First pass five to ten minutes; second pass up to an hour; third pass four to five hours, or about an hour for an experienced reader.</desc>
+<text x="0" y="18" class="c-head">How long each pass takes</text>
+<text x="0" y="50" class="c-lab">First pass</text>
+<rect x="118" y="37" width="332" height="18" rx="9" class="c-track"/>
+<rect x="118" y="37" width="11" height="18" rx="9" class="c-bar"/>
+<text x="462" y="51" class="c-val">5–10 minutes</text>
+<text x="0" y="96" class="c-lab">Second pass</text>
+<rect x="118" y="83" width="332" height="18" rx="9" class="c-track"/>
+<rect x="118" y="83" width="66" height="18" rx="9" class="c-bar"/>
+<text x="462" y="97" class="c-val">Up to an hour</text>
+<text x="0" y="142" class="c-lab">Third pass</text>
+<rect x="118" y="129" width="332" height="18" rx="9" class="c-track"/>
+<rect x="118" y="129" width="332" height="18" rx="9" class="c-bar"/>
+<text x="462" y="143" class="c-val">4–5 hours (1 if experienced)</text>
+</svg>
+    <p class="fine">Timings from S. Keshav, <em>How to Read a Paper</em>, ACM SIGCOMM Computer Communication Review, 2007. The third pass is four to five hours for a beginner and about an hour for an experienced reader.</p>
+
+    <h2>Why reading it straight through fails</h2>
+    <p>A paper is not written in the order it should be read. The methods section is the hardest English in the document and is written for people repeating the work, not for people deciding whether to care. Start there and you will spend forty minutes on sample preparation before finding out the paper answers a question you did not have.</p>
+    <p>The real result is usually one figure or one table. Reading the caption and the axes tells you more in two minutes than the results section does in twenty, and figures are far easier to read in a second language than paragraphs are, because a chart is a chart everywhere.</p>
+
+    <h2>If English isn't your first language, there is a fourth thing</h2>
+    <p>The long technical words are the easy part. They mean one thing, and you look them up once. The trouble is ordinary words that a field has quietly borrowed.</p>
+    <table class="cmp">
+      <thead><tr><th>Word</th><th>What you know</th><th>What it means in a paper</th></tr></thead>
+      <tbody>
+        <tr><th>significant</th><td data-col="What you know">big, important</td><td data-col="In a paper">the result is unlikely to be chance — it can still be tiny</td></tr>
+        <tr><th>positive</th><td data-col="What you know">good news</td><td data-col="In a paper">the thing was found; in a lab result, usually bad news</td></tr>
+        <tr><th>expression</th><td data-col="What you know">a phrase, or a face</td><td data-col="In a paper">how much a gene is being used to make protein</td></tr>
+        <tr><th>regression</th><td data-col="What you know">going backwards</td><td data-col="In a paper">a way of fitting a line to data</td></tr>
+        <tr><th>robust</th><td data-col="What you know">strong</td><td data-col="In a paper">the finding holds up when the assumptions are changed</td></tr>
+        <tr><th>novel</th><td data-col="What you know">a book</td><td data-col="In a paper">new — the paper's claim to be worth publishing</td></tr>
+      </tbody>
+    </table>
+    <p>These are the ones that change what a sentence means without making you stop. A result described as <span class="lit">significant</span> can be so small that nobody would ever notice it in a clinic; that is not a translation problem, it is a vocabulary problem hiding inside a word you already knew.</p>
+
+    <h2>Where to find papers you can actually open</h2>
+    <p>Before paying for anything: <strong>PubMed Central</strong> for biomedical work, <strong>arXiv</strong> for physics, maths and computing, and the preprint servers for most other fields. In Google Scholar, "All versions" under a result usually turns up a free copy, and many authors post the PDF on their own university page. If none of that works, the corresponding author's email is printed in the paper, and most researchers will send you their own paper if you ask — it costs them nothing, and they are pleased someone wants to read it.</p>
+
+    <h2>When one word stops you</h2>
+    <p>Two habits first, because they need nothing. Read one sentence further: papers define their own terms more often than you expect, usually immediately after the first use. And do not stop for every unknown word — only for the ones the paragraph depends on.</p>
+    <p>When you do stop, the thing you want is not a dictionary, which gives you every meaning, and not a translator, which <a href="/blog/why-google-translate-gets-words-wrong">has no context to work from</a> when you hand it a single word. You want the meaning that fits this sentence.</p>
+    <figure>
+      <img src="img/word-in-context-english.webp" width="710" height="470" loading="lazy" decoding="async" alt="Context Reader open on a research article: the word significant is selected, and the bubble explains that in science it means the difference was unlikely to be chance.">
+      <figcaption><strong>Context Reader</strong>, the free extension I build: select a word and it sends the paragraph with it, then answers with the one meaning that fits — here, <em>significant</em> in a trial. Captured from the extension, not a mockup.</figcaption>
+    </figure>
+    <p>It works on journal sites, on PubMed and on a PDF open in your browser. The answers come from a model, so they can be wrong; the <strong>EN</strong> button shows the same answer in English, which is the fastest way to check one. For a dose or a clause, ask a person.</p>
+
+    <h2>The part nobody says out loud</h2>
+    <p>If a paper takes you an hour and you looked up nine words, you did not read it badly. You read it. Researchers reading in their own language do the same three passes, and they skip most of what they open. Speed comes from knowing the shape of papers and from deciding quickly what not to read — not from knowing more English.</p>
+
+    <h2>Questions</h2>
+    <div class="faq">
+      <div><h3>How long does it take to read a research paper?</h3><p>Ten minutes to decide whether it is worth reading, up to an hour to understand what it found, and four to five hours to understand it deeply enough to review it — about an hour if you already know the field. Those figures are from Keshav's three-pass method, which is the standard advice in computer science and travels well to other fields.</p></div>
+      <div><h3>Which section should I read first?</h3><p>The abstract, then the section headings and the conclusion. Then the figures. The methods come last, and often not at all: they are written for someone repeating the work.</p></div>
+      <div><h3>Do I have to read the methods?</h3><p>Only when you need to trust the numbers or repeat the work. For understanding what a paper found, the figures and the discussion carry it.</p></div>
+      <div><h3>How do I read a paper when English is not my first language?</h3><p>The same three passes, plus one thing: watch the ordinary words. Papers give plain English words field-specific meanings — significant, positive, expression — and those, not the long technical terms, are what change what a sentence means.</p></div>
+      <div><h3>Where can I read research papers for free?</h3><p>PubMed Central for biomedical work, arXiv for physics, maths and computer science, and the preprint servers for most other fields. Google Scholar shows free versions under “All versions”, and many authors post the PDF on their own university page. If nothing is free, the authors' email is in the paper and most will send you a copy.</p></div>
+    </div>
+
+    <h2>Sources</h2>
+    <ul>
+      <li>S. Keshav, <a href="https://web.stanford.edu/class/ee384m/Handouts/HowtoReadPaper.pdf">How to Read a Paper</a>, ACM SIGCOMM Computer Communication Review, 2007. The three passes, the five Cs and the timings.</li>
+    </ul>
+
+    <p>Related: <a href="/blog/reading-english-second-language">how to understand English words when it isn't your first language</a>, and <a href="/blog/how-accurate-is-google-translate">how accurate Google Translate is, language by language</a>.</p>
+
+    <div class="cta">
+      <a class="primary js-install" data-umami-event="install-click" data-umami-event-place="paper-end" href="https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck">Add to Chrome</a>
+      <a href="/">See it working</a>
+    </div>
+    <p class="fine" id="install-fine">Free. Chrome, Brave and Edge install from the Chrome Web Store; Firefox from addons.mozilla.org.</p>
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">
+    <a href="/">Home</a>
+    <a href="/blog/">Writing</a>
+    <a href="/support">Support</a>
+    <a href="/privacy">Privacy</a>
+    <a href="https://github.com/contextreader/contextreader.github.io">Source</a>
+    <span class="spacer">The extension collects nothing; this site counts visits with Cloudflare Web Analytics, and visits and clicks with Umami, both cookieless.</span>
+  </div>
+</footer>
+
+<script defer src="https://cloud.umami.is/script.js" data-website-id="583c9618-5c32-40a5-b0dd-33b2d8f7048d"></script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "ceec88afaf1f47a289d50d0a20bff3bb"}'></script>
+<script>
+/* Install button, per browser.
+ *
+ * The markup ships "Add to Chrome" pointing at the Chrome Web Store (live 22
+ * Sep), so with no JavaScript the button is still true. This only renames it
+ * for a browser whose store is filled in below: "Add to Brave" is the same
+ * listing with a different word. A browser with no listing of its own
+ * (Safari, Opera) keeps "Add to Chrome", which stays honest.
+ * test/copy.test.js checks that each URL points at that browser's own store.
+ */
+(function () {
+  var STORES = {
+    chrome:  'https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck',
+    brave:   'https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck',
+    edge:    'https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck',   /* Edge installs from the Chrome Web Store too */
+    opera:   '',   /* Opera needs a helper add-on for the Chrome Web Store: the button stays "Add to Chrome" */
+    vivaldi: 'https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck',
+    firefox: 'https://addons.mozilla.org/firefox/addon/contextreader/'   /* listed 25 Sep */
+  };
+  var NAMES = { chrome: 'Chrome', brave: 'Brave', edge: 'Edge', opera: 'Opera',
+                vivaldi: 'Vivaldi', firefox: 'Firefox', safari: 'Safari' };
+
+  function detect() {
+    var ua = navigator.userAgent;
+    /* Brave hides in the UA string and says so only through this API. */
+    if (navigator.brave && navigator.brave.isBrave) return 'brave';
+    if (/Edg\//.test(ua)) return 'edge';
+    if (/OPR\//.test(ua)) return 'opera';
+    if (/Vivaldi/.test(ua)) return 'vivaldi';
+    if (/Firefox\//.test(ua)) return 'firefox';
+    if (/Chrome\//.test(ua)) return 'chrome';
+    if (/Safari\//.test(ua)) return 'safari';
+    return '';
+  }
+
+  function apply(which) {
+    var url = STORES[which];
+    /* Umami reads these on click: which browser was detected, and where the button went. */
+    var tagged = document.querySelectorAll('a.js-install');
+    for (var j = 0; j < tagged.length; j++) {
+      tagged[j].setAttribute('data-umami-event-browser', which || 'other');
+      tagged[j].setAttribute('data-umami-event-to', url ? 'store' : 'chrome-store');
+    }
+    if (!url) return;                       /* no listing: leave "Add to Chrome" alone */
+    var name = NAMES[which] || 'your browser';
+    var links = document.querySelectorAll('a.js-install');
+    for (var i = 0; i < links.length; i++) {
+      var a = links[i];
+      a.href = url;
+      a.textContent = a.getAttribute('data-long') ? 'Add to ' + name + ', free' : 'Add to ' + name;
+    }
+  }
+
+  var which = detect();
+  /* isBrave() is async; everything else is settled already. */
+  if (which === 'brave' && navigator.brave.isBrave.call) {
+    navigator.brave.isBrave().then(function (yes) { apply(yes ? 'brave' : 'chrome'); })
+      .catch(function () { apply('chrome'); });
+  } else {
+    apply(which);
+  }
+})();
+</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[
+{"@type":"Article","headline":"How to read a research paper (and how long it actually takes)","datePublished":"2026-09-26","dateModified":"2026-09-26","author":{"@type":"Organization","name":"Context Reader","url":"https://contextreader.github.io"},"publisher":{"@type":"Organization","name":"Context Reader","url":"https://contextreader.github.io"},"mainEntityOfPage":"https://contextreader.github.io/blog/how-to-read-a-research-paper","image":["https://contextreader.github.io/share.png","https://contextreader.github.io/blog/img/word-in-context-english.webp"],"description":"The three-pass method with real timings, why reading straight through fails, the ordinary words that mean something else in a paper, and where to find papers free."},
+{"@type":"FAQPage","mainEntity":[
+{"@type": "Question", "name": "How long does it take to read a research paper?", "acceptedAnswer": {"@type": "Answer", "text": "Ten minutes to decide whether it is worth reading, up to an hour to understand what it found, and four to five hours to understand it deeply enough to review it — about an hour if you already know the field. Those figures are from Keshav's three-pass method, which is the standard advice in computer science and travels well to other fields."}},
+{"@type": "Question", "name": "Which section should I read first?", "acceptedAnswer": {"@type": "Answer", "text": "The abstract, then the section headings and the conclusion. Then the figures. The methods come last, and often not at all: they are written for someone repeating the work."}},
+{"@type": "Question", "name": "Do I have to read the methods?", "acceptedAnswer": {"@type": "Answer", "text": "Only when you need to trust the numbers or repeat the work. For understanding what a paper found, the figures and the discussion carry it."}},
+{"@type": "Question", "name": "How do I read a paper when English is not my first language?", "acceptedAnswer": {"@type": "Answer", "text": "The same three passes, plus one thing: watch the ordinary words. Papers give plain English words field-specific meanings — significant, positive, expression — and those, not the long technical terms, are what change what a sentence means."}},
+{"@type": "Question", "name": "Where can I read research papers for free?", "acceptedAnswer": {"@type": "Answer", "text": "PubMed Central for biomedical work, arXiv for physics, maths and computer science, and the preprint servers for most other fields. Google Scholar shows free versions under “All versions”, and many authors post the PDF on their own university page. If nothing is free, the authors' email is in the paper and most will send you a copy."}}
+]}]}</script>
+</body>
+</html>

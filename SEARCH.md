@@ -50,6 +50,34 @@ language-neutral; see LANDING.md.
 
 ---
 
+## The two search APIs are wired up (26 Sep)
+
+Both read-only credentials live **outside the repo**, in the session scratchpad, and must never
+be committed — this repository is public.
+
+| What | Where the credential is | What it answers |
+|---|---|---|
+| **Google Search Console API** | `scratchpad/gsc-key.json` (service account `console-search@plated-mantis-509813-g7`, added as a Full user on the property) | Our own queries, clicks, impressions, **positions**, pages, countries. Free, no billing. |
+| **Bing Webmaster API** | `scratchpad/.bing-key` | Keyword volumes for ANY query (`GetKeyword`, `GetRelatedKeywords`), our own stats, and **URL submission** (99/day). |
+
+`scratchpad/gsc.mjs` signs a JWT with the service-account key and returns a `gsc(path, body)`
+helper; `scratchpad/report.mjs` prints queries, pages and countries for the last 28 days.
+`scratchpad/kw.sh "<query>"` prints Bing's exact and broad impressions.
+
+**First readings, 26 Sep (28 days):** 2 clicks, 52 impressions, average position 9.8.
+`/vs-reverso` carries most of the visibility (32 impressions at 13.6 — page two, as expected
+against Reverso's own pages), `/privacy` sits at 2.4 on brand searches, and the three-day-old
+translate post already ranked **4.0** for *why does google translate change words*. Bing
+volumes, US, three months: `reverso context` 3,242 · `context clues` 1,659 ·
+`how to read a research paper` 500 · `is google translate accurate` 52. Long-tail questions
+read as zero on Bing because Bing is small — use autocomplete to FIND questions and Bing to
+SIZE head terms.
+
+**The lesson so far:** the question posts rank in days; the product-comparison page climbs
+slowly. Write questions.
+
+---
+
 ## Google autocomplete, 22 Sep — what people actually type
 
 Pulled from Google's suggest endpoint for 22 seed phrases (a suggestion only appears when
