@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How accurate is Google Translate? What the numbers show</title>
+<meta name="description" content="Accurate enough for the gist, weakest where it matters most. What one study found language by language, why accuracy varies, and how to check a translation yourself.">
+<link rel="canonical" href="https://contextreader.github.io/blog/how-accurate-is-google-translate">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<link rel="icon" href="../icon128.png" sizes="128x128" type="image/png">
+<link rel="apple-touch-icon" href="../icon128.png">
+<meta name="theme-color" content="#eef0f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#101317" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Context Reader">
+<meta property="og:title" content="How accurate is Google Translate?">
+<meta property="og:description" content="94% for Spanish, 55% for Armenian, in one study of hospital instructions. Why accuracy varies by language, and how to check a translation yourself.">
+<meta property="og:url" content="https://contextreader.github.io/blog/how-accurate-is-google-translate">
+<meta property="og:image" content="https://contextreader.github.io/share.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="Context Reader: the word you're stuck on, in your language. The word culture explained two ways, in a lab report and in a job review.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://contextreader.github.io/share.png">
+<!-- Beyond the visit counter named at the foot of this page, it makes no third-party requests.
+     Every number here comes from the two studies linked at the end, read on 26 Sep 2026; the
+     chart is drawn from the first one's own figures. No accuracy figure is estimated, and no
+     model output is shown that was not captured from the extension. Paths are ../ because this
+     page sits in /blog/. -->
+<link rel="preload" href="../fonts/inter-latin-800.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/inter-latin-400.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 600; font-display: swap; src: url("../fonts/inter-latin-600.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 800; font-display: swap; src: url("../fonts/inter-latin-800.woff2") format("woff2"); }
+
+:root {
+  --ground: #eef0f3; --ground-a: rgba(238,240,243,.86); --paper: #fbfbfc; --rule: #d9dde3;
+  --ink: #111827; --ink-soft: #374151; --mute: #5b6472; --accent: #a84e08; --glow: #fbbf24;
+  --lit-ink: #111827; --green-tag: #166534;
+  --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --serif: "Iowan Old Style", "Charter", "Georgia", "Cambria", serif;
+  --mono: ui-monospace, "SF Mono", "Menlo", "Consolas", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #101317; --ground-a: rgba(16,19,23,.86); --paper: #1a1f26; --rule: #2a3039;
+    --ink: #eef0f3; --ink-soft: #c9ced6; --mute: #9aa3af; --accent: #fbbf24; --green-tag: #4ade80;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #101317; --ground-a: rgba(16,19,23,.86); --paper: #1a1f26; --rule: #2a3039;
+  --ink: #eef0f3; --ink-soft: #c9ced6; --mute: #9aa3af; --accent: #fbbf24; --green-tag: #4ade80;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--ground); color: var(--ink); font: 400 17px/1.7 var(--sans); -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 800px; margin: 0 auto; padding-inline: 21px; }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+
+.mast { position: sticky; top: 0; z-index: 20; background: var(--ground-a); -webkit-backdrop-filter: blur(13px) saturate(120%); backdrop-filter: blur(13px) saturate(120%); }
+.mast .wrap { max-width: 1180px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 13px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: -.01em; color: var(--ink); text-decoration: none; font-size: 16px; }
+.brand img { width: 28px; height: 28px; display: block; }
+.mast nav { display: flex; align-items: center; gap: 21px; font-size: 15px; }
+.mast nav a:not(.btn) { color: var(--ink-soft); text-decoration: none; }
+.mast nav a:not(.btn):hover { color: var(--ink); }
+.btn { display: inline-flex; align-items: center; min-height: 38px; padding: 0 16px; border-radius: 999px; font: 600 14px/1 var(--sans); text-decoration: none; background: var(--ink); color: var(--ground); border: 1px solid var(--ink); }
+
+header.page { padding-block: 55px 0; }
+.kicker { font: 600 12px/1 var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--mute); margin: 0 0 13px; }
+h1 { margin: 0; font: 800 clamp(2.1rem, 5vw, 3.1rem)/1.05 var(--sans); letter-spacing: -.035em; color: var(--ink); text-wrap: balance; }
+.lede { margin-top: 21px; font-size: 1.14rem; line-height: 1.6; color: var(--ink-soft); max-width: 40em; }
+.checked { margin-top: 13px; font-size: 14px; color: var(--mute); }
+
+main { padding-block: 21px 89px; }
+h2 { margin: 55px 0 16px; font: 800 clamp(1.4rem, 2.6vw, 1.85rem)/1.2 var(--sans); letter-spacing: -.025em; color: var(--ink); text-wrap: balance; }
+h3 { margin: 0 0 6px; font: 700 1.05rem/1.3 var(--sans); color: var(--ink); }
+p { margin: 0 0 16px; color: var(--ink-soft); }
+p strong, li strong, td strong { color: var(--ink); font-weight: 700; }
+
+/* The one bold element: the lit word, as the logo draws it. */
+.lit { background: var(--glow); color: var(--lit-ink); border-radius: .26em; padding: 0 .14em; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+
+.specimen { margin: 21px 0; background: var(--paper); border: 1px solid var(--rule); border-radius: 17px; padding: 21px 24px; }
+.specimen q { display: block; font: 400 1.2rem/1.55 var(--serif); color: var(--ink); quotes: none; }
+.specimen .two { display: grid; grid-template-columns: 1fr 1fr; gap: 21px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--rule); }
+.specimen .two p { margin: 0; font-size: 15.5px; }
+.specimen .who { display: block; font: 600 12px/1 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--mute); margin-bottom: 8px; }
+
+.cards { display: grid; gap: 13px; margin-top: 21px; }
+.card { background: var(--paper); border: 1px solid var(--rule); border-radius: 17px; padding: 18px 21px; }
+.card p { margin: 0; font-size: 15.5px; }
+.card p + p { margin-top: 10px; }
+
+table.cmp { width: 100%; border-collapse: collapse; margin-top: 21px; font-size: 15px; line-height: 1.5; }
+.cmp th, .cmp td { text-align: start; vertical-align: top; padding: 12px 13px; border-bottom: 1px solid var(--rule); }
+.cmp thead th { font: 700 13px/1.3 var(--sans); letter-spacing: .04em; color: var(--mute); border-bottom-color: var(--ink-soft); }
+.cmp tbody th { font-weight: 700; color: var(--ink); width: 22%; }
+.cmp td { color: var(--ink-soft); width: 39%; }
+.cmp tbody th, .cmp td:first-of-type { padding-inline-start: 0; }
+.cmp tbody th + td { padding-inline-start: 13px; }
+
+.pick { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; margin-top: 21px; }
+.pick .card h3 { margin-bottom: 8px; }
+.pick ul { margin: 0; padding-inline-start: 1.1em; color: var(--ink-soft); font-size: 15.5px; }
+.pick li + li { margin-top: 6px; }
+
+.faq { border-top: 1px solid var(--rule); margin-top: 21px; }
+.faq div { padding-block: 16px; border-bottom: 1px solid var(--rule); }
+.faq p { margin: 0; font-size: 15.5px; }
+.cta { margin-top: 21px; display: flex; flex-wrap: wrap; gap: 13px; }
+.cta a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; text-decoration: none; font: 600 15px/1 var(--sans); border: 1px solid var(--rule); color: var(--ink); background: var(--paper); }
+.cta a.primary { background: var(--ink); color: var(--ground); border-color: var(--ink); }
+.fine { font-size: 14px; color: var(--mute); margin-top: 13px; }
+
+footer { border-top: 1px solid var(--rule); padding-block: 34px 55px; font-size: 14.5px; color: var(--mute); }
+footer .wrap { max-width: 1180px; display: flex; flex-wrap: wrap; gap: 13px 26px; align-items: center; }
+footer a { color: var(--ink-soft); text-decoration: none; border-bottom: 1px solid transparent; }
+footer a:hover { color: var(--ink); border-bottom-color: var(--rule); }
+footer .spacer { margin-inline-start: auto; }
+footer .tm { flex-basis: 100%; margin: 0; font-size: 13.5px; color: var(--mute); }
+@media (max-width: 620px) {
+  .mast nav a.hide-sm { display: none; }
+  footer .spacer { margin-inline-start: 0; }
+  .specimen .two, .pick { grid-template-columns: 1fr; }
+  /* The table becomes one block per row, each cell labelled by its column. */
+  .cmp thead { display: none; }
+  .cmp tr { display: block; padding-block: 13px; border-bottom: 1px solid var(--rule); }
+  .cmp th, .cmp td { display: block; width: auto; border: 0; padding: 0; }
+  .cmp tbody th { margin-bottom: 6px; width: auto; }
+  .cmp tbody th + td { padding-inline-start: 0; }
+  .cmp td + td { margin-top: 6px; }
+  .cmp td::before { content: attr(data-col); display: block; font: 700 12px/1.4 var(--sans); letter-spacing: .04em; color: var(--mute); }
+}
+</style>
+<style>
+figure { margin: 21px 0; }
+figure img { display: block; margin-inline: auto; max-width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 17px; background: var(--paper); }
+figcaption { margin-top: 10px; font-size: 14px; line-height: 1.55; color: var(--mute); }
+</style>
+<style>
+.chart { display: block; width: 100%; height: auto; max-width: 640px; margin-inline: auto; }
+.c-head { font: 700 13px/1 var(--sans); letter-spacing: .04em; text-transform: uppercase; fill: var(--mute); }
+.c-lab { font: 600 14.5px/1 var(--sans); fill: var(--ink); }
+.c-val { font: 600 13.5px/1 var(--sans); fill: var(--mute); }
+.c-track { fill: var(--rule); opacity: .5; }
+.c-bar { fill: var(--accent); }
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 13px; margin: 21px 0; }
+.step { background: var(--paper); border: 1px solid var(--rule); border-radius: 17px; padding: 16px 18px; }
+.step b { display: block; font: 700 12px/1 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--mute); margin-bottom: 8px; }
+.step p { margin: 0; font-size: 15px; }
+.step .word { font: 600 1.05rem/1.4 var(--serif); color: var(--ink); }
+@media (max-width: 620px) { .steps { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <div class="wrap">
+    <a class="brand" href="/"><img src="../icon.svg" alt="" width="28" height="28">Context Reader</a>
+    <nav aria-label="Site">
+      <a href="/blog/" class="hide-sm">Writing</a>
+      <a href="/vs-reverso" class="hide-sm">vs Reverso</a>
+      <a class="btn js-install" data-umami-event="install-click" data-umami-event-place="acc-masthead" href="https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck">Add to Chrome</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <header class="page">
+    <p class="kicker">Reading in another language</p>
+    <h1>How accurate is Google Translate?</h1>
+    <p class="lede">Accurate enough to tell you what a page is about. Least accurate exactly where you need it most: one word, a specialist term, or a language that has less text online. In one study of hospital discharge instructions, the meaning survived in <strong>94%</strong> of Spanish translations and <strong>55%</strong> of Armenian ones — and what went wrong in the rest was not clumsy wording, it was the opposite instruction.</p>
+    <p class="checked">Written on 26 September 2026. Every number here comes from the two studies linked at the end. I build Context Reader, a free extension for reading in another language, so read this knowing that.</p>
+  </header>
+
+  <main>
+    <h2>What one study actually measured</h2>
+    <p>Researchers took twenty real emergency-department discharge instructions, ran them through Google Translate into seven languages, and asked bilingual speakers one question about each: <em>did the instruction still mean what it meant in English?</em> Not "is it elegant" — does a patient reading this do the right thing.</p>
+    <svg viewBox="0 0 640 316" role="img" width="640" height="316" aria-labelledby="acc-title acc-desc" class="chart">
+<title id="acc-title">Google Translate accuracy by language, from Taira et al. 2021</title>
+<desc id="acc-desc">Share of emergency-department instructions whose meaning survived translation: Spanish 94.0 per cent, Tagalog 90.0 per cent, Korean 82.5 per cent, Chinese 81.7 per cent, Vietnamese 77.5 per cent, Farsi 67.5 per cent, Armenian 55.0 per cent.</desc>
+<text x="0" y="49" class="c-lab">Spanish</text>
+<rect x="108" y="36" width="472" height="17" rx="8" class="c-track"/>
+<rect x="108" y="36" width="444" height="17" rx="8" class="c-bar"/>
+<text x="562" y="49" class="c-val">94%</text>
+<text x="0" y="87" class="c-lab">Tagalog</text>
+<rect x="108" y="74" width="472" height="17" rx="8" class="c-track"/>
+<rect x="108" y="74" width="425" height="17" rx="8" class="c-bar"/>
+<text x="543" y="87" class="c-val">90%</text>
+<text x="0" y="125" class="c-lab">Korean</text>
+<rect x="108" y="112" width="472" height="17" rx="8" class="c-track"/>
+<rect x="108" y="112" width="389" height="17" rx="8" class="c-bar"/>
+<text x="507" y="125" class="c-val">82.5%</text>
+<text x="0" y="163" class="c-lab">Chinese</text>
+<rect x="108" y="150" width="472" height="17" rx="8" class="c-track"/>
+<rect x="108" y="150" width="386" height="17" rx="8" class="c-bar"/>
+<text x="504" y="163" class="c-val">81.7%</text>
+<text x="0" y="201" class="c-lab">Vietnamese</text>
+<rect x="108" y="188" width="472" height="17" rx="8" class="c-track"/>
+<rect x="108" y="188" width="366" height="17" rx="8" class="c-bar"/>
+<text x="484" y="201" class="c-val">77.5%</text>
+<text x="0" y="239" class="c-lab">Farsi</text>
+<rect x="108" y="226" width="472" height="17" rx="8" class="c-track"/>
+<rect x="108" y="226" width="319" height="17" rx="8" class="c-bar"/>
+<text x="437" y="239" class="c-val">67.5%</text>
+<text x="0" y="277" class="c-lab">Armenian</text>
+<rect x="108" y="264" width="472" height="17" rx="8" class="c-track"/>
+<rect x="108" y="264" width="260" height="17" rx="8" class="c-bar"/>
+<text x="378" y="277" class="c-val">55%</text>
+<text x="0" y="18" class="c-head">Meaning kept, by language</text>
+</svg>
+    <p class="fine">Share of instructions whose meaning survived. Taira BR, Kreger V, Orue A, Diamond LC, <em>A Pragmatic Assessment of Google Translate for Emergency Department Instructions</em>, Journal of General Internal Medicine, 2021 — 400 judgements by 20 bilingual reviewers.</p>
+    <p>Two things stand out. Spanish is genuinely good. And the spread is enormous: the same tool, the same sentences, and Armenian readers got something usable barely half the time.</p>
+
+    <h2>Why accuracy changes with the language</h2>
+    <p>These systems learn from text. The more of a language exists online, translated alongside other languages, the better the system gets at it. Spanish, French, German, Portuguese and Chinese have oceans of it. Armenian, Farsi and most of the world's languages have far less, and the model has correspondingly less to go on.</p>
+    <p>It is not a judgement about the languages. It is a fact about how much of each one was written down where a machine could read it. Google has said its newer language support leans on large language models to bridge into languages closely related to ones it already knows, which helps — but it does not invent the missing text.</p>
+
+    <h2>The errors that survive are the dangerous ones</h2>
+    <p>You would expect the failures to look broken. Mostly they don't. In the same study, one Armenian translation offered a patient an <em>anti-tank missile</em> where the English said <em>ibuprofen</em> — obvious, and harmless because nobody would follow it. The quiet ones are worse. In an earlier study of the same kind of instructions, "hold the kidney medicine until you speak to your kidney doctor" came back in Chinese as "keep taking kidney medicine until you talk to your kidney doctor": fluent, confident, and the opposite of what the doctor meant.</p>
+    <p>That is the shape of machine-translation error. Not gibberish you can spot — a smooth sentence with one thing reversed.</p>
+
+    <h2>Is Google Translate a dictionary?</h2>
+    <p>No, and this is where most disappointment comes from. A dictionary lists every meaning a word has and leaves the choosing to you. A translator has to choose, and when you give it a single word there is nothing to choose from, so it returns the most common meaning. In a lab report, <span class="lit">culture</span> is a sample grown to find bacteria. Alone in a box, it is art and customs. The tool is not wrong about the word; it never saw your sentence.</p>
+
+    <h2>How to check a translation when you don't know the language</h2>
+    <div class="steps">
+      <div class="step"><b>1 · Start</b><p class="word">hold the medicine</p><p>The sentence you actually need to understand.</p></div>
+      <div class="step"><b>2 · Translate</b><p class="word">→ your language</p><p>Whole sentence, never the single word.</p></div>
+      <div class="step"><b>3 · Translate back</b><p class="word">keep taking it?</p><p>If you don't get your own words back, the meaning moved.</p></div>
+    </div>
+    <p>Back-translation is rough — a good translation can come back worded differently — but a <em>reversed</em> instruction almost always shows up. Two more habits that cost nothing: paste the whole paragraph rather than the sentence, and say out loud what the text is about before you trust the result, because most bad translations are a word pulled out of its field.</p>
+
+    <h2>When not to rely on it at all</h2>
+    <p>Anything you will act on: a dose, a deadline, a clause, a consent form. The study above was written precisely because hospitals were using machine translation with patients, and its authors' conclusion was not "don't" but "not on its own" — give the English alongside it, and use a human interpreter for anything that matters. The same logic covers contracts and immigration forms.</p>
+
+    <h2>Where this leaves you, and where my extension fits</h2>
+    <p>Translation is the right tool for a page you cannot read at all. For a page you can mostly follow, where one word stopped you, it is the wrong shape: you don't want the page moved into your language, you want that word explained in the sentence it is sitting in.</p>
+    <p>That is what <strong>Context Reader</strong> does — the free extension I build. Select the word and it sends the paragraph with it, then answers with the one meaning that fits, in your language. It is the difference between "what does this word mean" and "what does it mean here".</p>
+    <figure>
+      <img src="img/word-in-context-english.webp" width="710" height="470" loading="lazy" decoding="async" alt="Context Reader open on a research article: the word significant is selected, and the bubble explains that in science it means the difference was unlikely to be chance.">
+      <figcaption>The same word, answered for the sentence it is in rather than in general. Captured from the extension, not a mockup.</figcaption>
+    </figure>
+    <p>It has the same limits, honestly: the answers come from a model, only English and Sinhala ship examples checked by a speaker, and the <strong>EN</strong> button exists so you can see the same answer in English and catch a bad one. For a dose or a clause, ask a person.</p>
+
+    <h2>Questions</h2>
+    <div class="faq">
+      <div><h3>Is Google Translate accurate?</h3><p>For whole sentences between widely written languages, usually yes. In one study of emergency-department instructions it kept the meaning in 94% of Spanish translations and 55% of Armenian ones, and the errors that remained were the serious kind. Treat it as good for the gist and unreliable for a single word or a specialist term.</p></div>
+      <div><h3>Is Google Translate accurate for my language?</h3><p>It depends on how much text that language has online, because that is what these systems learn from. Spanish, French, German and Chinese do well. Smaller languages are noticeably weaker, and the same study found Armenian kept the meaning only about half the time.</p></div>
+      <div><h3>Is Google Translate a dictionary?</h3><p>No, and this is the most common mix-up. A dictionary lists every meaning a word has and lets you choose. A translator must choose for you, and with a single word it has no context to choose from, so it gives you the most common meaning.</p></div>
+      <div><h3>Can I use Google Translate for medical or legal text?</h3><p>For understanding roughly what a document is about, yes. For anything you will act on — a dose, a deadline, a clause — no. Two studies of medical instructions found rare but serious reversals, including a translation that told a patient to keep taking a medicine they had been told to stop.</p></div>
+      <div><h3>How do I check a translation when I do not know the language?</h3><p>Translate the result back into the language you started in. If the word that returns is not the word you began with, the meaning moved. It is rough, but it catches the obvious failures.</p></div>
+    </div>
+
+    <h2>Sources</h2>
+    <ul>
+      <li>Taira BR, Kreger V, Orue A, Diamond LC. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8606479/">A Pragmatic Assessment of Google Translate for Emergency Department Instructions</a>. Journal of General Internal Medicine, 2021. The per-language figures in the chart.</li>
+      <li>Khoong EC, Steinbrook E, Brown C, Fernandez A. <a href="https://pubmed.ncbi.nlm.nih.gov/30801626/">Assessing the Use of Google Translate for Spanish and Chinese Translations of Emergency Department Discharge Instructions</a>. JAMA Internal Medicine, 2019. The reversed medicine instruction.</li>
+      <li>Google, <a href="https://blog.google/products/translate/google-translate-new-languages-2024/">110 new languages in Google Translate</a>, 2024, on using a large language model to reach related languages.</li>
+    </ul>
+
+    <p>Related: <a href="/blog/why-google-translate-gets-words-wrong">why a single word comes back wrong</a>, and <a href="/blog/reading-english-second-language">how to understand English words when it isn't your first language</a>.</p>
+
+    <div class="cta">
+      <a class="primary js-install" data-umami-event="install-click" data-umami-event-place="acc-end" href="https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck">Add to Chrome</a>
+      <a href="/">See it working</a>
+    </div>
+    <p class="fine" id="install-fine">Free. Chrome, Brave and Edge install from the Chrome Web Store; Firefox from addons.mozilla.org.</p>
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">
+    <a href="/">Home</a>
+    <a href="/blog/">Writing</a>
+    <a href="/support">Support</a>
+    <a href="/privacy">Privacy</a>
+    <a href="https://github.com/contextreader/contextreader.github.io">Source</a>
+    <span class="spacer">The extension collects nothing; this site counts visits with Cloudflare Web Analytics, and visits and clicks with Umami, both cookieless.</span>
+    <p class="tm">Google and Google Translate are trademarks of Google LLC. Context Reader is an independent project, not affiliated with or endorsed by Google. Nothing here is medical or legal advice.</p>
+  </div>
+</footer>
+
+<script defer src="https://cloud.umami.is/script.js" data-website-id="583c9618-5c32-40a5-b0dd-33b2d8f7048d"></script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "ceec88afaf1f47a289d50d0a20bff3bb"}'></script>
+<script>
+/* Install button, per browser.
+ *
+ * The markup ships "Add to Chrome" pointing at the Chrome Web Store (live 22
+ * Sep), so with no JavaScript the button is still true. This only renames it
+ * for a browser whose store is filled in below: "Add to Brave" is the same
+ * listing with a different word. A browser with no listing of its own
+ * (Safari, Opera) keeps "Add to Chrome", which stays honest.
+ * test/copy.test.js checks that each URL points at that browser's own store.
+ */
+(function () {
+  var STORES = {
+    chrome:  'https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck',
+    brave:   'https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck',
+    edge:    'https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck',   /* Edge installs from the Chrome Web Store too */
+    opera:   '',   /* Opera needs a helper add-on for the Chrome Web Store: the button stays "Add to Chrome" */
+    vivaldi: 'https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck',
+    firefox: 'https://addons.mozilla.org/firefox/addon/contextreader/'   /* listed 25 Sep */
+  };
+  var NAMES = { chrome: 'Chrome', brave: 'Brave', edge: 'Edge', opera: 'Opera',
+                vivaldi: 'Vivaldi', firefox: 'Firefox', safari: 'Safari' };
+
+  function detect() {
+    var ua = navigator.userAgent;
+    /* Brave hides in the UA string and says so only through this API. */
+    if (navigator.brave && navigator.brave.isBrave) return 'brave';
+    if (/Edg\//.test(ua)) return 'edge';
+    if (/OPR\//.test(ua)) return 'opera';
+    if (/Vivaldi/.test(ua)) return 'vivaldi';
+    if (/Firefox\//.test(ua)) return 'firefox';
+    if (/Chrome\//.test(ua)) return 'chrome';
+    if (/Safari\//.test(ua)) return 'safari';
+    return '';
+  }
+
+  function apply(which) {
+    var url = STORES[which];
+    /* Umami reads these on click: which browser was detected, and where the button went. */
+    var tagged = document.querySelectorAll('a.js-install');
+    for (var j = 0; j < tagged.length; j++) {
+      tagged[j].setAttribute('data-umami-event-browser', which || 'other');
+      tagged[j].setAttribute('data-umami-event-to', url ? 'store' : 'chrome-store');
+    }
+    if (!url) return;                       /* no listing: leave "Add to Chrome" alone */
+    var name = NAMES[which] || 'your browser';
+    var links = document.querySelectorAll('a.js-install');
+    for (var i = 0; i < links.length; i++) {
+      var a = links[i];
+      a.href = url;
+      a.textContent = a.getAttribute('data-long') ? 'Add to ' + name + ', free' : 'Add to ' + name;
+    }
+  }
+
+  var which = detect();
+  /* isBrave() is async; everything else is settled already. */
+  if (which === 'brave' && navigator.brave.isBrave.call) {
+    navigator.brave.isBrave().then(function (yes) { apply(yes ? 'brave' : 'chrome'); })
+      .catch(function () { apply('chrome'); });
+  } else {
+    apply(which);
+  }
+})();
+</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[
+{"@type":"Article","headline":"How accurate is Google Translate?","datePublished":"2026-09-26","dateModified":"2026-09-26","author":{"@type":"Organization","name":"Context Reader","url":"https://contextreader.github.io"},"publisher":{"@type":"Organization","name":"Context Reader","url":"https://contextreader.github.io"},"mainEntityOfPage":"https://contextreader.github.io/blog/how-accurate-is-google-translate","image":["https://contextreader.github.io/share.png","https://contextreader.github.io/blog/img/word-in-context-english.webp"],"description":"What one study found language by language, why accuracy varies, the errors that survive, and how to check a translation yourself."},
+{"@type":"FAQPage","mainEntity":[
+{"@type": "Question", "name": "Is Google Translate accurate?", "acceptedAnswer": {"@type": "Answer", "text": "For whole sentences between widely written languages, usually yes. In one study of emergency-department instructions it kept the meaning in 94% of Spanish translations and 55% of Armenian ones, and the errors that remained were the serious kind. Treat it as good for the gist and unreliable for a single word or a specialist term."}},
+{"@type": "Question", "name": "Is Google Translate accurate for my language?", "acceptedAnswer": {"@type": "Answer", "text": "It depends on how much text that language has online, because that is what these systems learn from. Spanish, French, German and Chinese do well. Smaller languages are noticeably weaker, and the same study found Armenian kept the meaning only about half the time."}},
+{"@type": "Question", "name": "Is Google Translate a dictionary?", "acceptedAnswer": {"@type": "Answer", "text": "No, and this is the most common mix-up. A dictionary lists every meaning a word has and lets you choose. A translator must choose for you, and with a single word it has no context to choose from, so it gives you the most common meaning."}},
+{"@type": "Question", "name": "Can I use Google Translate for medical or legal text?", "acceptedAnswer": {"@type": "Answer", "text": "For understanding roughly what a document is about, yes. For anything you will act on — a dose, a deadline, a clause — no. Two studies of medical instructions found rare but serious reversals, including a translation that told a patient to keep taking a medicine they had been told to stop."}},
+{"@type": "Question", "name": "How do I check a translation when I do not know the language?", "acceptedAnswer": {"@type": "Answer", "text": "Translate the result back into the language you started in. If the word that returns is not the word you began with, the meaning moved. It is rough, but it catches the obvious failures."}}
+]}]}</script>
+</body>
+</html>
