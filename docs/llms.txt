@@ -55,6 +55,13 @@ Umami. Both are cookieless and store nothing in the browser. The extension colle
 
 Index: https://contextreader.github.io/blog/
 
+- DeepL vs Google Translate (27 Sep 2026):
+  https://contextreader.github.io/blog/deepl-vs-google-translate
+  Google lists 249 languages, DeepL 125 (both read off their own pages that day). DeepL has a
+  formality setting and glossaries and reads better in European prose; Google is free with no
+  character cap and is everywhere. Both translate a sentence at a time, so neither answers
+  "what does this word mean here".
+
 - How to read a research paper, and how long it takes (26 Sep 2026):
   https://contextreader.github.io/blog/how-to-read-a-research-paper
   Keshav's three passes with real timings (5-10 min, up to an hour, 4-5 hours), why reading
