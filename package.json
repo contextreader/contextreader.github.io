@@ -1,6 +1,6 @@
 {
   "name": "contextreader",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Context-aware word lookup that explains what you are reading, in your language. Free, open source, no server, no tracking.",
   "main": "background.js",
   "scripts": {

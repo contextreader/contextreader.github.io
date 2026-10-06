@@ -12,9 +12,22 @@ cause of rejection.
 
 ## Short description (132 characters max)
 
-> The word you're stuck on, explained in your language — using the sentence around it. Free, open source, no tracking.
+Rewritten 1 Oct, for two reasons the dashboard made plain: the listing had **1 impression**
+in a month of Chrome Web Store search, so the words people type were missing; and 3 of 18
+installs were removed, most likely at the API-key step, so the key is now named before the
+install rather than after it.
 
-*(116 characters)*
+> Word meaning in context: select a word, get the definition that fits that sentence, in your language. Free, needs your own Gemini key.
+
+*(131 characters)*
+
+The searchable words are in it and all of them are true: **word meaning**, **in context**,
+**definition**, **your language**. "Needs your own Gemini key" costs a few installs on
+purpose: the people it turns away are the ones who would have uninstalled an hour later.
+
+Previous version, kept for comparison: *"The word you're stuck on, explained in your
+language, using the sentence around it. Free, open source, no tracking."* (116 characters).
+True, and it contains none of the words anyone searches.
 
 ## Category
 
@@ -35,14 +48,20 @@ English
 
 ## Detailed description
 
-**Understand the word, not just its definition.**
+**What does this word mean HERE?**
 
-A dictionary gives you every meaning of "culture". Context Reader reads the sentence
-you're actually looking at, works out that you're reading a lab report, and gives you
-the one that fits.
+A dictionary gives you every meaning of "culture". A translator picks the most common one.
+Context Reader reads the sentence you are actually looking at, works out that you are reading
+a lab report, and gives you the one that fits.
 
-Select a word on any page. You get the meaning that matches the context, in your
-language, in about two seconds.
+Select a word on any page. You get the meaning for that sentence, in your language, in about
+two seconds. It works on articles, papers, contracts, documentation and PDFs open in your
+browser.
+
+**Before you install: it needs a free Google Gemini API key.** That takes about a minute at
+aistudio.google.com/apikey and needs no card. It is the reason the extension has no server,
+no account, no subscription and nothing that can collect your reading. If you would rather not
+do that step, this is not the tool for you, and it is better to know now.
 
 **110 languages**
 Every language Google lists Gemini as supporting, from Afrikaans to Zulu — සිංහල, தமிழ்,
@@ -54,7 +73,8 @@ which languages are and which aren't.
 gives you a simpler word for the one you're stuck on.
 
 **Go deeper when you need to.** Three further views on any word: a worked scenario, a
-dictionary-style entry, and a plain explanation pitched at a thirteen-year-old.
+dictionary-style entry, and **Simple**, which says the same thing in layman's terms, plainly
+enough for a thirteen-year-old.
 
 **Free, and built to stay that way.**
 Context Reader has no server. It calls Google's Gemini API directly from your browser

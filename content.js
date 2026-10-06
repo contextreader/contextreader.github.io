@@ -370,6 +370,13 @@ const styles = SR_BUNDLED_FACES + `
         } 
     }
     
+    /* One flex item per character, so a flex row in an RTL bubble lays the
+       letters out right to left and the word reads backwards: ESCALATED came
+       out as DETALACSE for a reader whose language is Arabic, Urdu, Persian or
+       Hebrew (Ian, 6 Oct). The elements carry dir="auto", so the direction
+       comes from the WORD on the page, not from the language being answered
+       in: a Latin word stays left to right inside an RTL bubble, and an Arabic
+       word still reads right to left. */
     .sr-imprint-word { 
         font-size: 24px; font-weight: 800; color: #111827; 
         text-transform: uppercase; letter-spacing: 4px; 
@@ -2055,7 +2062,7 @@ triggerBtn.addEventListener('mousedown', function(e) {
                     <div class="sr-neural-node sr-node-1"></div>
                     <div class="sr-neural-node sr-node-2"></div>
                 </div>
-                <div class="sr-imprint-word" style="${imprintStyle}">${generateTypewriterHtml(displayWord)}</div>
+                <div class="sr-imprint-word" dir="auto" style="${imprintStyle}">${generateTypewriterHtml(displayWord)}</div>
                 <div class="sr-loading-text">
                     <div style="font-weight:700; color:#4b5563;">Analyzing Context...</div>
                     <div style="font-size:11px; color:#9ca3af; margin-top:4px;">
@@ -2569,7 +2576,7 @@ function showVideoPlayer(query) {
                 <div class="sr-neural-node sr-node-2"></div>
                 <div class="sr-neural-node sr-node-3"></div>
             </div>
-            <div class="sr-imprint-word">${generateTypewriterHtml(query)}</div>
+            <div class="sr-imprint-word" dir="auto">${generateTypewriterHtml(query)}</div>
             <div class="sr-loading-text">Scanning Movie Archives...</div>
             <button id="sr-cancel-video" class="sr-cancel-btn">Cancel Request</button>
         </div>

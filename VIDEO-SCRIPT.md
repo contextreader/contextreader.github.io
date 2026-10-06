@@ -180,3 +180,67 @@ sped up, because two seconds is already fast.
 **Kills it:** a stock-photo intro, music that fights the captions, a cursor that never stops
 moving, a fake "typing" animation, any answer that did not come from the extension, and
 anything that dresses up the waiting. If a lookup takes three seconds, show three seconds.
+
+---
+
+# The setup tutorial (added 1 Oct)
+
+A separate, more important film than the launch one. The dashboard says 3 of the first 18
+installs were removed, and the only hard step in the product is getting an API key. A real
+screen recording of that step is worth more than any animation, because people need to see
+**Google's actual screens**, not a drawing of them.
+
+**Length:** 75 to 95 seconds. **Shape:** 16:9, 1280×800 window.
+
+## Before you record: protect yourself
+
+1. **Make a throwaway key for the film, and delete it afterwards.** Create a new key at
+   aistudio.google.com/apikey, record with it, then delete that key in AI Studio the moment
+   you finish. Then the key visible on screen is dead, and nothing has to be blurred.
+2. **Account name and avatar.** AI Studio shows your Google account at the top right. Either
+   record in a Chrome profile signed into a throwaway Google account, or set the capture
+   rectangle to exclude the top-right corner. Decide before you start, not in editing.
+3. Everything from the browser setup section above still applies: separate profile, bookmarks
+   bar hidden with `⌘⇧B`, one tab, Do Not Disturb on, dock and desktop icons hidden.
+4. **Move slowly.** Pause about a second before each click. What feels painfully slow while
+   recording reads as calm on playback.
+
+## The shot list
+
+| Time | What you do | Caption |
+|---|---|---|
+| 0:00 | Static title over the extension's welcome page | **Setting up takes about a minute** |
+| 0:05 | Open `aistudio.google.com/apikey` | **1. Get a free key from Google** |
+| 0:12 | Click **Create API key**. Wait for it. Click **Copy** | **No card. No account with us.** |
+| 0:28 | Right-click the extension icon → **Options** | **2. Open Settings** |
+| 0:36 | Paste into the key field, click **Save**, wait for *Saved and verified* | **3. Paste it and save** |
+| 0:48 | Puzzle icon in the toolbar → pin Context Reader | **4. Pin it, so the language switch is one click away** |
+| 0:58 | Open a real article. Select a word. The amber mark appears | **5. Select any word** |
+| 1:06 | Click the mark. The answer arrives. **Hold still** | **The meaning for that sentence, in your language** |
+| 1:18 | Click **Simple** once | **Too technical? Ask for it simpler** |
+| 1:26 | End card | **That is the whole setup. Free, no account, nothing stored.** |
+
+Do not cut the waiting. If the key takes four seconds to create, show four seconds. A tutorial
+that hides the waiting makes people think something is wrong when it happens to them.
+
+## Where it goes
+
+| Place | How |
+|---|---|
+| **The site**, a new `/setup` page | The MP4 hosted on our own domain, in a `<video controls>` tag. No YouTube embed: the site promises no third-party requests and `test/copy.test.js` enforces it |
+| **The welcome page**, which opens on install | A link to `/setup`, right at the top. An extension page cannot embed YouTube either, because its own content-security policy forbids it |
+| **The support page** | The same link, under "Getting started" |
+| **The Chrome Web Store listing** | A YouTube copy. The store accepts a link only, and that is Google's page, not ours |
+
+So: one recording, two homes. The self-hosted copy keeps every promise the site makes; the
+YouTube copy exists because the store will not take a file.
+
+## What I do with the recording
+
+Send me the raw file and I will trim the dead ends, burn in the captions above, add a poster
+frame, export it web-optimised (faststart, about 5 to 8 MB at 1280×720), build the `/setup`
+page around it with a written version of the same steps underneath for people who do not play
+videos, and wire the links from the welcome and support pages.
+
+**The written steps matter as much as the film.** Search engines and language models read text,
+not video, and "how do I get a Gemini API key" is a real search.
