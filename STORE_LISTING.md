@@ -254,3 +254,26 @@ Settings also lets you change the language (110), the model, and the prompts.
 **Then:** upload `dist/contextreader-chrome-1.0.2.zip` and submit. Appeal only if it is
 rejected again with the same reference, quoting this section.
 
+---
+
+## Rejection, 8 Oct 2026 — the wrong zip was uploaded
+
+**Rejected:** "Including remotely hosted code in a Manifest V3 item", reference *Blue Argon*,
+quoting `docs/blog/index.html` and `docs/privacy.html` and their Cloudflare and Umami tags.
+
+**Cause:** `contextreader-source-1.0.4.zip` was uploaded instead of
+`contextreader-chrome-1.0.4.zip`. The source archive is the whole repository, website
+included, and the website loads two analytics scripts. The reviewer was right about the file
+they were given. The extension package itself has 42 files, no `docs/`, and no remote script
+tag anywhere.
+
+**Fix:** upload `dist/contextreader-chrome-<version>.zip` and resubmit. No appeal, no code
+change.
+
+**So it cannot happen again:** source archives are now written by `npm run source` into
+`dist/mozilla-only/`, which is the only place they live and says in its name who they are for.
+
+**The rule, in one line:** Chrome gets `contextreader-chrome-*.zip`. Mozilla gets
+`contextreader-firefox-*.zip` plus `mozilla-only/contextreader-source-*.zip`. Chrome never
+receives source.
+

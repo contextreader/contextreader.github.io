@@ -6,7 +6,8 @@
   "scripts": {
     "build": "node esbuild.config.mjs",
     "test": "node test/run.mjs",
-    "package": "node scripts/package.mjs"
+    "package": "node scripts/package.mjs",
+    "source": "node scripts/source-zip.mjs"
   },
   "repository": {
     "type": "git",
