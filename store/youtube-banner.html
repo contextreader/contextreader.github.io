@@ -1,0 +1,39 @@
+<!doctype html>
+<!-- Source for store/youtube-banner.png, the YouTube channel banner.
+     Re-render (from the repo root, any headless Chromium):
+       chrome --headless --window-size=2048,1152 --force-color-profile=srgb \
+         --screenshot=store/youtube-banner.png file://$PWD/store/youtube-banner.html
+     YouTube shows 2048x1152 on a TV and crops to the centre 1546x423 everywhere
+     else, so nothing that matters may leave .safe. The light variant is the same
+     file with the five colour values swapped; it is checked in as
+     youtube-banner-light.png. --><html><head><meta charset="utf-8">
+<style>
+@font-face { font-family:"Inter"; font-weight:400; src:url("../docs/fonts/inter-latin-400.woff2") format("woff2"); }
+@font-face { font-family:"Inter"; font-weight:600; src:url("../docs/fonts/inter-latin-600.woff2") format("woff2"); }
+@font-face { font-family:"Inter"; font-weight:800; src:url("../docs/fonts/inter-latin-800.woff2") format("woff2"); }
+* { margin:0; padding:0; box-sizing:border-box; }
+html,body { width:2048px; height:1152px; background:#101317; }
+body { font-family:"Inter",sans-serif; -webkit-font-smoothing:antialiased; display:grid; place-items:center; }
+/* Everything lives inside YouTube's 1546x423 safe area, the only part every
+   device shows. The rest of the 2048x1152 is ground, which is the point. */
+.safe { width:1546px; height:423px; display:flex; flex-direction:column; align-items:center;
+         justify-content:center; gap:34px; }
+.row { display:flex; align-items:center; gap:28px; }
+.mark { width:92px; height:92px; display:block; }
+h1 { font-weight:800; font-size:76px; letter-spacing:-0.025em; color:#f3f4f6; line-height:1; }
+.line { font-weight:400; font-size:34px; line-height:1.3; color:#c3c8d0; text-align:center; }
+.lit { color:#fbbf24; font-weight:600; background:rgba(251,191,36,0.16); border-radius:7px; padding:2px 9px; }
+.fine { font-weight:600; font-size:21px; letter-spacing:0.16em; text-transform:uppercase; color:#8b929c; }
+</style></head><body>
+<div class="safe">
+  <div class="row"><svg class="mark" viewBox="0 0 128 128" aria-hidden="true">
+  <rect width="128" height="128" rx="28" fill="#fbbf24"/>
+  <rect x="24" y="28" width="80" height="16" rx="8" fill="#111827" fill-opacity="0.34"/>
+  <rect x="24" y="56" width="52" height="16" rx="8" fill="#111827"/>
+  <rect x="86" y="56" width="18" height="16" rx="8" fill="#111827" fill-opacity="0.34"/>
+  <rect x="24" y="84" width="60" height="16" rx="8" fill="#111827" fill-opacity="0.34"/>
+</svg><h1>Context Reader</h1></div>
+  <p class="line">The word you&rsquo;re stuck on, explained in <span class="lit">your language</span>, using the sentence around it.</p>
+  <p class="fine">Free &nbsp;·&nbsp; Open source &nbsp;·&nbsp; No server</p>
+</div>
+</body></html>
