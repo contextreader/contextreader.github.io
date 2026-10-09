@@ -89,3 +89,29 @@ ground is `#eef0f3`. The lit-word highlight is the one bold element — use it o
 
 Save as `store/launch-x-<yyyy-mm-dd>.mp4`, tell Ian, and post the first frame as a still so he
 can check it reads at a glance. The thread text is in `LAUNCH.md` §4 — the clip goes on post 1.
+
+---
+
+## The Chrome Web Store video (10 Oct 2026)
+
+The store listing takes a YouTube link, not a file, and the setup tutorial is the wrong film
+for it: it answers "how do I get a key", not "what is this". The product film does that.
+
+**Upload `store/store-video-2026-10-10-4k.mp4`.** It is the 25-second 4K cut
+(`launch-x-2026-09-24-4k.mp4`) with the first 2.9 seconds trimmed off, leaving 22.1s.
+
+Why the trim: for the first three seconds the brand lockup and the paper's own RESULTS header
+sit on top of each other, which reads as a layout bug in the one place a store visitor is
+paying attention. Everything after 2.9s is clean. The cut now opens on the settled frame and
+the caption "One of them doesn't mean what you think", which is a better first line anyway.
+`store/store-video-2026-10-10-first-frame.png` is that opening frame, and it works as the
+thumbnail.
+
+The film keeps every promise in the Hard constraints above: real captured answers, Google
+Translate's own output labelled as such, no Sinhala framing, 110 languages.
+
+The end card says "Chrome · Brave · Edge" and stays that way for this listing. Firefox belongs
+on the AMO description, not on a Chrome Web Store film.
+
+The master files stay on the machine. `.gitignore` keeps every `.mp4` except the web copy
+under `docs/media`, so the Pages repo does not carry a 20 MB video.

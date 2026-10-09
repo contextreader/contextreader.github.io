@@ -163,6 +163,7 @@ text and clicks.
 | Homepage URL | `https://contextreader.github.io` |
 | Support URL | `https://github.com/contextreader/contextreader.github.io/issues` — public and trackable, unlike an inbox |
 | Mature content | Off |
+| Video | A YouTube link, nothing else: the store takes no file. Upload `store/store-video-2026-10-10-4k.mp4` (22 seconds, 4K, silent, real captured answers) and paste the watch URL. See the Chrome Web Store section at the end of `VIDEO.md` for what it is and why it was trimmed. The setup tutorial at https://youtu.be/62NEXB5b7zc is the wrong film for this field; it belongs on the `/setup` page and in the support answer, not on the listing. |
 
 **Search Console verification files** in `docs/`, one per owner — the site can have several,
 and each account collects its own search data:
