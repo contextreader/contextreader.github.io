@@ -244,3 +244,37 @@ videos, and wire the links from the welcome and support pages.
 
 **The written steps matter as much as the film.** Search engines and language models read text,
 not video, and "how do I get a Gemini API key" is a real search.
+
+---
+
+# What actually shipped (10 Oct 2026)
+
+Ian recorded the setup tutorial by hand in a clean profile and cut it in DaVinci. The film
+is 28.3 seconds, silent, 1920x1080 at 60fps, with a slow zoom that follows the cursor.
+
+| File | Where it lives | Size |
+|---|---|---|
+| `docs/media/setup-gemini-key.mp4` | served by the site at `/media/…`, H.264 CRF 21, faststart, audio dropped | 3.1 MB |
+| `docs/media/setup-gemini-key.jpg` | poster frame | 34 KB |
+| YouTube copy | https://youtu.be/62NEXB5b7zc, titled "Context Reader: add your free Gemini API key (60 seconds)" | 4K60 upload |
+| `store/youtube-avatar.png` | the channel picture: 800x800, the mark at 85% so the circle crop never clips a bar | 8 KB |
+
+The 4K file went to YouTube even though it is an upscale of a 1080p timeline: measured 7%
+less edge detail than the 1080p master, but YouTube gives 4K uploads a better encoder ladder,
+and the result is visibly cleaner than its 1080p transcode.
+
+The page built around it is `docs/setup.html` (`/setup`): the film, the five steps written out, what the key does and does not allow, four failure messages, and five questions as
+FAQPage structured data. The written half is the point. "how do I get a gemini api key" is a
+real search and a video answers none of it.
+
+## The key is readable in the film
+
+**Between about 17s and 21s the full API key and the Google Cloud project number are legible**
+in the API key details dialog. The key was a throwaway, so the fix is to delete it in AI
+Studio, which makes the frames harmless. Blurring it afterwards is not worth attempting in
+ffmpeg: the shot pans and zooms through that stretch, so a fixed rectangle either misses the
+key or smears half the window. If it has to go, it is a tracked blur in DaVinci over the
+original timeline, re-exported, and both copies swapped.
+
+**For the next recording:** create the key *before* rolling, and never open "API key details"
+on camera. The flow only needs Create key then Copy, and the copy happens from the list.

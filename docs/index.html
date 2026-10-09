@@ -549,6 +549,9 @@ h1 {
 .gs-step h3 { margin: 0; font: 700 clamp(1.3rem, 2vw, 1.6rem)/1.2 var(--sans); letter-spacing: -.02em; color: var(--ink); text-wrap: balance; }
 .gs-step p { margin-top: 13px; color: var(--ink-soft); font-size: 1.05rem; line-height: 1.6; max-width: 30em; }
 .gs .cta { margin-top: 21px; }
+.gs-watch { margin-top: 13px; font-size: 1rem; }
+.gs-watch a { color: var(--ink-soft); text-decoration: none; border-bottom: 1px solid var(--rule); }
+.gs-watch a:hover { color: var(--ink); border-bottom-color: currentColor; }
 
 .gs-visual { position: sticky; top: max(80px, calc(50vh - 240px)); align-self: start; }
 .gs-win { position: relative; background: var(--desk); border-radius: 17px; padding: 8px; box-shadow: var(--doc-shadow); }
@@ -1146,6 +1149,7 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
   </section>
 
 
+  <!-- .gs-watch: the setup film lives on /setup, self-hosted. Added 10 Oct 2026. -->
   <section class="gs" id="sec-start" aria-labelledby="gs-h">
     <div class="gs-head">
       <p class="kicker">Get started</p>
@@ -1174,6 +1178,7 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
               <a class="btn primary js-install" data-umami-event="install-click" data-umami-event-place="get-started" href="https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck" data-long="1">Add to Chrome, free</a>
               <a class="btn" href="https://aistudio.google.com/apikey" data-umami-event="get-key-click" data-umami-event-place="get-started">Get a Gemini key ↗</a>
             </div>
+            <p class="gs-watch"><a href="/setup">Watch the setup, 28 seconds →</a></p>
           </div></div>
         </div>
       </div>
@@ -1383,6 +1388,7 @@ dialog.md-view::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur
       </nav>
       <nav aria-label="Reading and contact">
         <h4>The details</h4>
+        <a href="/setup">Setting up your key</a>
         <a href="/privacy">Privacy policy ↗</a>
         <a href="/vs-reverso">Compared with Reverso Context</a>
         <a href="/blog/">Writing</a>

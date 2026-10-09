@@ -198,6 +198,10 @@
         }
         .key-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-md) var(--space-lg); margin-top: var(--space-lg); }
         .key-link { font-size: 13.5px; font-weight: 600; color: var(--amber-deep); text-underline-offset: 3px; }
+        /* The film lives on the site, not here: an extension page's CSP forbids a YouTube
+           embed, and the site hosts the MP4 itself. Added 10 Oct 2026. */
+        .key-see { font-size: 13.5px; color: var(--ink-mute); text-underline-offset: 3px; }
+        .key-see:hover { color: var(--ink-soft); }
         .key-btn {
             padding: var(--space-md) var(--space-lg);
             background: var(--glass-soft);
@@ -330,11 +334,12 @@
             <div class="step-content">
                 <h3>Add your free Gemini key</h3>
                 <p>Context Reader has no server. Your browser asks Google&rsquo;s Gemini directly, using a
-                   key that belongs to you &mdash; which is why it can be free permanently and has nothing
-                   to track you with. Getting a key takes about a minute and needs no card.</p>
+                   key that belongs to you. That is why it can be free permanently and has nothing to
+                   track you with. Getting a key takes about a minute and needs no card.</p>
                 <div class="key-row">
                     <a class="key-link" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Get a key at Google AI Studio &#x2197;</a>
                     <button class="key-btn" id="welcome-open-settings" type="button">Paste it in Settings</button>
+                    <a class="key-see" href="https://contextreader.github.io/setup" target="_blank" rel="noopener">Watch it, 28 seconds &#x2197;</a>
                 </div>
                 <p class="key-status" id="welcome-key-status"></p>
             </div>
@@ -354,7 +359,7 @@
             <div class="step-num">4</div>
             <div class="step-content">
                 <h3>Highlight a word you&rsquo;re stuck on</h3>
-                <p>Select it on any page. A small button appears next to your selection &mdash; click it.</p>
+                <p>Select it on any page. A small button appears next to your selection. Click it.</p>
             </div>
         </div>
 
@@ -364,7 +369,7 @@
             <div class="step-content">
                 <h3>Get the meaning <em>this sentence</em> needs</h3>
                 <p>A dictionary gives every meaning of a word. Context Reader reads the sentence around it
-                   and gives you the one that fits &mdash; in the language you chose.</p>
+                   and gives you the one that fits, in the language you chose.</p>
                 <div class="demo">
                     <div class="demo-row">
                         <p class="demo-src">The blood <mark>culture</mark> came back negative.</p>
@@ -414,7 +419,7 @@
         <!-- Commitments -->
         <div class="privacy-note">
             <h3>Free permanently. No tracking.</h3>
-            <p>No account, no plan, no daily limit &mdash; there is no server of ours to pay for.
+            <p>No account, no plan, no daily limit. There is no server of ours to pay for.
                The word you look up and the sentence around it go from your browser to Google&rsquo;s
                Gemini with your key, and nowhere else. No analytics of any kind. The code is open
                source, so you can check.</p>

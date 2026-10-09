@@ -7,6 +7,7 @@
 
 Install (Chrome, Brave, Edge and other Chromium browsers): https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck
 Install (Firefox 140+): https://addons.mozilla.org/firefox/addon/contextreader/
+Setting up the key (a 28-second screen recording and the written steps): https://contextreader.github.io/setup
 
 ## What it does
 
@@ -97,4 +98,6 @@ pdfium) retains its own licences; see NOTICE in the repository.
 - Privacy policy: https://github.com/contextreader/contextreader.github.io/blob/main/PRIVACY_POLICY.md
 - Contributing (adding a language): https://github.com/contextreader/contextreader.github.io/blob/main/CONTRIBUTING.md
 - Get a free Gemini key: https://aistudio.google.com/apikey
+- Setup page, with the film and the steps written out: https://contextreader.github.io/setup
+- The same film on YouTube: https://youtu.be/62NEXB5b7zc
 - Compared with Reverso Context (where each is better): https://contextreader.github.io/vs-reverso

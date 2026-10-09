@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Setting up Context Reader: your free Gemini API key</title>
+<meta name="description" content="A 28-second video and the written steps: create a free Google Gemini API key, paste it into Context Reader, and start reading. No card, no account with us.">
+<link rel="canonical" href="https://contextreader.github.io/setup">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="icon" href="icon128.png" sizes="128x128" type="image/png">
+<link rel="apple-touch-icon" href="icon128.png">
+<meta name="theme-color" content="#eef0f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#101317" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Context Reader">
+<meta property="og:title" content="Setting up Context Reader: your free Gemini API key">
+<meta property="og:description" content="The whole setup, in under a minute: create a free key, paste it, done.">
+<meta property="og:url" content="https://contextreader.github.io/setup">
+<meta property="og:image" content="https://contextreader.github.io/share.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="Context Reader: the word you're stuck on, in your language.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://contextreader.github.io/share.png">
+<!-- The video is served from this site, not embedded from YouTube: an embed would make the
+     page call a third party and set cookies, which the privacy page says it never does, and
+     test/copy.test.js enforces. The YouTube copy exists for the Chrome Web Store listing,
+     which accepts only a link, and is linked below as a plain link. Recorded by Ian on
+     9 Oct 2026 in a clean profile; the key shown was a throwaway, deleted after filming. -->
+<link rel="preload" href="../fonts/inter-latin-800.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/inter-latin-400.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 600; font-display: swap; src: url("../fonts/inter-latin-600.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 800; font-display: swap; src: url("../fonts/inter-latin-800.woff2") format("woff2"); }
+
+:root {
+  --ground: #eef0f3; --ground-a: rgba(238,240,243,.86); --paper: #fbfbfc; --rule: #d9dde3;
+  --ink: #111827; --ink-soft: #374151; --mute: #5b6472; --accent: #a84e08; --glow: #fbbf24;
+  --lit-ink: #111827; --green-tag: #166534;
+  --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --serif: "Iowan Old Style", "Charter", "Georgia", "Cambria", serif;
+  --mono: ui-monospace, "SF Mono", "Menlo", "Consolas", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #101317; --ground-a: rgba(16,19,23,.86); --paper: #1a1f26; --rule: #2a3039;
+    --ink: #eef0f3; --ink-soft: #c9ced6; --mute: #9aa3af; --accent: #fbbf24; --green-tag: #4ade80;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #101317; --ground-a: rgba(16,19,23,.86); --paper: #1a1f26; --rule: #2a3039;
+  --ink: #eef0f3; --ink-soft: #c9ced6; --mute: #9aa3af; --accent: #fbbf24; --green-tag: #4ade80;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--ground); color: var(--ink); font: 400 17px/1.7 var(--sans); -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 800px; margin: 0 auto; padding-inline: 21px; }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+
+.mast { position: sticky; top: 0; z-index: 20; background: var(--ground-a); -webkit-backdrop-filter: blur(13px) saturate(120%); backdrop-filter: blur(13px) saturate(120%); }
+.mast .wrap { max-width: 1180px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 13px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: -.01em; color: var(--ink); text-decoration: none; font-size: 16px; }
+.brand img { width: 28px; height: 28px; display: block; }
+.mast nav { display: flex; align-items: center; gap: 21px; font-size: 15px; }
+.mast nav a:not(.btn) { color: var(--ink-soft); text-decoration: none; }
+.mast nav a:not(.btn):hover { color: var(--ink); }
+.btn { display: inline-flex; align-items: center; min-height: 38px; padding: 0 16px; border-radius: 999px; font: 600 14px/1 var(--sans); text-decoration: none; background: var(--ink); color: var(--ground); border: 1px solid var(--ink); }
+
+header.page { padding-block: 55px 0; }
+.kicker { font: 600 12px/1 var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--mute); margin: 0 0 13px; }
+h1 { margin: 0; font: 800 clamp(2.1rem, 5vw, 3.1rem)/1.05 var(--sans); letter-spacing: -.035em; color: var(--ink); text-wrap: balance; }
+.lede { margin-top: 21px; font-size: 1.14rem; line-height: 1.6; color: var(--ink-soft); max-width: 40em; }
+.checked { margin-top: 13px; font-size: 14px; color: var(--mute); }
+
+main { padding-block: 21px 89px; }
+h2 { margin: 55px 0 16px; font: 800 clamp(1.4rem, 2.6vw, 1.85rem)/1.2 var(--sans); letter-spacing: -.025em; color: var(--ink); text-wrap: balance; }
+h3 { margin: 0 0 6px; font: 700 1.05rem/1.3 var(--sans); color: var(--ink); }
+p { margin: 0 0 16px; color: var(--ink-soft); }
+p strong, li strong, td strong { color: var(--ink); font-weight: 700; }
+
+/* The one bold element: the lit word, as the logo draws it. */
+.lit { background: var(--glow); color: var(--lit-ink); border-radius: .26em; padding: 0 .14em; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+
+.specimen { margin: 21px 0; background: var(--paper); border: 1px solid var(--rule); border-radius: 17px; padding: 21px 24px; }
+.specimen q { display: block; font: 400 1.2rem/1.55 var(--serif); color: var(--ink); quotes: none; }
+.specimen .two { display: grid; grid-template-columns: 1fr 1fr; gap: 21px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--rule); }
+.specimen .two p { margin: 0; font-size: 15.5px; }
+.specimen .who { display: block; font: 600 12px/1 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--mute); margin-bottom: 8px; }
+
+.cards { display: grid; gap: 13px; margin-top: 21px; }
+.card { background: var(--paper); border: 1px solid var(--rule); border-radius: 17px; padding: 18px 21px; }
+.card p { margin: 0; font-size: 15.5px; }
+.card p + p { margin-top: 10px; }
+
+table.cmp { width: 100%; border-collapse: collapse; margin-top: 21px; font-size: 15px; line-height: 1.5; }
+.cmp th, .cmp td { text-align: start; vertical-align: top; padding: 12px 13px; border-bottom: 1px solid var(--rule); }
+.cmp thead th { font: 700 13px/1.3 var(--sans); letter-spacing: .04em; color: var(--mute); border-bottom-color: var(--ink-soft); }
+.cmp tbody th { font-weight: 700; color: var(--ink); width: 22%; }
+.cmp td { color: var(--ink-soft); width: 39%; }
+.cmp tbody th, .cmp td:first-of-type { padding-inline-start: 0; }
+.cmp tbody th + td { padding-inline-start: 13px; }
+
+.pick { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; margin-top: 21px; }
+.pick .card h3 { margin-bottom: 8px; }
+.pick ul { margin: 0; padding-inline-start: 1.1em; color: var(--ink-soft); font-size: 15.5px; }
+.pick li + li { margin-top: 6px; }
+
+.faq { border-top: 1px solid var(--rule); margin-top: 21px; }
+.faq div { padding-block: 16px; border-bottom: 1px solid var(--rule); }
+.faq p { margin: 0; font-size: 15.5px; }
+.cta { margin-top: 21px; display: flex; flex-wrap: wrap; gap: 13px; }
+.cta a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; text-decoration: none; font: 600 15px/1 var(--sans); border: 1px solid var(--rule); color: var(--ink); background: var(--paper); }
+.cta a.primary { background: var(--ink); color: var(--ground); border-color: var(--ink); }
+.fine { font-size: 14px; color: var(--mute); margin-top: 13px; }
+
+footer { border-top: 1px solid var(--rule); padding-block: 34px 55px; font-size: 14.5px; color: var(--mute); }
+footer .wrap { max-width: 1180px; display: flex; flex-wrap: wrap; gap: 13px 26px; align-items: center; }
+footer a { color: var(--ink-soft); text-decoration: none; border-bottom: 1px solid transparent; }
+footer a:hover { color: var(--ink); border-bottom-color: var(--rule); }
+footer .spacer { margin-inline-start: auto; }
+footer .tm { flex-basis: 100%; margin: 0; font-size: 13.5px; color: var(--mute); }
+@media (max-width: 620px) {
+  .mast nav a.hide-sm { display: none; }
+  footer .spacer { margin-inline-start: 0; }
+  .specimen .two, .pick { grid-template-columns: 1fr; }
+  /* The table becomes one block per row, each cell labelled by its column. */
+  .cmp thead { display: none; }
+  .cmp tr { display: block; padding-block: 13px; border-bottom: 1px solid var(--rule); }
+  .cmp th, .cmp td { display: block; width: auto; border: 0; padding: 0; }
+  .cmp tbody th { margin-bottom: 6px; width: auto; }
+  .cmp tbody th + td { padding-inline-start: 0; }
+  .cmp td + td { margin-top: 6px; }
+  .cmp td::before { content: attr(data-col); display: block; font: 700 12px/1.4 var(--sans); letter-spacing: .04em; color: var(--mute); }
+}
+</style>
+<style>
+figure { margin: 21px 0; }
+figure img { display: block; margin-inline: auto; max-width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 17px; background: var(--paper); }
+figcaption { margin-top: 10px; font-size: 14px; line-height: 1.55; color: var(--mute); }
+</style>
+<style>
+.chart { display: block; width: 100%; height: auto; max-width: 640px; margin-inline: auto; }
+.c-head { font: 700 13px/1 var(--sans); letter-spacing: .04em; text-transform: uppercase; fill: var(--mute); }
+.c-lab { font: 600 14.5px/1 var(--sans); fill: var(--ink); }
+.c-val { font: 600 13.5px/1 var(--sans); fill: var(--mute); }
+.c-track { fill: var(--rule); opacity: .5; }
+.c-bar { fill: var(--accent); }
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 13px; margin: 21px 0; }
+.step { background: var(--paper); border: 1px solid var(--rule); border-radius: 17px; padding: 16px 18px; }
+.step b { display: block; font: 700 12px/1 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--mute); margin-bottom: 8px; }
+.step p { margin: 0; font-size: 15px; }
+.step .word { font: 600 1.05rem/1.4 var(--serif); color: var(--ink); }
+@media (max-width: 620px) { .steps { grid-template-columns: 1fr; } }
+</style>
+<style>
+.film { margin: 21px 0 8px; }
+.film video { display: block; width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 17px; background: var(--paper); }
+.cap { font-size: 14px; color: var(--mute); margin: 10px 0 0; }
+ol.steps-list { counter-reset: s; list-style: none; padding: 0; margin: 21px 0; }
+ol.steps-list li { position: relative; padding-inline-start: 44px; margin-bottom: 18px; }
+ol.steps-list li::before { counter-increment: s; content: counter(s); position: absolute; inset-inline-start: 0; top: -1px;
+  width: 30px; height: 30px; border-radius: 50%; background: var(--ink); color: var(--ground);
+  font: 700 14px/30px var(--sans); text-align: center; }
+ol.steps-list b { color: var(--ink); }
+kbd { font: 13px var(--mono); background: var(--paper); border: 1px solid var(--rule); border-radius: 6px; padding: 1px 6px; }
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <div class="wrap">
+    <a class="brand" href="/"><img src="icon.svg" alt="" width="28" height="28">Context Reader</a>
+    <nav aria-label="Site">
+      <a href="/blog/" class="hide-sm">Writing</a>
+      <a href="/support" class="hide-sm">Support</a>
+      <a class="btn js-install" data-umami-event="install-click" data-umami-event-place="setup-masthead" href="https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck">Add to Chrome</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <header class="page">
+    <p class="kicker">Setup</p>
+    <h1>Your free Gemini API key, in about a minute</h1>
+    <p class="lede">Context Reader has no server. Your browser asks Google's Gemini directly, with a key that belongs to you. That is why it is free with no account and nothing that can collect your reading, and it is the only setup step there is. Here it is, start to finish.</p>
+  </header>
+
+  <main>
+    <div class="film">
+      <video controls preload="metadata" playsinline poster="media/setup-gemini-key.jpg" width="1920" height="1080"
+             aria-label="Screen recording: creating a Gemini API key and pasting it into Context Reader's settings">
+        <source src="media/setup-gemini-key.mp4" type="video/mp4">
+        Your browser cannot play this video. The written steps are below.
+      </video>
+      <p class="cap">28 seconds, no sound. Recorded on a clean profile; the key in the film was a throwaway and has been deleted. Same video <a href="https://youtu.be/62NEXB5b7zc">on YouTube</a> if you prefer.</p>
+    </div>
+
+    <h2>The same thing, written down</h2>
+    <ol class="steps-list">
+      <li><b>Open <a href="https://aistudio.google.com/apikey">aistudio.google.com/apikey</a></b> and sign in with any Google account. Press <b>Create API key</b>, give it a name if you like, and press <b>Create key</b>. It is free and asks for no card.</li>
+      <li><b>Press Copy.</b> It is a long string of letters and numbers. Older keys start with <code>AIza</code>, newer ones with <code>AQ.</code>, and both work. Treat it like a password.</li>
+      <li><b>Open Context Reader's Settings.</b> Right-click the extension icon and choose <b>Options</b>, or open the welcome page's <b>Paste it in Settings</b> button.</li>
+      <li><b>Paste the key</b> into the <b>Gemini API Key</b> field (<kbd>⌘V</kbd> or <kbd>Ctrl+V</kbd>) and press <b>Save</b>. It is checked once against Google, then kept on this device. You should see <b>Saved and verified</b>.</li>
+      <li><b>Select a word</b> on any page. A small amber mark appears beside it. Click the mark, and the meaning for that sentence arrives in the language you chose.</li>
+    </ol>
+
+    <h2>What the key does, and does not, allow</h2>
+    <div class="cards">
+      <div class="card">
+        <h3>It stays on your device</h3>
+        <p>The key is kept in your browser's local storage, never in Chrome's sync storage, and is read only by the extension's background worker. It is sent to exactly one place: Google's Gemini API, on each lookup. Nothing reaches us, because there is no us to reach.</p>
+      </div>
+      <div class="card">
+        <h3>You can encrypt it</h3>
+        <p>In Settings, under <b>At rest</b>, you can set a passphrase. The key is then encrypted with AES-GCM and unlocked for the browser session. The passphrase is never stored, so there is no recovery: forget it and you paste the key again.</p>
+      </div>
+      <div class="card">
+        <h3>It is yours to revoke</h3>
+        <p>Press <b>Revoke</b> in Settings to delete it from the device, and delete the key itself in Google AI Studio to stop it working anywhere. Removing the extension removes the stored key too.</p>
+      </div>
+      <div class="card">
+        <h3>Google's terms apply to the lookups</h3>
+        <p>Because the key is yours, your lookups are covered by <a href="https://ai.google.dev/gemini-api/terms">Google's Gemini API terms</a>, not by anything of ours. On the free tier Google says it may use submitted content to improve its products.</p>
+      </div>
+    </div>
+
+    <h2>If something goes wrong</h2>
+    <div class="cards">
+      <div class="card">
+        <h3>"API key not valid"</h3>
+        <p>That sentence comes from Google. The key was mistyped, or it has been deleted in AI Studio. Create a new one and paste it again.</p>
+      </div>
+      <div class="card">
+        <h3>"Could not reach Gemini"</h3>
+        <p>The check could not run: a blocked network, or Google having a bad minute. Press <b>Save without checking</b> and the key is stored anyway; the next lookup will tell you if it is wrong.</p>
+      </div>
+      <div class="card">
+        <h3>"That model isn't available"</h3>
+        <p>Google renames and retires models. The extension tries another one by itself and says which answered. Settings shows what it is using and offers <b>Check now</b> to go back to your choice.</p>
+      </div>
+      <div class="card">
+        <h3>Nothing happens when I select a word</h3>
+        <p>Some pages block extensions outright: the Chrome Web Store, <code>chrome://</code> pages and PDF viewers other than the browser's own. Try a normal article first. If it still does nothing, <a href="/support">tell us</a>.</p>
+      </div>
+    </div>
+
+    <h2>Questions</h2>
+    <div class="faq">
+      <div><h3>Why does Context Reader need an API key at all?</h3><p>Because there is no server. The extension calls Google's Gemini API straight from your browser with your own key, so there is nothing to pay for monthly, nothing to keep running, and nowhere your reading can pile up. The cost is this one minute of setup.</p></div>
+      <div><h3>Is the Gemini API key free?</h3><p>Yes, on Google's free tier, and it needs no card. You create it at aistudio.google.com/apikey with a Google account. Heavy use can hit Google's rate limits, at which point the extension falls back to another free model and says so.</p></div>
+      <div><h3>Where is my key stored?</h3><p>In your browser's local storage on that device only, never in Chrome's sync storage, and never sent anywhere except Google. You can also encrypt it with a passphrase in Settings, in which case it is unlocked for the browser session and the passphrase is never stored.</p></div>
+      <div><h3>It says “API key not valid”. What now?</h3><p>That message comes from Google, not from the extension, and it means the key was mistyped or has been deleted. Create a new one and paste it again. If instead it says it could not reach Gemini, your network is blocking the check: press Save without checking, and the key is stored anyway.</p></div>
+      <div><h3>How do I remove the key?</h3><p>Settings, then Revoke. It is deleted from the device immediately. Removing the extension removes it too.</p></div>
+    </div>
+
+    <div class="cta">
+      <a class="primary js-install" data-umami-event="install-click" data-umami-event-place="setup-end" href="https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck">Add to Chrome</a>
+      <a href="https://addons.mozilla.org/firefox/addon/contextreader/">Add to Firefox</a>
+    </div>
+    <p class="fine" id="install-fine">Free. Chrome, Brave and Edge install from the Chrome Web Store; Firefox from addons.mozilla.org.</p>
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">
+    <a href="/">Home</a>
+    <a href="/blog/">Writing</a>
+    <a href="/support">Support</a>
+    <a href="/privacy">Privacy</a>
+    <a href="https://github.com/contextreader/contextreader.github.io">Source</a>
+    <span class="spacer">The extension collects nothing; this site counts visits with Cloudflare Web Analytics, and visits and clicks with Umami, both cookieless.</span>
+  </div>
+</footer>
+
+<script defer src="https://cloud.umami.is/script.js" data-website-id="583c9618-5c32-40a5-b0dd-33b2d8f7048d"></script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "ceec88afaf1f47a289d50d0a20bff3bb"}'></script>
+<script>
+/* Install button, per browser.
+ *
+ * The markup ships "Add to Chrome" pointing at the Chrome Web Store (live 22
+ * Sep), so with no JavaScript the button is still true. This only renames it
+ * for a browser whose store is filled in below: "Add to Brave" is the same
+ * listing with a different word. A browser with no listing of its own
+ * (Safari, Opera) keeps "Add to Chrome", which stays honest.
+ * test/copy.test.js checks that each URL points at that browser's own store.
+ */
+(function () {
+  var STORES = {
+    chrome:  'https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck',
+    brave:   'https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck',
+    edge:    'https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck',   /* Edge installs from the Chrome Web Store too */
+    opera:   '',   /* Opera needs a helper add-on for the Chrome Web Store: the button stays "Add to Chrome" */
+    vivaldi: 'https://chromewebstore.google.com/detail/context-reader/bfhgggeccjejoklejaiffefnlemdalck',
+    firefox: 'https://addons.mozilla.org/firefox/addon/contextreader/'   /* listed 25 Sep */
+  };
+  var NAMES = { chrome: 'Chrome', brave: 'Brave', edge: 'Edge', opera: 'Opera',
+                vivaldi: 'Vivaldi', firefox: 'Firefox', safari: 'Safari' };
+
+  function detect() {
+    var ua = navigator.userAgent;
+    /* Brave hides in the UA string and says so only through this API. */
+    if (navigator.brave && navigator.brave.isBrave) return 'brave';
+    if (/Edg\//.test(ua)) return 'edge';
+    if (/OPR\//.test(ua)) return 'opera';
+    if (/Vivaldi/.test(ua)) return 'vivaldi';
+    if (/Firefox\//.test(ua)) return 'firefox';
+    if (/Chrome\//.test(ua)) return 'chrome';
+    if (/Safari\//.test(ua)) return 'safari';
+    return '';
+  }
+
+  function apply(which) {
+    var url = STORES[which];
+    /* Umami reads these on click: which browser was detected, and where the button went. */
+    var tagged = document.querySelectorAll('a.js-install');
+    for (var j = 0; j < tagged.length; j++) {
+      tagged[j].setAttribute('data-umami-event-browser', which || 'other');
+      tagged[j].setAttribute('data-umami-event-to', url ? 'store' : 'chrome-store');
+    }
+    if (!url) return;                       /* no listing: leave "Add to Chrome" alone */
+    var name = NAMES[which] || 'your browser';
+    var links = document.querySelectorAll('a.js-install');
+    for (var i = 0; i < links.length; i++) {
+      var a = links[i];
+      a.href = url;
+      a.textContent = a.getAttribute('data-long') ? 'Add to ' + name + ', free' : 'Add to ' + name;
+    }
+  }
+
+  var which = detect();
+  /* isBrave() is async; everything else is settled already. */
+  if (which === 'brave' && navigator.brave.isBrave.call) {
+    navigator.brave.isBrave().then(function (yes) { apply(yes ? 'brave' : 'chrome'); })
+      .catch(function () { apply('chrome'); });
+  } else {
+    apply(which);
+  }
+})();
+</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[
+{"@type":"VideoObject","name":"Context Reader: add your free Gemini API key","description":"Creating a free Google Gemini API key in AI Studio and pasting it into Context Reader's settings.","thumbnailUrl":"https://contextreader.github.io/media/setup-gemini-key.jpg","contentUrl":"https://contextreader.github.io/media/setup-gemini-key.mp4","uploadDate":"2026-10-09","duration":"PT28S","isFamilyFriendly":true,"publisher":{"@type":"Organization","name":"Context Reader","url":"https://contextreader.github.io"}},
+{"@type":"FAQPage","mainEntity":[
+{"@type": "Question", "name": "Why does Context Reader need an API key at all?", "acceptedAnswer": {"@type": "Answer", "text": "Because there is no server. The extension calls Google's Gemini API straight from your browser with your own key, so there is nothing to pay for monthly, nothing to keep running, and nowhere your reading can pile up. The cost is this one minute of setup."}},
+{"@type": "Question", "name": "Is the Gemini API key free?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, on Google's free tier, and it needs no card. You create it at aistudio.google.com/apikey with a Google account. Heavy use can hit Google's rate limits, at which point the extension falls back to another free model and says so."}},
+{"@type": "Question", "name": "Where is my key stored?", "acceptedAnswer": {"@type": "Answer", "text": "In your browser's local storage on that device only, never in Chrome's sync storage, and never sent anywhere except Google. You can also encrypt it with a passphrase in Settings, in which case it is unlocked for the browser session and the passphrase is never stored."}},
+{"@type": "Question", "name": "It says “API key not valid”. What now?", "acceptedAnswer": {"@type": "Answer", "text": "That message comes from Google, not from the extension, and it means the key was mistyped or has been deleted. Create a new one and paste it again. If instead it says it could not reach Gemini, your network is blocking the check: press Save without checking, and the key is stored anyway."}},
+{"@type": "Question", "name": "How do I remove the key?", "acceptedAnswer": {"@type": "Answer", "text": "Settings, then Revoke. It is deleted from the device immediately. Removing the extension removes it too."}}
+]}]}</script>
+</body>
+</html>
